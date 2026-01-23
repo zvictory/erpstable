@@ -1,7 +1,7 @@
 'use server';
 
-import { db } from '../../db';
-import { vendorBills, journalEntries, journalEntryLines } from '../../db/schema';
+import { db } from '../../../db';
+import { vendorBills, journalEntries, journalEntryLines } from '../../../db/schema';
 import { eq, notInArray } from 'drizzle-orm';
 import { ACCOUNTS } from '../../lib/accounting-config';
 import { revalidatePath } from 'next/cache';

@@ -1,7 +1,7 @@
 'use server';
 
-import { db } from '../../db';
-import { journalEntries, journalEntryLines, glAccounts } from '../../db/schema';
+import { db } from '../../../db';
+import { journalEntries, journalEntryLines, glAccounts } from '../../../db/schema';
 import { eq, desc, sql } from 'drizzle-orm';
 
 /**

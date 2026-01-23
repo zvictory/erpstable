@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -49,6 +49,9 @@ interface Item {
     price?: number;
     salesPrice?: number;
     status?: string;
+    quantityOnHand?: number;
+    qtyOnHand?: number;
+    itemClass?: string;
 }
 
 interface InvoiceFormProps {
@@ -100,6 +103,24 @@ export default function InvoiceForm({
     // Auto-calculate due date based on terms
     const invoiceDate = watch('invoiceDate');
     const terms = watch('terms');
+    const watchedItems = watch('items');
+
+    // Calculate if all lines have valid stock
+    const hasStockIssues = useMemo(() => {
+        const itemsToCheck = watchedItems.filter(item => item.itemId > 0 && item.quantity > 0);
+
+        return itemsToCheck.some(item => {
+            const product = availableItems.find(i => i.id === Number(item.itemId));
+            if (!product) return false;
+
+            // Skip service items
+            if (product.itemClass === 'SERVICE') return false;
+
+            // Check stock for inventory items
+            const availableQty = product.quantityOnHand || product.qtyOnHand || 0;
+            return item.quantity > availableQty;
+        });
+    }, [watchedItems, availableItems]);
 
     useEffect(() => {
         if (invoiceDate) {
@@ -157,6 +178,8 @@ export default function InvoiceForm({
                 onClose={onCancel}
                 onSave={handleSubmit(onSubmit)}
                 isSubmitting={isSubmitting}
+                saveDisabled={hasStockIssues}
+                saveButtonText={hasStockIssues ? 'Insufficient Stock' : undefined}
                 header={
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                         {/* Invoice Information Card */}
@@ -238,7 +261,7 @@ export default function InvoiceForm({
                 }
             >
                 <div className="space-y-4">
-                    <SalesGrid items={availableItems} />
+                    <SalesGrid items={availableItems} enableStockValidation={true} />
                     <PickingLocationDisplay
                         items={methods.watch('items')
                             .filter(item => item.itemId && item.quantity > 0)

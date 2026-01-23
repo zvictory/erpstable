@@ -104,7 +104,7 @@ export async function getCustomerCenterData(selectedId?: number) {
 
                 const transactions = [
                     ...selectedCustomer.invoices.map(inv => ({
-                        id: `inv-${inv.id}`,
+                        id: `invoice-${inv.id}`,
                         date: inv.date,
                         type: 'Invoice',
                         ref: inv.invoiceNumber,
@@ -112,7 +112,7 @@ export async function getCustomerCenterData(selectedId?: number) {
                         status: inv.status
                     })),
                     ...selectedCustomer.payments.map(pmt => ({
-                        id: `pmt-${pmt.id}`,
+                        id: `payment-${pmt.id}`,
                         date: pmt.date,
                         type: 'Payment',
                         ref: pmt.reference || `Pmt #${pmt.id}`,
@@ -717,5 +717,70 @@ export async function updateCustomer(id: number, data: z.infer<typeof updateCust
     } catch (error: any) {
         console.error('Update Customer Error:', error);
         return { success: false, error: error.message || 'Failed to update customer' };
+    }
+}
+
+export async function getCustomerKPIs() {
+    'use server';
+
+    try {
+        const now = new Date();
+        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        // Open Quotes: status = 'QUOTE'
+        const openQuotesResults = await db.select({
+            count: sql<number>`cast(count(*) as int)`,
+            total: sql<number>`coalesce(sum(${invoices.totalAmount}), 0)`
+        }).from(invoices).where(eq(invoices.status, 'QUOTE'));
+
+        // Unbilled Orders: status = 'OPEN'
+        const unbilledOrdersResults = await db.select({
+            count: sql<number>`cast(count(*) as int)`,
+            total: sql<number>`coalesce(sum(${invoices.totalAmount}), 0)`
+        }).from(invoices).where(eq(invoices.status, 'OPEN'));
+
+        // Overdue AR: status IN ('OPEN', 'PARTIAL') AND dueDate < today
+        const overdueARResults = await db.select({
+            count: sql<number>`cast(count(*) as int)`,
+            total: sql<number>`coalesce(sum(${invoices.balanceRemaining}), 0)`
+        }).from(invoices).where(and(
+            inArray(invoices.status, ['OPEN', 'PARTIAL']),
+            sql`${invoices.dueDate} < ${now.toISOString().split('T')[0]}`
+        ));
+
+        // Paid Last 30 Days: sum of payments.amount where date >= thirtyDaysAgo
+        const paidLast30Results = await db.select({
+            count: sql<number>`cast(count(*) as int)`,
+            total: sql<number>`coalesce(sum(${customerPayments.amount}), 0)`
+        }).from(customerPayments).where(
+            sql`${customerPayments.date} >= ${thirtyDaysAgo.toISOString().split('T')[0]}`
+        );
+
+        return {
+            openQuotes: {
+                count: openQuotesResults[0]?.count || 0,
+                total: openQuotesResults[0]?.total || 0
+            },
+            unbilledOrders: {
+                count: unbilledOrdersResults[0]?.count || 0,
+                total: unbilledOrdersResults[0]?.total || 0
+            },
+            overdueAR: {
+                count: overdueARResults[0]?.count || 0,
+                total: overdueARResults[0]?.total || 0
+            },
+            paidLast30: {
+                count: paidLast30Results[0]?.count || 0,
+                total: paidLast30Results[0]?.total || 0
+            }
+        };
+    } catch (error: any) {
+        console.error('Get Customer KPIs Error:', error);
+        return {
+            openQuotes: { count: 0, total: 0 },
+            unbilledOrders: { count: 0, total: 0 },
+            overdueAR: { count: 0, total: 0 },
+            paidLast30: { count: 0, total: 0 }
+        };
     }
 }

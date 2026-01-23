@@ -11,6 +11,8 @@ interface SalesDocumentLayoutProps {
     onClose: () => void;
     onSave: () => void;
     isSubmitting?: boolean;
+    saveDisabled?: boolean;
+    saveButtonText?: string;
     header: React.ReactNode;
     children: React.ReactNode;
     footer: React.ReactNode;
@@ -22,6 +24,8 @@ export default function SalesDocumentLayout({
     onClose,
     onSave,
     isSubmitting,
+    saveDisabled = false,
+    saveButtonText,
     header,
     children,
     footer
@@ -78,13 +82,13 @@ export default function SalesDocumentLayout({
                     </button>
                     <button
                         onClick={onSave}
-                        disabled={isSubmitting}
-                        className={`flex items-center gap-2 px-6 py-1.5 rounded-lg text-xs font-bold transition shadow-lg ${typeColors[type]} hover:opacity-90 disabled:opacity-50`}
+                        disabled={isSubmitting || saveDisabled}
+                        className={`flex items-center gap-2 px-6 py-1.5 rounded-lg text-xs font-bold transition shadow-lg ${typeColors[type]} hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
                         {isSubmitting ? tc('saving') : (
                             <>
                                 <Save size={14} />
-                                {tc('save')}
+                                {saveButtonText || tc('save')}
                             </>
                         )}
                     </button>

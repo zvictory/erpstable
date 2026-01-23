@@ -4,6 +4,7 @@ import React, { useEffect, useCallback, useRef } from 'react';
 import { useFormContext, useFieldArray, useWatch, Control } from 'react-hook-form';
 import { Trash2, Plus } from 'lucide-react';
 import { formatNumber } from '@/lib/format';
+import { StockValidationBadge } from '@/components/sales/StockValidationBadge';
 
 /**
  * Type for form data with items
@@ -45,10 +46,20 @@ export function useSalesGridMath(control: Control<any>) {
 }
 
 interface SalesGridProps {
-    items: { id: number; name: string; sku?: string | null; price?: number; status?: string }[];
+    items: {
+        id: number;
+        name: string;
+        sku?: string | null;
+        price?: number;
+        status?: string;
+        quantityOnHand?: number;
+        qtyOnHand?: number;
+        itemClass?: string;
+    }[];
+    enableStockValidation?: boolean;
 }
 
-export default function SalesGrid({ items: availableItems }: SalesGridProps) {
+export default function SalesGrid({ items: availableItems, enableStockValidation = false }: SalesGridProps) {
     const { register, control, setValue, setFocus, getValues, formState: { errors } } = useFormContext<any>();
 
     const { fields, append, remove } = useFieldArray({
@@ -142,8 +153,13 @@ export default function SalesGrid({ items: availableItems }: SalesGridProps) {
                             const price = parseFloat(item?.unitPrice as any) || 0;
                             const amount = qty * price;
 
+                            // Find the selected item data for stock validation
+                            const selectedItem = availableItems.find(ai => String(ai.id) === String(item?.itemId));
+                            const shouldShowValidation = enableStockValidation && selectedItem && qty > 0;
+
                             return (
-                                <tr key={field.id} className="group hover:bg-slate-50/50 transition-colors">
+                                <React.Fragment key={field.id}>
+                                <tr className="group hover:bg-slate-50/50 transition-colors">
                                     <td className="px-4 py-3 text-center text-xs text-slate-300 font-bold font-mono">
                                         {index + 1}
                                     </td>
@@ -231,6 +247,22 @@ export default function SalesGrid({ items: availableItems }: SalesGridProps) {
                                         </button>
                                     </td>
                                 </tr>
+
+                                {/* Stock Validation Row */}
+                                {shouldShowValidation && (
+                                    <tr className="border-t-0">
+                                        <td colSpan={7} className="px-4 pb-3 pt-1 bg-slate-50/30">
+                                            <StockValidationBadge
+                                                itemId={selectedItem.id}
+                                                requestedQty={qty}
+                                                availableQty={selectedItem.quantityOnHand || selectedItem.qtyOnHand || 0}
+                                                itemClass={selectedItem.itemClass || 'RAW_MATERIAL'}
+                                                itemName={selectedItem.name}
+                                            />
+                                        </td>
+                                    </tr>
+                                )}
+                                </React.Fragment>
                             );
                         })}
                     </tbody>
