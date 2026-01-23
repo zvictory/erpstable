@@ -1,0 +1,810 @@
+{
+    "dashboard": {
+        "mainTitle": "Stable ERP",
+        "title": "Dashboard",
+        "purchasing": "Xaridlar va To'lovlar",
+        "vendors": "Yetkazib beruvchilar",
+        "purchase_orders": "Xarid Buyurtmalari",
+        "receive_items": "Tovarlarni Qabul Qilish",
+        "enter_bills": "Hisob-fakturalarni Kiritish",
+        "pay_bills": "Hisoblarni To'lash",
+        "manufacturing": "Ishlab Chiqarish va Ombor",
+        "items_services": "Tovarlar va Xizmatlar",
+        "mixing": "Aralashtirish",
+        "sublimation": "Sublimatsiya",
+        "packing": "Qadoqlash",
+        "yield_analysis": "Chiqish Tahlili",
+        "sales": "Sotuvlar va Debitorlik Qarzlari",
+        "customers": "Mijozlar",
+        "estimates": "Smeta",
+        "new_invoice": "Yangi Hisob-faktura",
+        "invoices": "Hisob-fakturalar",
+        "receive_pay": "To'lovni Qabul Qilish",
+        "deposits": "Depozitlar",
+        "company_financial": "Kompaniya va Moliya",
+        "chart_of_accounts": "Hisoblar Rejasi",
+        "make_journal_entries": "Jurnal O'tkazmalari",
+        "reports_center": "Hisobotlar Markazi",
+        "back_to_dashboard": "Boshqaruv Paneliga Qaytish"
+    },
+    "common": {
+        "save": "Saqlash",
+        "cancel": "Bekor qilish",
+        "delete": "O'chirish",
+        "edit": "Tahrirlash",
+        "create": "Yaratish",
+        "actions": "Harakatlar",
+        "none": "Yo'q",
+        "saving": "Saqlanmoqda...",
+        "loading": "Yuklanmoqda...",
+        "status": "Holati",
+        "archived": "Arxivda",
+        "active": "Faol",
+        "inactive": "Nofaol",
+        "confirm": "Tasdiqlash",
+        "back": "Orqaga",
+        "search": "Qidirish",
+        "optional": "Ixtiyoriy"
+    },
+    "purchasing": {
+        "modals": {
+            "delete_po": {
+                "title": "Xarid buyurtmasini o'chirish {orderNumber}",
+                "button_confirm": "Xarid buyurtmasini o'chirish",
+                "checkbox_label": "Men oqibalarini tushunaman",
+                "warnings": {
+                    "open": "Siz ochiq xarid buyurtmasini o'chirmoqchi. Bu harakatni bekor qilib bo'lmaydi.",
+                    "received": "⚠️ OGOHLANTIRISH: Bu xarid buyurtmasi qabul qilingan.",
+                    "received_unusual": "Qabul qilingan buyurtmani o'chirish nostandart va quyidagilarni ko'rsatishi mumkin:",
+                    "received_reasons": {
+                        "incorrect": "Tovarlarni qabul qilish noto'g'ri ro'yxatga olingan",
+                        "error": "Buyurtma xatosi bilan yaratilgan",
+                        "return": "Tovarlarni qaytarish kerak"
+                    },
+                    "received_advice": "Agar tovarlar qabul qilingan bo'lsa, qaytarish buyurtmasini yaratishni o'ylab ko'ring.",
+                    "partial": "⚠️ OGOHLANTIRISH: Bu xarid buyurtmasi qisman qabul qilingan.",
+                    "partial_info": "O'chirish buyurtmani bekor qiladi, lekin tovarlarni qabul qilishni bekor qilmaydi. Agar kerak bo'lsa, qabul qilishni bekor qilishni o'ylab ko'ring."
+                },
+                "details": {
+                    "order_number": "Buyurtma raqami",
+                    "amount": "Summa",
+                    "status": "Holati"
+                },
+                "consequences": {
+                    "title": "Bu quyidagilarni amalga oshiradi:",
+                    "delete_po": "Xarid buyurtmasini va barcha tovar pozitsiyalarini o'chirish",
+                    "reverse_gl": "Asosiy bukuniga yozuvlarni bekor qilish",
+                    "update_balance": "Yetkazib beruvchi balansini yangilash"
+                }
+            },
+            "delete_bill": {
+                "title": "Hisobni o'chirish {billNumber}",
+                "button_confirm": "Hisobni o'chirish",
+                "checkbox_label": "Men oqibalarini tushunaman",
+                "warnings": {
+                    "open": "Siz ochiq (to'lanmagan) hisobni o'chirmoqchi. Bu harakatni bekor qilib bo'lmaydi.",
+                    "paid": "⚠️ OGOHLANTIRISH: Bu hisob TO'LANDI deb belgilangan.",
+                    "paid_unusual": "To'langan hisobni o'chirish nostandart va quyidagilarni ko'rsatishi mumkin:",
+                    "paid_reasons": {
+                        "incorrect": "To'lov noto'g'ri ro'yxatga olingan",
+                        "error": "Hisob xatosi bilan yaratilgan",
+                        "credit": "Yetkazib beruvchi kredit berilgan"
+                    },
+                    "paid_advice": "Agar to'lov haqiqatan amalga oshirilgan bo'lsa, avval to'lovni bekor qilishingiz kerak.",
+                    "partial": "⚠️ OGOHLANTIRISH: Bu hisob qisman to'langan.",
+                    "partial_info": "O'chirish hisobni bekor qiladi, lekin to'lovlarni bekor qilmaydi. Agar kerak bo'lsa, qismiy to'lovlarni bekor qilishni o'ylab ko'ring."
+                },
+                "details": {
+                    "bill_number": "Hisob raqami",
+                    "amount": "Summa",
+                    "status": "Holati"
+                },
+                "consequences": {
+                    "title": "Bu quyidagilarni amalga oshiradi:",
+                    "delete_bill": "Hisobni va barcha tovar pozitsiyalarini o'chirish",
+                    "reverse_gl": "Asosiy bukuniga yozuvlarni bekor qilish",
+                    "update_balance": "Yetkazib beruvchi balansini yangilash"
+                }
+            }
+        },
+        "purchase_orders": {
+            "table": {
+                "header_po_number": "Buyurtma raqami",
+                "header_vendor": "Yetkazib beruvchi",
+                "header_date": "Sana",
+                "header_status": "Holati",
+                "header_total": "Jami",
+                "header_actions": "Harakatlar",
+                "empty_state": "Xarid buyurtmalari topilmadi."
+            },
+            "form": {
+                "title_new": "Yangi xarid buyurtmasi",
+                "description": "Yetkazib beruvchi uchun yangi buyurtma yarating.",
+                "button_cancel": "Bekor qilish",
+                "button_save": "Buyurtmani saqlash",
+                "label_vendor": "Yetkazib beruvchi",
+                "label_po_number": "PO raqami",
+                "label_date": "Sana",
+                "placeholder_vendor": "Yetkazib beruvchini tanlang",
+                "placeholder_po_number": "masalan PO-2024-001",
+                "placeholder_item": "Tovarni tanlang",
+                "section_items": "Tovarlar",
+                "column_item": "Tovar",
+                "column_qty": "Miqdor",
+                "column_unit_cost": "Birlik narxi (UZS)",
+                "column_total": "Jami",
+                "button_add_item": "Tovar qatorini qo'shing",
+                "label_total_amount": "Umumiy summa",
+                "currency": "UZS"
+            }
+        },
+        "bills": {
+            "form": {
+                "loading_items": "Tovarlar yuklanmoqda...",
+                "payment_terms": {
+                    "due_on_receipt": "Qabul qilishda to'lov"
+                },
+                "error_items_required": "Iltimos, miqdori 0 dan ko'p bo'lgan kamida bir tovarni qo'shing",
+                "error_failed": "Hisob saqlanmadi",
+                "error_unexpected": "Hisob saqlanayotganda xato yuz berdi"
+            }
+        },
+        "vendors": {
+            "title": "Yetkazib beruvchilar",
+            "center_title": "Yetkazib beruvchilar markazi",
+            "filter_placeholder": "Yetkazib beruvchilarni filtrlash...",
+            "new_vendor": "Yangi yetkazib beruvchi",
+            "no_vendors": "Yetkazib beruvchilar topilmadi",
+            "sidebar_confirm_delete": "Siz bu yetkazib beruvchini o'chirishni tasdiqlaysizmi? Agar yetkazib beruvchida hisob/PO bo'lsa, uni arxivlaydi yoki ishlatilmasa, butunlay o'chiradi.",
+            "sidebar_edit_title": "Yetkazib beruvchini tahrirlash",
+            "sidebar_delete_title": "Yetkazib beruvchini o'chirish",
+            "new_vendor_desc": "Ma'lumotnomangizga yangi yetkazib beruvchini qo'shing.",
+            "edit_vendor": "Yetkazib beruvchini tahrirlash",
+            "edit_vendor_desc": "Yetkazib beruvchi ma'lumotlarini yangilash",
+            "cancel": "Bekor qilish",
+            "select_detail": "Tafsilotlarni ko'rish uchun yetkazib beruvchini tanlang",
+            "create_new": "Yaratish...",
+            "new_bill": "Yangi hisob",
+            "new_po": "Yangi buyurtma",
+            "active_filter": "Faol filtr:",
+            "clear_filter": "Filtrni tozalash",
+            "no_transactions": "Tranzaksiyalar topilmadi",
+            "manage_contacts": "Kontaktlarni boshqarish",
+            "manage_contacts_desc": "Ushbu yetkazib beruvchi uchun kontakt ismlari, lavozimlari va elektron pochta manzillarini saqlang.",
+            "add_contact": "Kontakt qo'shish",
+            "notes_placeholder": "Yetkazib beruvchi haqida eslatmalarni shu yerga kiriting... (masalan, yetkazib berish ko'rsatmalari)",
+            "fields": {
+                "vendor_name": "Yetkazib beruvchi nomi",
+                "tax_id": "STIR (INN)",
+                "open_balance": "Joriy balans",
+                "ytd_volume": "Yil boshidan beri hajm",
+                "last_payment": "Oxirgi to'lov",
+                "reliability_score": "Ishonchlilik reytingi",
+                "top_tier": "Yuqori daraja",
+                "spending_trend": "Xarajatlar dinamikasi (oxirgi 6 oy)",
+                "company_name": "Kompaniya nomi",
+                "company_name_placeholder": "masalan, ООО «Yetkazib Beruvchi»",
+                "tax_id_placeholder": "123456789",
+                "currency": "Valyuta",
+                "email": "Email",
+                "email_placeholder": "contact@supplier.com",
+                "phone": "Telefon",
+                "phone_placeholder": "+998 90 123 45 67",
+                "address": "Manzil",
+                "address_placeholder": "To'liq manzil...",
+                "payment_terms": "To'lov shartlari",
+                "payment_terms_placeholder": "Net 30, Net 60 va h.k."
+            },
+            "currencies": {
+                "uzs": "UZS (Soʻm)",
+                "usd": "USD (AQSh dollari)"
+            },
+            "modal": {
+                "button_cancel": "Bekor qilish",
+                "button_save": "O'zgarishlarni saqlash",
+                "button_saving": "Saqlanmoqda..."
+            },
+            "tabs": {
+                "transactions": "Tranzaksiyalar ro'yxati",
+                "contacts": "Kontaktlar",
+                "notes": "Eslatmalar"
+            },
+            "table": {
+                "header_name": "Nomi",
+                "header_contact": "Kontakt",
+                "header_currency": "Valyuta",
+                "header_actions": "Harakatlar",
+                "empty_state": "Yetkazib beruvchilar topilmadi. Yaratish uchun 'Yangi yetkazib beruvchi' ni bosing.",
+                "confirm_delete": "Siz bu yetkazib beruvchini o'chirishni tasdiqlaysizmi?",
+                "toggle_hide_archived": "Arxivlanganni yashirish",
+                "toggle_show_archived": "Arxivlanganni ko'rsatish",
+                "button_edit": "Yetkazib beruvchini tahrirlash",
+                "date": "Sana",
+                "type": "Turi",
+                "ref": "Ref №",
+                "amount": "Summa",
+                "status": "Holati"
+            },
+            "status": {
+                "inactive": "Nofaol",
+                "archived": "Arxivda"
+            },
+            "save_vendor": "Yetkazib beruvchini saqlash",
+            "errors": {
+                "name_required": "Nom kiritish majburiy",
+                "invalid_email": "Noto'g'ri email",
+                "failed_to_create": "Yetkazib beruvchini yaratib bo'lmadi",
+                "unexpected": "Kutilmagan xato yuz berdi"
+            },
+            "transaction_types": {
+                "purchase_order": "Xarid buyurtmasi",
+                "bill": "Hisob"
+            },
+            "statuses": {
+                "paid": "To'langan",
+                "open": "Ochiq",
+                "partial": "Qisman",
+                "closed": "Yopilgan",
+                "cancelled": "Bekor qilingan"
+            },
+            "cards": {
+                "document_info": "Hujjat ma'lumoti",
+                "payment_terms": "To'lov shartlari"
+            }
+        },
+        "documents": {
+            "new_po": "Yangi xarid buyurtmasi",
+            "edit_po": "Xarid buyurtmasini tahrirlash",
+            "new_receipt": "Yangi tovar qabuli",
+            "edit_receipt": "Tovar qabulini tahrirlash",
+            "new_bill": "Yangi yetkazib beruvchi hisobi",
+            "edit_bill": "Yetkazib beruvchi hisobini tahrirlash",
+            "fields": {
+                "vendor": "Yetkazib beruvchi",
+                "date": "Sana",
+                "ref_number": "Ref № / Hisob-faktura №",
+                "payment_terms": "To'lov shartlari",
+                "memo": "Eslatma / Shaxsiy qaydlar",
+                "memo_placeholder": "Yozuvlaringiz uchun eslatma qo'shing...",
+                "subtotal": "Oraliq jami",
+                "total": "Jami",
+                "item": "Tovar",
+                "description": "Tavsifi",
+                "description_placeholder": "Tavsif qo'shing...",
+                "qty": "Miqdori",
+                "rate": "Narxi",
+                "amount": "Summa",
+                "add_line": "Qator qo'shish",
+                "select_vendor": "Yetkazib beruvchini tanlang...",
+                "select_item": "Tovarni tanlang..."
+            }
+        },
+        "receive_items": {
+            "title": "Tovarlarni qabul qilish",
+            "po_number": "Buyurtma №{number}",
+            "ordered": "Buyurtma berilgan",
+            "received": "Qabul qilingan",
+            "receive_now": "Hozir qabul qilish",
+            "confirm": "Qabulni tasdiqlash",
+            "error_qty": "Iltimos, kamida bitta tovar uchun qabul qilinadigan miqdorni kiriting.",
+            "item": "Tovar"
+        },
+        "new_bill_placeholder": {
+            "title": "Yangi hisob kiritish",
+            "desc": "Yetkazib beruvchi hisob-fakturasini qayd etish",
+            "note": "Eslatma: Hisob kiritish mantiqi hozirda yakunlanmoqda. Ushbu modal havola orqali ochildi!",
+            "vendor": "Yetkazib beruvchi",
+            "bill_date": "Hisob sanasi",
+            "save": "Hisobni saqlash"
+        },
+        "open_pos": {
+            "title": "Ochiq xarid buyurtmalari",
+            "desc": "Avtomatik to'ldirish uchun {vendor} buyurtmasini tanlang",
+            "no_pos": "Ushbu yetkazib beruvchi uchun ochiq xarid buyurtmalari topilmadi.",
+            "status_open": "Ochiq",
+            "select": "Tanlash",
+            "skip": "O'tkazib yuborish va qo'lda yaratish"
+        }
+    },
+    "sales": {
+        "customers": {
+            "title": "Mijozlar",
+            "loading": "Mijozlar yuklanmoqda...",
+            "back_to_dashboard": "Bosh panelga qaytish",
+            "center_title": "Mijoz markazi",
+            "command_center": "Sotuvlar buyurtmasi markazi",
+            "new_customer": "Yangi mijoz",
+            "search_placeholder": "Mijozlarni qidirish...",
+            "filters": {
+                "all": "Hammasini",
+                "open": "Ochiq",
+                "overdue": "Muddati o'tgan"
+            },
+            "empty_state": "Mijozlar topilmadi",
+            "total_count": "Jami soni",
+            "status_overdue": "Muddati o'tgan",
+            "edit": "Tahrirlash",
+            "delete": "O'chirish",
+            "fields": {
+                "credit_limit": "Kredit limiti"
+            },
+            "form": {
+                "title_create": "Yangi mijoz",
+                "title_edit": "Mijozni tahrirlash",
+                "company_name": "Kompaniya nomi",
+                "email": "Elektron pochta",
+                "phone": "Telefon",
+                "address": "Manzil",
+                "credit_limit": "Kredit limiti",
+                "payment_terms": "To'lov shartlari",
+                "tax_id": "Soliq ID",
+                "currency": "Valyuta",
+                "cancel": "Bekor qilish",
+                "save": "Mijozni saqlash",
+                "saving": "Saqlanmoqda..."
+            }
+        },
+        "invoice": {
+            "title": "Hisob-faktura",
+            "fields": {
+                "bill_to": "To'lovchi",
+                "ship_to": "Qabul qiluvchi",
+                "subtotal": "Oraliq jami"
+            }
+        },
+        "invoices": {
+            "new_invoice": "Yangi hisob-faktura",
+            "edit_invoice": "Hisob-fakturni tahrirlash",
+            "cards": {
+                "document_info": "Hisob ma'lumoti",
+                "payment_terms": "To'lov shartlari"
+            },
+            "fields": {
+                "customer": "Mijoz",
+                "select_customer": "Mijozni tanlang",
+                "invoice_date": "Hisob-faktura sanasi",
+                "invoice_number": "Hisob raqami",
+                "due_date": "To'lov muddati",
+                "payment_terms": "To'lov shartlari",
+                "memo": "Eslatma"
+            },
+            "payment_terms_options": {
+                "net_30": "Net 30",
+                "net_15": "Net 15",
+                "due_on_receipt": "Qabul qilishda"
+            }
+        },
+        "invoice_form": {
+            "title_new": "Yangi hisob-faktura",
+            "button_cancel": "Bekor qilish",
+            "button_save": "Hisob-fakturni saqlash",
+            "label_customer_id": "Mijoz ID",
+            "label_terms": "To'lov shartlari",
+            "label_invoice_date": "Hisob-faktura sanasi",
+            "label_due_date": "To'lov muddati",
+            "payment_terms": {
+                "net15": "Net 15",
+                "net30": "Net 30",
+                "due_on_receipt": "Qabul qilishda"
+            },
+            "column_number": "№",
+            "column_item": "Tovar",
+            "column_description": "Tavsifi",
+            "column_qty": "Miqdor",
+            "column_rate": "Tarif",
+            "column_amount": "Summa",
+            "button_add_line": "Qator qo'shing",
+            "placeholder_item": "Tovarni tanlang...",
+            "placeholder_description": "Tavs...",
+            "label_subtotal": "Oraliq jami",
+            "label_total": "Jami",
+            "stock_warning": "Yetarli tovar yo'q: {qty} ta mavjud"
+        },
+        "customer_detail": {
+            "empty_state_title": "Mijozni tanlang",
+            "empty_state_description": "Moliyaviy ma'lumot va tranzaksiya tarixini ko'rish uchun chap ro'yxatdan mijozni tanlang.",
+            "button_new_invoice": "Yangi hisob-faktura",
+            "button_receive_payment": "To'lovni qabul qilish",
+            "button_send_statement": "Bayonnomani yuborish",
+            "no_phone": "Telefon yo'q",
+            "no_email": "Email yo'q",
+            "no_tax_id": "Soliq ID yo'q",
+            "label_open_balance": "Ochiq balansi",
+            "label_overdue": "Muddati o'tgan",
+            "label_unused_credits": "Ishlatilmagan kreditlar",
+            "label_credit_limit": "Kredit limiti",
+            "label_open_invoices": "Ochiq hisoblar",
+            "sales_trend": "Sotuvlar trendi",
+            "collection_title": "To'plash yordamchisi taklifi",
+            "collection_message": "Hisob muddati o'tgan va {days} kun davomida mijoz bilan aloqa qilinmagan. To'lov uchun qo'ng'iroq qilish vaqti keldi.",
+            "button_mark_contacted": "Aloqa qilingan deb belgilash",
+            "tab_transactions": "So'nggi tranzaksiyalar",
+            "tab_contacts": "Kontaktlar",
+            "tab_locations": "Ish joylari",
+            "table_header_date": "Sana",
+            "table_header_type": "Turi",
+            "table_header_number": "Raqami",
+            "table_header_amount": "Summa",
+            "table_header_status": "Holati",
+            "empty_transactions": "Bu mijoz uchun so'nggi tranzaksiyalar yo'q.",
+            "empty_contacts": "Bu mijoz uchun qo'shimcha kontaktlar bu yerda paydo bo'ladi.",
+            "empty_locations": "Etkazib berish va ish joylari bu yerda paydo bo'ladi."
+        },
+        "customer_history": {
+            "tab_transactions": "Tranzaksiyalar",
+            "tab_contacts": "Kontaktlar",
+            "tab_locations": "Joylar",
+            "filtered_by": "Filtr asosida",
+            "header_date": "Sana",
+            "header_type": "Turi",
+            "header_number": "Raqami",
+            "header_amount": "Summa",
+            "header_status": "Holati",
+            "header_actions": "Harakatlar",
+            "action_edit": "Tahrirlash",
+            "action_delete": "O'chirish",
+            "empty_transactions": "Tranzaksiyalar topilmadi",
+            "empty_contacts": "Kontaktlar topilmadi",
+            "empty_locations": "Joylar topilmadi"
+        },
+        "estimate": {
+            "title": "Smeta"
+        },
+        "receive_payment": {
+            "title": "To'lovni qabul qilish"
+        },
+        "modals": {
+            "delete_invoice": {
+                "title": "{invoiceNumber} schyotsni o'chirish",
+                "button_confirm": "Schyotsni o'chirish",
+                "checkbox_label": "Men oqibatlarini tushunaman",
+                "warnings": {
+                    "open": "Siz ochiq (to'lanmagan) schyotsni o'chirmoqchisiz. Bu amalni qaytarib bo'lmaydi.",
+                    "paid": "⚠️ OGOHLANTIRISH: Bu schyots TO'LANGAN deb belgilangan.",
+                    "paid_unusual": "To'langan schyotsni o'chirish g'ayrimavhum va quyidagilarga ishora qilishi mumkin:",
+                    "paid_reasons": {
+                        "incorrect": "To'lov noto'g'ri ro'yxatga olingan",
+                        "error": "Schyots xatoga berilgan",
+                        "credit": "Mijoz kredit berilgan"
+                    },
+                    "paid_advice": "Agar to'lov haqiqatan qabul qilingan bo'lsa, avval to'lovni bekor qiling.",
+                    "partial": "⚠️ OGOHLANTIRISH: Bu schyots qisman to'langan.",
+                    "partial_info": "O'chirish schyotsni bekor qiladi, lekin to'lovlarni bekor qilmaydi. Agar zarur bo'lsa, avval qisman to'lovlarni bekor qiling."
+                },
+                "details": {
+                    "invoice_number": "Schyot raqami",
+                    "amount": "Summa",
+                    "status": "Holati"
+                },
+                "consequences": {
+                    "title": "Bu quyidagilarni amalga oshiradi:",
+                    "delete_invoice": "Schyotni va barcha qatorlarni o'chirish",
+                    "reverse_gl": "Bosh kitob yozuvlarini bekor qilish",
+                    "restore_inventory": "Inventarni omborga qaytarish",
+                    "update_balance": "Mijoz balansi yangilash"
+                }
+            }
+        }
+    },
+    "manufacturing": {
+        "production_run": {
+            "title": "Ishlab chiqarish sikli",
+            "fields": {
+                "batch_no": "Partiya №"
+            }
+        },
+        "mixing": {
+            "title": "Aralashtirish",
+            "fields": {
+                "ingredients": "Ingrediyentlar"
+            }
+        },
+        "sublimation": {
+            "title": "Sublimatsiya"
+        },
+        "packing": {
+            "title": "Qadoqlash"
+        },
+        "yield_analysis": {
+            "title": "Chiqish tahlili",
+            "fields": {
+                "actual_weight": "Haqiqiy vazn",
+                "loss_percent": "Yo'qotish %"
+            }
+        },
+        "production_lines": {
+            "dashboard_title": "Ishlab chiqarish qatorlari boshqaruvi paneli",
+            "dashboard_subtitle": "Barcha ishlab chiqarish qatorlarining haqiqiy vaqt kuzatilishi",
+            "auto_refresh_on": "Avtoboshlash YOQ'IQ",
+            "auto_refresh_off": "Avtoboshlash O'CHIRILGAN",
+            "refresh": "Yangilash",
+            "of": "dan",
+            "line_utilization": "Qator ishlatilinishi",
+            "total_throughput": "Jami unumdorlik",
+            "average_oee": "O'rtacha OEE",
+            "active_operators": "Faol operatorlar",
+            "total_downtime_today": "Bugungi umumiy to'xtash vaqti",
+            "active_downtime": "Faol to'xtash",
+            "open_issues": "Ochiq muammolar",
+            "due_maintenance": "Kutilayotgan ta'mirlash",
+            "lines_active": "qatorlar faol",
+            "units_per_hour": "birlik/soat birlashtirilgan",
+            "target_oee": "Maqsad: >85%",
+            "across_all_lines": "barcha qatorlarda",
+            "lines": "qatorlar",
+            "total": "jami",
+            "due_soon": "yaqin kunda",
+            "error_prefix": "Xato:",
+            "production_status": "Ishlab chiqarish holati",
+            "control_status": "Boshqaruv holati",
+            "todays_summary": "Bugungi xulosa",
+            "progress": "Muvaffaqiyat",
+            "downtime": "To'xtash vaqti",
+            "events": "Voqealar",
+            "mttr": "MTTR",
+            "throughput": "Unumdorlik",
+            "oee": "OEE",
+            "utilization": "Ishlatilinishi",
+            "log_downtime": "To'xtashni qayd etish",
+            "report_issue": "Muammoni xabar qilish",
+            "schedule": "Jadval",
+            "min_elapsed": "min o'tdi",
+            "upcoming_maintenance": "kutilayotgan ta'mirlash",
+            "open_issues_count": "ochiq muammolar",
+            "no_active_issues": "Faol muammolar yo'q",
+            "unit_min": "min",
+            "unit_uh": "birlik/soat"
+        },
+        "common": {
+            "commit_run": "Ishga tushirishni tasdiqlash"
+        }
+    },
+    "finance": {
+        "coa": {
+            "title": "Hisoblar rejasi",
+            "fields": {
+                "asset": "Aktiv",
+                "liability": "Majburiyat"
+            }
+        },
+        "journal_entry": {
+            "title": "Jurnal o'tkazmasi",
+            "fields": {
+                "debit": "Debet",
+                "credit": "Kredit"
+            }
+        },
+        "gl_impact": {
+            "title": "Bosh daftarga ta'siri"
+        },
+        "reports": {
+            "title": "Hisobotlar",
+            "fields": {
+                "net_profit": "Sof foyda",
+                "fiscal_year": "Moliyaviy yil"
+            }
+        }
+    },
+    "inventory": {
+        "title": "Ombor",
+        "items": "Tovarlar",
+        "inventory_center": "Ombor Markazi",
+        "all_items": "Barcha Tovarlar",
+        "categories": "Kategoriyalar",
+        "raw_materials": "Xomashyo",
+        "finished_goods": "Tayyor Mahsulot",
+        "services": "Xizmatlar",
+        "scan": "Skanerlash",
+        "new_item": "Yangi Tovar",
+        "edit_item": "Tovarni Tahrirlash",
+        "no_sku": "SKU yo'q",
+        "table": {
+            "item": "Tovar",
+            "type": "Turi",
+            "on_hand": "Mavjud",
+            "price": "Narxi",
+            "cost": "Tannarxi"
+        },
+        "types": {
+            "inventory": "Inventar",
+            "service": "Xizmat",
+            "assembly": "Sbor",
+            "non_inventory": "Noinventar"
+        },
+        "form": {
+            "basic_info": "Asosiy ma'lumotlar",
+            "financials": "Moliya va Ombor",
+            "name": "Nomi",
+            "name_placeholder": "masalan, Qizil olma XL",
+            "sku": "Artikul / Tovar kodi",
+            "sku_placeholder": "SKU-001",
+            "description": "Tavsifi",
+            "description_placeholder": "Batafsil tavsif...",
+            "category": "Kategoriya",
+            "select_category": "Kategoriyani tanlang...",
+            "category_required": "Kategoriya majburiy",
+            "sales_price": "Sotuv narxi (UZS)",
+            "standard_cost": "Standart tannarxi (UZS)",
+            "reorder_point": "Qayta buyurtma nuqtasi",
+            "base_unit": "Asosiy birlik",
+            "purchase_unit": "Xarid birligi",
+            "select_unit": "Birlikni tanlang",
+            "active": "Tovar faol",
+            "bom": "Spetsifikatsiya (BOM)",
+            "add_component": "Komponent qo'shish",
+            "select_component": "Komponentni tanlang...",
+            "no_components": "Komponentlar hali qo'shilmagan.",
+            "save_info": "O'zgarishlar darhol omborda aks etadi.",
+            "create_title": "Yangi tovar yaratish",
+            "create_desc": "Yangi inventar, xizmat yoki sborni aniqlang.",
+            "select_type": "Tovar turini tanlang",
+            "select_type_desc": "Tegishli maydonlarni ko'rish uchun yaratilayotgan tovar turini tanlang.",
+            "inventory_desc": "Miqdori kuzatiladigan ombor tovarni",
+            "service_desc": "Ish yoki tajriba",
+            "assembly_desc": "Boshqa tovarlardan yig'ilgan"
+        },
+        "actions": {
+            "edit": "Tahrirlash",
+            "adjust_qty": "Miqdorni tuzatish",
+            "build": "Yig'ish",
+            "stock_level": "Zaxira darajasi",
+            "reorder_needed": "Qayta buyurtma kerak",
+            "in_stock": "Omborda bor",
+            "active": "Faol",
+            "inactive": "Faol emas",
+            "archived": "Arxivda",
+            "hide_archived": "Arxivlanganni yashirish",
+            "show_archived": "Arxivlanganni ko'rsatish"
+        },
+        "no_items_found": "Tovarlar topilmadi. Boshlash uchun yangisini yarating.",
+        "delete_modal": {
+            "title_check": "Tovarni o'chirish: {itemName}",
+            "title_confirm": "O'chirishni tasdiqlang",
+            "checking_history": "Tovar tarixini tekshiryapman...",
+            "no_history_title": "Tarikh topilmadi",
+            "no_history_message": "Bu tovarning operatsiya tarixi yo'q va xavfsiz o'chirilishi mumkin.",
+            "button_delete_permanently": "Butunlay o'chirish",
+            "has_history_title": "Tovar operatsiya tarixiga ega",
+            "has_history_warning": "Bu tovarni xavfsiz o'chirib bo'lmaydi, chunki u operatsiyalarda ishlatilgan:",
+            "section_purchasing": "Xaridlash tarixi",
+            "count_po_lines": "{count} ta xarid buyurtma qatorlari",
+            "count_bill_lines": "{count} ta supplier hisoblari",
+            "section_sales": "Sotuv tarixi",
+            "count_invoice_lines": "{count} ta hisob-faktura qatorlari",
+            "section_manufacturing": "Ishlab chiqarish tarixi",
+            "count_bom_items": "{count} ta spetsifikatsiya havolalari",
+            "count_production_inputs": "{count} ta ishlab chiqarish kirituvchilari",
+            "count_production_outputs": "{count} ta ishlab chiqarish chiquvchilari",
+            "section_inventory": "Ombor tarixi",
+            "count_inventory_layers": "{count} ta ombor qatlami (FIFO)",
+            "action_prompt": "Nima qilmoqchisiz?",
+            "button_archive": "Tovarni arxivlash",
+            "button_archive_desc": "Butun tarixni saqlash (Xavfsiz)",
+            "button_clean_delete": "Tarixni tozalash va o'chirish",
+            "button_clean_delete_desc": "Butun ma'lumotlarni o'chirish (Xavfli)",
+            "confirm_title": "⚠️ O'chirishni tasdiqlang",
+            "confirm_warning": "Bu butunlay o'chirib tashlamoq:",
+            "confirm_warning_item": "Tovar: {itemName}",
+            "confirm_warning_history": "BARCHA operatsiya tarixi yuqorida ko'rsatilgan",
+            "confirm_warning_cannot_undo": "Bu amalni qaytarib bo'lmaydi.",
+            "confirm_instruction": "Tasdiqlash uchun DELETE yozing:",
+            "confirm_placeholder": "DELETE yozing",
+            "checkbox_understand": "Bu amalni qaytarib bo'lmagani to'g'risini tushunaman",
+            "button_confirm_delete": "O'chirishni tasdiqlash",
+            "deleting": "O'chiryapman...",
+            "archiving": "Arxivlamoqda...",
+            "success_deleted": "Tovar butunlay o'chirildi",
+            "success_archived": "Tovar arxivlandi (tarikh saqlanmosdi)",
+            "error_failed": "Tovarni o'chirishda xato"
+        }
+    },
+    "auth": {
+        "login": {
+            "title": "Tizimga kirish",
+            "subtitle": "Stable ERP ga kirish uchun hisobingizni kiriting",
+            "email": "Email manzili",
+            "password": "Parol",
+            "email_placeholder": "sizning@email.com",
+            "password_placeholder": "Parolni kiriting",
+            "submit": "Kirish",
+            "signing_in": "Kirish jarayoni...",
+            "errors": {
+                "invalid_credentials": "Noto'g'ri email yoki parol",
+                "account_deactivated": "Sizning hisobingiz o'chirilgan. Administrator bilan bog'laning.",
+                "server_error": "Xatolik yuz berdi. Qaytadan harakat qiling.",
+                "required_email": "Email talab qilinadi",
+                "required_password": "Parol talab qilinadi",
+                "invalid_email": "Iltimos, to'g'ri email manzilini kiriting"
+            }
+        },
+        "user_menu": {
+            "profile": "Profil",
+            "change_password": "Parolni o'zgartirish",
+            "settings": "Sozlamalar",
+            "logout": "Chiqish"
+        },
+        "change_password": {
+            "title": "Parolni o'zgartirish",
+            "current_password": "Joriy parol",
+            "new_password": "Yangi parol",
+            "confirm_password": "Yangi parolni tasdiqlang",
+            "submit": "Parolni yangilash",
+            "cancel": "Bekor qilish",
+            "success": "Parol muvaffaqiyatli o'zgartirildi",
+            "errors": {
+                "wrong_current": "Joriy parol noto'g'ri",
+                "mismatch": "Parollar mos kelmadi",
+                "weak": "Parol talablarni qondirmaydi",
+                "same_as_current": "Yangi parol joriy paroldan boshqacha bo'lishi kerak"
+            },
+            "requirements": {
+                "title": "Parol talablari:",
+                "length": "Kamida 8 ta belgi",
+                "lowercase": "Kamida bitta kichik harf",
+                "uppercase": "Kamida bitta bosh harf",
+                "number": "Kamida bitta raqam"
+            }
+        }
+    },
+    "settings": {
+        "title": "Sozlamalar",
+        "uom": "O'lchov birliklari",
+        "categories": "Kategoriyalar",
+        "uom_section": {
+            "title": "O'lchov biriklari",
+            "description": "Inventar tovarlar uchun o'lchov birliklarini boshqarish",
+            "back_to_dashboard": "Asosiy sahifaga",
+            "button_add": "Yangi o'lchov birligini qo'sh",
+            "table": {
+                "header_name": "Nomi",
+                "header_code": "Kod",
+                "header_type": "Turi",
+                "header_precision": "Aniqlik",
+                "header_status": "Holati",
+                "header_actions": "Harakatlar",
+                "empty_state": "O'lchov biriqlari topilmadi. 'Yangi o'lchov birligini qo'sh' ni bosing.",
+                "confirm_deactivate": "Siz bu o'lchov birligini faolsizlashtirish istaysizmi?"
+            },
+            "types": {
+                "mass": "Massa",
+                "volume": "Hajm",
+                "count": "Hisob",
+                "length": "Uzunlik"
+            },
+            "status": {
+                "active": "Faol",
+                "inactive": "Faol emas"
+            },
+            "actions": {
+                "reactivate": "Qayta faollash"
+            },
+            "placeholders": {
+                "name": "Kilogramm",
+                "code": "kg"
+            },
+            "modal": {
+                "title": "Tezda o'lchov birligi yaratish",
+                "description": "Yangi o'lchov birligini qo'shish",
+                "label_name": "Nomi",
+                "label_code": "Kod",
+                "label_type": "Turi",
+                "placeholder_name": "Butilka",
+                "placeholder_code": "btl",
+                "precision_note": "Aniqlik turga asosan avtomatik ravishda o'rnatiladi",
+                "button_cancel": "Bekor qilish",
+                "button_create": "O'lchov birligini yaratish",
+                "types_with_precision": {
+                    "count": "Hisob (0 kasrli raqam)",
+                    "mass": "Massa (3 kasrli raqam)",
+                    "volume": "Hajm (3 kasrli raqam)",
+                    "length": "Uzunlik (2 kasrli raqam)"
+                }
+            }
+        },
+        "categories_section": {
+            "title": "Kategoriyalar",
+            "description": "Inventar kategoriyalarini boshqarish",
+            "back_to_dashboard": "Asosiy sahifaga"
+        }
+    }
+}

@@ -1,0 +1,22 @@
+# Database - Block local DBs
+*.db
+*.sqlite
+*.sqlite-journal
+*.db-shm
+*.db-wal
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+.next/
+dist/
+coverage/
+
+# Misc
+.DS_Store
+*.log
+tests/.auth/user.json
