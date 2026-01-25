@@ -2,9 +2,12 @@
 
 import { db } from '../../../db';
 import { uoms, categories, items } from '../../../db/schema/inventory';
+import { users } from '../../../db/schema/auth';
 import { eq, and, or, not, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { auth } from '@/auth';
+import { UserRole } from '@/auth.config';
 
 // --- Validation Schemas ---
 
@@ -24,6 +27,44 @@ const quickCreateUOMSchema = z.object({
 });
 
 // --- Server Actions ---
+
+/**
+ * Get all UOMs with item counts (for management panel)
+ */
+export async function getUOMsWithItemCounts() {
+    try {
+        const uomsData = await db
+            .select({
+                id: uoms.id,
+                name: uoms.name,
+                code: uoms.code,
+                type: uoms.type,
+                precision: uoms.precision,
+                isActive: uoms.isActive,
+                itemCount: sql<number>`(
+                    SELECT COUNT(DISTINCT ${items.id})
+                    FROM ${items}
+                    WHERE ${items.baseUomId} = ${uoms.id}
+                       OR ${items.purchaseUomId} = ${uoms.id}
+                )`,
+            })
+            .from(uoms)
+            .orderBy(uoms.type, uoms.name);
+
+        return uomsData as Array<{
+            id: number;
+            name: string;
+            code: string;
+            type: string;
+            precision: number;
+            isActive: boolean;
+            itemCount: number;
+        }>;
+    } catch (error: any) {
+        console.error('❌ Get UOMs With Item Counts Error:', error);
+        return [];
+    }
+}
 
 /**
  * Get all active UOMs for dropdowns
@@ -466,5 +507,105 @@ export async function reactivateCategory(id: number) {
     } catch (error: any) {
         console.error('❌ Reactivate Category Error:', error);
         return { success: false, error: error.message || 'Failed to reactivate category' };
+    }
+}
+
+// --- Team Management ---
+
+/**
+ * Get all users for team management
+ */
+export async function getAllUsers() {
+    try {
+        // Verify authentication and ADMIN role
+        const session = await auth();
+        if (!session?.user) {
+            return { success: false, error: 'Not authenticated' };
+        }
+
+        const userRole = (session.user as any).role as UserRole;
+        if (userRole !== UserRole.ADMIN) {
+            return { success: false, error: 'Admin access required' };
+        }
+
+        // Get all users with selected fields
+        const allUsers = await db
+            .select({
+                id: users.id,
+                email: users.email,
+                name: users.name,
+                role: users.role,
+                isActive: users.isActive,
+                lastLoginAt: users.lastLoginAt,
+            })
+            .from(users)
+            .orderBy(users.name);
+
+        return { success: true, users: allUsers };
+    } catch (error: any) {
+        console.error('❌ Get All Users Error:', error);
+        return { success: false, error: error.message || 'Failed to fetch users' };
+    }
+}
+
+/**
+ * Update user role
+ */
+const updateUserRoleSchema = z.object({
+    userId: z.number().positive(),
+    newRole: z.enum(['FACTORY_WORKER', 'PLANT_MANAGER', 'ACCOUNTANT', 'ADMIN']),
+});
+
+export async function updateUserRole(userId: number, newRole: string) {
+    try {
+        // Verify authentication and ADMIN role
+        const session = await auth();
+        if (!session?.user) {
+            return { success: false, error: 'Not authenticated' };
+        }
+
+        const userRole = (session.user as any).role as UserRole;
+        if (userRole !== UserRole.ADMIN) {
+            return { success: false, error: 'Admin access required' };
+        }
+
+        // Validate input
+        const validated = updateUserRoleSchema.parse({ userId, newRole });
+
+        // Get current user ID from session
+        const currentUserId = parseInt((session.user as any).id || '0');
+
+        // Prevent self-demotion: if current user ID matches userId and newRole is not ADMIN, return error
+        if (currentUserId === validated.userId && validated.newRole !== 'ADMIN') {
+            return { success: false, error: 'Cannot change your own admin role' };
+        }
+
+        // Update user role
+        const [updatedUser] = await db
+            .update(users)
+            .set({
+                role: validated.newRole,
+                updatedAt: new Date(),
+            })
+            .where(eq(users.id, validated.userId))
+            .returning();
+
+        if (!updatedUser) {
+            return { success: false, error: 'User not found' };
+        }
+
+        console.log('✅ User role updated:', updatedUser.id, validated.newRole);
+
+        revalidatePath('/settings/team');
+
+        return { success: true, user: updatedUser };
+    } catch (error: any) {
+        console.error('❌ Update User Role Error:', error);
+
+        if (error.name === 'ZodError') {
+            return { success: false, error: error.errors[0].message };
+        }
+
+        return { success: false, error: error.message || 'Failed to update user role' };
     }
 }
