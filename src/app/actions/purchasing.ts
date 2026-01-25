@@ -10,6 +10,11 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { ACCOUNTS } from '../../lib/accounting-config';
 import { purchasingDocumentSchema } from '@/lib/validators/purchasing';
+import { getItemCostingInfo } from './inventory-costing';
+import { updateItemInventoryFields } from './inventory-tools';
+import { checkPeriodLock } from './finance';
+import { auth } from '@/auth';
+import { UserRole } from '@/auth.config';
 
 // --- Validation Schemas ---
 const vendorSchema = z.object({
@@ -243,9 +248,56 @@ export async function getVendorCenterData(selectedId?: number) {
             }
         }
 
+        // Calculate scoreboard stats
+        const allPOs = await db.select().from(purchaseOrders);
+        const allBillsForStats = await db.select().from(vendorBills);
+
+        // Open POs (OPEN or PARTIAL status)
+        const openPOs = allPOs.filter(po => po.status === 'OPEN' || po.status === 'PARTIAL');
+        const openPOsStats = {
+            count: openPOs.length,
+            total: openPOs.reduce((sum, po) => sum + (po.totalAmount || 0), 0)
+        };
+
+        // Open Bills (OPEN or PARTIAL status)
+        const openBillsList = allBillsForStats.filter(b => b.status === 'OPEN' || b.status === 'PARTIAL');
+        const openBillsStats = {
+            count: openBillsList.length,
+            total: openBillsList.reduce((sum, b) => sum + b.totalAmount, 0)
+        };
+
+        // Overdue Bills (OPEN/PARTIAL and past due date - assume Net 30 from bill date)
+        const now = new Date();
+        const overdueBills = openBillsList.filter(b => {
+            const dueDate = new Date(b.billDate);
+            dueDate.setDate(dueDate.getDate() + 30); // Net 30
+            return now > dueDate;
+        });
+        const overdueStats = {
+            count: overdueBills.length,
+            total: overdueBills.reduce((sum, b) => sum + b.totalAmount, 0)
+        };
+
+        // Paid in last 30 days
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const paidBills = allBillsForStats.filter(b =>
+            b.status === 'PAID' && new Date(b.updatedAt) >= thirtyDaysAgo
+        );
+        const paidLast30Stats = {
+            count: paidBills.length,
+            total: paidBills.reduce((sum, b) => sum + b.totalAmount, 0)
+        };
+
         return {
             vendors: vendorsWithBalances,
-            selectedVendor
+            selectedVendor,
+            stats: {
+                openPOs: openPOsStats,
+                overdueBills: overdueStats,
+                openBills: openBillsStats,
+                paidLast30: paidLast30Stats
+            }
         };
     } catch (error: any) {
         console.error('Get Vendor Center Data Error:', error);
@@ -297,33 +349,16 @@ export async function saveItemReceipt(data: z.infer<typeof purchasingDocSchema>)
         const totalAmount = val.items.reduce((sum, item) => sum + Math.round(item.quantity * item.unitPrice), 0);
 
         await db.transaction(async (tx) => {
-            // 1. Create Receipt (Using vendorBills table for now or a new one, but requested just logic)
-            // Wait, schema doesn't have a 'receipts' table? I should check schema/purchasing.ts again.
-            // Ah, there's no dedicated 'item_receipts' table in the schema I saw.
-            // I should probably create one or just handle the logic as requested (Invent Layer + JE).
-            // Actually, if there's no 'item_receipts' table, I'll just skip the table insert for now and do logic.
-
-            // 2. FIFO: Create inventory layers
-            for (const item of val.items) {
-                const batchNum = `REC-${val.refNumber}-${item.itemId}-${Date.now()}`;
-                await tx.insert(inventoryLayers).values({
-                    itemId: item.itemId,
-                    batchNumber: batchNum,
-                    initialQty: item.quantity,
-                    remainingQty: item.quantity,
-                    unitCost: item.unitPrice,
-                    receiveDate: val.date,
-                });
-
-                // 3. Update PO lines if linked
-                if (val.poId) {
+            // 2. Update PO lines if linked (Inventory layers are NOT created here - bills are the source of inventory)
+            if (val.poId) {
+                for (const item of val.items) {
                     await tx.update(purchaseOrderLines)
                         .set({ qtyReceived: sql`${purchaseOrderLines.qtyReceived} + ${item.quantity}` })
                         .where(eq(purchaseOrderLines.poId, val.poId)); // Simplified, should match itemId
                 }
             }
 
-            // 4. GL Entry: Accrual on Receipt
+            // 3. GL Entry: Accrual on Receipt
             const [je] = await tx.insert(journalEntries).values({
                 date: val.date,
                 description: `Item Receipt: ${val.refNumber}`,
@@ -349,7 +384,7 @@ export async function saveItemReceipt(data: z.infer<typeof purchasingDocSchema>)
                 description: `Accrual for Receipt ${val.refNumber}`
             });
 
-            // 5. Update PO status
+            // 4. Update PO status
             if (val.poId) {
                 // Simplified: Set to PARTIAL/CLOSED
                 await tx.update(purchaseOrders)
@@ -371,9 +406,69 @@ export async function saveItemReceipt(data: z.infer<typeof purchasingDocSchema>)
 
 export async function createVendorBill(data: any) {
     try {
-        // Simple manual parsing or use the schema. 
-        // The user wants strict integer (Tiyin) parsing.
-        const val = purchasingDocSchema.parse(data);
+        // Use the shared schema that expects transactionDate (matches form data)
+        const val = purchasingDocumentSchema.parse(data);
+
+        // Get current user role from session
+        const session = await auth();
+        const userRole = (session?.user as any)?.role as string | undefined;
+
+        // Check period lock (GAAP/IFRS compliance - prevent posting to closed periods)
+        await checkPeriodLock(val.transactionDate);
+
+        // THREE-WAY MATCH VALIDATION (GAAP/IFRS Compliance - prevent billing undelivered goods)
+        if (val.poId) {
+            // Fetch PO lines for this purchase order
+            const poLines = await db.select().from(purchaseOrderLines)
+                .where(eq(purchaseOrderLines.poId, val.poId));
+
+            if (poLines.length === 0) {
+                throw new Error(`Purchase Order #${val.poId} has no line items`);
+            }
+
+            // Validate each bill line against PO
+            for (const billItem of val.items) {
+                const billItemId = Number(billItem.itemId);
+                const billQty = parseFloat(billItem.quantity as any) || 0;
+                const billPrice = parseFloat(billItem.unitPrice as any) || 0;
+
+                // Find matching PO line
+                const poLine = poLines.find(pl => pl.itemId === billItemId);
+                if (!poLine) {
+                    throw new Error(
+                        `Item #${billItemId} is not on Purchase Order #${val.poId}. ` +
+                        `Three-way match failed.`
+                    );
+                }
+
+                // Check 1: Cannot bill more than received
+                const alreadyBilled = poLine.qtyBilled || 0;
+                const availableToBill = poLine.qtyReceived - alreadyBilled;
+
+                if (billQty > availableToBill) {
+                    throw new Error(
+                        `Cannot bill ${billQty} units of item #${billItemId}. ` +
+                        `Only ${availableToBill} units available (${poLine.qtyReceived} received, ${alreadyBilled} already billed). ` +
+                        `Three-way match violation.`
+                    );
+                }
+
+                // Check 2: Price variance validation (5% tolerance)
+                const poUnitCostTiyin = poLine.unitCost; // Already in Tiyin
+                const billUnitCostTiyin = Math.round(billPrice * 100); // Convert to Tiyin
+                const priceVariance = Math.abs(billUnitCostTiyin - poUnitCostTiyin);
+                const tolerance = poUnitCostTiyin * 0.05; // 5% tolerance
+
+                if (priceVariance > tolerance) {
+                    console.warn(
+                        `⚠️ PRICE VARIANCE WARNING: Item #${billItemId} - ` +
+                        `Expected: ${poUnitCostTiyin} Tiyin, Bill: ${billUnitCostTiyin} Tiyin, ` +
+                        `Variance: ${((priceVariance / poUnitCostTiyin) * 100).toFixed(2)}%`
+                    );
+                    // Allow with warning (not blocking, but logged for audit)
+                }
+            }
+        }
 
         // Convert to Tiyin (integers) safely
         const totalSubtotalTiyin = val.items.reduce((sum, item) => {
@@ -384,43 +479,189 @@ export async function createVendorBill(data: any) {
 
         const totalAmountTiyin = totalSubtotalTiyin;
 
+        // Check if approval required: amount > 10M UZS AND user is not ADMIN
+        const APPROVAL_THRESHOLD = 10_000_000 * 100; // 10M UZS in Tiyin
+        const requiresApproval = totalAmountTiyin > APPROVAL_THRESHOLD && userRole !== UserRole.ADMIN;
+
+        // Pre-validation: Load all items and validate
+        const itemIds = val.items.map(item => Number(item.itemId));
+        const itemsData = await db.select({
+            id: items.id,
+            name: items.name,
+            assetAccountCode: items.assetAccountCode,
+            itemClass: items.itemClass,
+            valuationMethod: items.valuationMethod,
+        }).from(items).where(inArray(items.id, itemIds));
+
+        const itemsMap = new Map(itemsData.map(i => [i.id, i]));
+
+        // Validate all items exist
+        for (const item of val.items) {
+            const itemData = itemsMap.get(Number(item.itemId));
+            if (!itemData) throw new Error(`Item ${item.itemId} not found`);
+        }
+
         await db.transaction(async (tx) => {
             // 1. Create Bill
             const [bill] = await tx.insert(vendorBills).values({
                 vendorId: val.vendorId,
                 poId: val.poId,
-                billDate: new Date(val.date),
+                billDate: val.transactionDate, // purchasingDocumentSchema already coerces to Date
                 billNumber: val.refNumber,
                 totalAmount: totalAmountTiyin,
                 status: 'OPEN',
+                approvalStatus: requiresApproval ? 'PENDING' : 'NOT_REQUIRED',
             }).returning();
 
-            // 2. GL Entry: Clear Accrual, Hit AP
-            const [je] = await tx.insert(journalEntries).values({
-                date: new Date(val.date),
-                description: `Vendor Bill: ${val.refNumber}`,
-                reference: val.refNumber,
-                transactionId: `bill-${bill.id}`,
-                isPosted: true,
-            }).returning();
+            // 2. Insert Bill Lines
+            for (let i = 0; i < val.items.length; i++) {
+                const item = val.items[i];
+                const qty = parseFloat(item.quantity as any) || 0;
+                const price = parseFloat(item.unitPrice as any) || 0;
+                const lineAmount = Math.round(qty * price * 100);
 
-            // Debit Accrued Liability / GRNI (2110) - Clearing the accrual
-            await tx.insert(journalEntryLines).values({
-                journalEntryId: je.id,
-                accountCode: '2110', // Accrued Liabilities
-                debit: totalSubtotalTiyin,
-                credit: 0,
-                description: `Clear Accrual for Bill ${val.refNumber}`
-            });
+                await tx.insert(vendorBillLines).values({
+                    billId: bill.id,
+                    itemId: Number(item.itemId),
+                    description: item.description || '',
+                    quantity: qty,
+                    unitPrice: Math.round(price * 100),
+                    amount: lineAmount,
+                    lineNumber: i + 1,
+                });
+            }
 
-            // Credit Accounts Payable (2100)
-            await tx.insert(journalEntryLines).values({
-                journalEntryId: je.id,
-                accountCode: '2100', // AP
-                debit: 0,
-                credit: totalAmountTiyin,
-                description: `Vendor Liability ${val.refNumber}`
-            });
+            // 2b. Update qtyBilled on PO lines (Three-way match control)
+            if (val.poId) {
+                for (const item of val.items) {
+                    const qty = parseFloat(item.quantity as any) || 0;
+                    const itemId = Number(item.itemId);
+
+                    // Find the matching PO line and update qtyBilled
+                    await tx.update(purchaseOrderLines)
+                        .set({
+                            qtyBilled: sql`${purchaseOrderLines.qtyBilled} + ${qty}`
+                        })
+                        .where(and(
+                            eq(purchaseOrderLines.poId, val.poId),
+                            eq(purchaseOrderLines.itemId, itemId)
+                        ));
+                }
+                console.log(`✅ Updated qtyBilled for PO #${val.poId}`);
+            }
+
+            // 3. Create inventory layers (FIFO tracking)
+            for (let i = 0; i < val.items.length; i++) {
+                const item = val.items[i];
+                const qty = parseFloat(item.quantity as any) || 0;
+                const price = parseFloat(item.unitPrice as any) || 0;
+                const unitCostTiyin = Math.round(price * 100);
+
+                await tx.insert(inventoryLayers).values({
+                    itemId: Number(item.itemId),
+                    batchNumber: `BILL-${bill.id}-${item.itemId}`,
+                    initialQty: qty,
+                    remainingQty: qty,
+                    unitCost: unitCostTiyin,
+                    receiveDate: val.transactionDate,
+                    isDepleted: false,
+                });
+            }
+
+            // 3b. Update denormalized inventory fields after creating layers
+            const uniqueItemIds = [...new Set(val.items.map(item => Number(item.itemId)))];
+            for (const itemId of uniqueItemIds) {
+                try {
+                    await updateItemInventoryFields(itemId, tx);
+                } catch (syncError) {
+                    console.error(`[CRITICAL] Failed to sync denormalized fields for item ${itemId}:`, syncError);
+                    console.error(`[ACTION NEEDED] Inventory layers are saved. Run resync from Settings → Inventory Tools`);
+                    // Don't throw - bill transaction should succeed even if sync fails
+                    // Layers are source of truth and are already saved
+                }
+            }
+            console.log('✅ Inventory fields updated for all items');
+
+            // 4. GL Entry: Post to item-specific asset accounts (ONLY if no approval required)
+            if (!requiresApproval) {
+                // Group line amounts by asset account
+                const accountTotals = new Map<string, number>();
+
+                for (const item of val.items) {
+                    const itemData = itemsMap.get(Number(item.itemId))!;
+                    const qty = parseFloat(item.quantity as any) || 0;
+                    const price = parseFloat(item.unitPrice as any) || 0;
+                    const lineAmount = Math.round(qty * price * 100);
+
+                    // Determine asset account (item-specific or class default)
+                    let assetAccount = itemData.assetAccountCode;
+                    if (!assetAccount) {
+                        const classDefaults: Record<string, string> = {
+                            'RAW_MATERIAL': '1310',
+                            'WIP': '1330',
+                            'FINISHED_GOODS': '1340',
+                            'SERVICE': '5100',
+                        };
+                        assetAccount = classDefaults[itemData.itemClass] || '1310';
+                    }
+
+                    // Accumulate by account
+                    accountTotals.set(
+                        assetAccount,
+                        (accountTotals.get(assetAccount) || 0) + lineAmount
+                    );
+                }
+
+                // Create journal entry
+                const [je] = await tx.insert(journalEntries).values({
+                    date: val.transactionDate,
+                    description: `Vendor Bill: ${val.refNumber}`,
+                    reference: val.refNumber,
+                    transactionId: `bill-${bill.id}`,
+                    isPosted: true,
+                }).returning();
+
+                // Post one debit entry per unique asset account
+                for (const [accountCode, amount] of accountTotals.entries()) {
+                    await tx.insert(journalEntryLines).values({
+                        journalEntryId: je.id,
+                        accountCode: accountCode,
+                        debit: amount,
+                        credit: 0,
+                        description: `Inventory/Expense - Bill ${val.refNumber}`,
+                    });
+                }
+
+                // Single credit to AP
+                await tx.insert(journalEntryLines).values({
+                    journalEntryId: je.id,
+                    accountCode: ACCOUNTS.AP_LOCAL, // 2100
+                    debit: 0,
+                    credit: totalAmountTiyin,
+                    description: `Vendor Liability - ${val.refNumber}`,
+                });
+
+                // Update GL balances
+                for (const [accountCode, amount] of accountTotals.entries()) {
+                    await tx.run(sql`
+                        UPDATE gl_accounts
+                        SET balance = balance + ${amount},
+                            updated_at = CURRENT_TIMESTAMP
+                        WHERE code = ${accountCode}
+                    `);
+                }
+
+                await tx.run(sql`
+                    UPDATE gl_accounts
+                    SET balance = balance - ${totalAmountTiyin},
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE code = ${ACCOUNTS.AP_LOCAL}
+                `);
+
+                console.log('✅ GL entries posted and balances updated');
+            } else {
+                console.log('⏸️  GL posting skipped - Bill requires approval');
+            }
         });
 
         revalidatePath('/purchasing/vendors');
@@ -436,225 +677,6 @@ export async function createVendorBill(data: any) {
         }
 
         return { success: false, error: error.message || 'Failed to create bill' };
-    }
-}
-
-/**
- * Enhanced wrapper for saving vendor bills with strict validation and error handling
- * This is the primary function to use from UI components
- */
-// Adapted from saveVendorBill validation logic
-export async function getBillForEdit(id: string) {
-    try {
-        const billId = parseInt(id);
-        if (isNaN(billId)) throw new Error('Invalid bill ID');
-
-        const billResults = await db.select().from(vendorBills).where(eq(vendorBills.id, billId)).limit(1);
-        const bill = billResults[0];
-
-        if (!bill) {
-            return { success: false, error: 'Bill not found' };
-        }
-
-        const itemsResults = await db.select().from(vendorBillLines).where(eq(vendorBillLines.billId, billId));
-
-        // Transform for form
-        const values = {
-            vendorId: bill.vendorId,
-            transactionDate: bill.billDate.toISOString().split('T')[0],
-            refNumber: bill.billNumber,
-            terms: 'Net 30', // Default or fetch if stored
-            memo: '', // Fetch if stored
-            items: itemsResults.map(item => ({
-                itemId: item.itemId,
-                description: item.description,
-                quantity: item.quantity,
-                unitPrice: item.unitPrice / 100, // Convert Tiyin back to main unit
-                amount: item.amount / 100, // Convert Tiyin back to main unit
-            }))
-        };
-
-        return { success: true, data: values };
-    } catch (error: any) {
-        console.error('Get Bill For Edit Error:', error);
-        return { success: false, error: 'Failed to load bill' };
-    }
-}
-
-export async function saveVendorBill(data: any) {
-    console.log("⚡ SERVER RECEIVED ACTION:", JSON.stringify(data, null, 2));
-    try {
-        console.log('💾 Saving vendor bill...', { vendorId: data.vendorId, refNumber: data.refNumber });
-
-        // Validate data structure before processing using shared schema
-        const val = purchasingDocumentSchema.parse(data);
-
-        // Convert to Tiyin (integers) safely
-        const totalSubtotalTiyin = val.items.reduce((sum, item) => {
-            const qty = parseFloat(item.quantity as any) || 0;
-            const rate = parseFloat(item.unitPrice as any) || 0;
-            return sum + Math.round(qty * rate * 100);
-        }, 0);
-
-        const totalAmountTiyin = totalSubtotalTiyin;
-
-        const result = await db.transaction(async (tx) => {
-            try {
-                // Validate vendor exists
-                const vendorExists = await tx.select({ id: vendors.id })
-                    .from(vendors)
-                    .where(eq(vendors.id, Number(val.vendorId)))
-                    .limit(1);
-
-                if (!vendorExists.length) {
-                    throw new Error(`Vendor with ID ${val.vendorId} does not exist`);
-                }
-
-                // Validate all items exist before proceeding
-                const itemIds = val.items.map(item => Number(item.itemId));
-                const existingItems = await tx.select({ id: items.id })
-                    .from(items)
-                    .where(inArray(items.id, itemIds));
-
-                const existingItemIds = existingItems.map(i => i.id);
-                const missingItemIds = itemIds.filter(id => !existingItemIds.includes(id));
-
-                if (missingItemIds.length > 0) {
-                    throw new Error(`Items with IDs ${missingItemIds.join(', ')} do not exist`);
-                }
-
-                // 1. Create Bill
-                const [bill] = await tx.insert(vendorBills).values({
-                    vendorId: Number(val.vendorId), // Schema has string, DB needs number
-                    poId: val.poId,
-                    billDate: new Date(val.transactionDate), // Schema uses transactionDate
-                    billNumber: val.refNumber,
-                    totalAmount: totalAmountTiyin,
-                    status: 'OPEN',
-                }).returning();
-
-                console.log('✅ Bill created:', bill.id);
-
-                // 1.5 Insert Bill Line Items
-                await tx.insert(vendorBillLines).values(
-                    val.items.map((item, index) => ({
-                        billId: bill.id,
-                        itemId: Number(item.itemId),
-                        description: item.description || '',
-                        quantity: Number(item.quantity),
-                        unitPrice: Math.round(Number(item.unitPrice) * 100), // Convert to Tiyin
-                        amount: Math.round(Number(item.quantity) * Number(item.unitPrice) * 100), // Tiyin
-                        lineNumber: index + 1,
-                    }))
-                );
-
-                console.log('✅ Bill line items created:', val.items.length);
-
-                // 2. Create Inventory Layers (if warehouse specified)
-                if (val.warehouseId) {
-                    for (const item of val.items) {
-                        const batchNum = `BILL-${val.refNumber}-${item.itemId}-${Date.now()}`;
-                        await tx.insert(inventoryLayers).values({
-                            itemId: Number(item.itemId),
-                            batchNumber: batchNum,
-                            initialQty: Number(item.quantity),
-                            remainingQty: Number(item.quantity),
-                            unitCost: Math.round(Number(item.unitPrice) * 100), // Convert to Tiyin
-                            warehouseId: val.warehouseId,
-                            locationId: val.locationId || null,
-                            isDepleted: false,
-                            receiveDate: new Date(val.transactionDate),
-                            version: 1,
-                        });
-                    }
-                    console.log('✅ Inventory layers created:', val.items.length);
-                }
-
-                // 3. GL Entry: Debit Inventory, Credit AP
-                const [je] = await tx.insert(journalEntries).values({
-                    date: new Date(val.transactionDate),
-                    description: `Vendor Bill: ${val.refNumber}`,
-                    reference: val.refNumber,
-                    transactionId: `bill-${bill.id}`, // Linked Transaction ID
-                    isPosted: true,
-                }).returning();
-
-                // Entry 1 (Debit): Inventory Asset (Assets Increase)
-                // accountId: ACCOUNTS.INVENTORY_RAW
-                await tx.insert(journalEntryLines).values({
-                    journalEntryId: je.id,
-                    accountCode: ACCOUNTS.INVENTORY_RAW,
-                    debit: totalAmountTiyin,
-                    credit: 0,
-                    description: `Bill ${val.refNumber} - Inventory Asset`
-                });
-
-                // Entry 2 (Credit): Accounts Payable (Liabilities Increase)
-                // accountId: ACCOUNTS.AP_LOCAL
-                await tx.insert(journalEntryLines).values({
-                    journalEntryId: je.id,
-                    accountCode: ACCOUNTS.AP_LOCAL,
-                    debit: 0,
-                    credit: totalAmountTiyin,
-                    description: `Bill ${val.refNumber} - AP Liability`
-                });
-
-                console.log('✅ Journal entries created for bill:', val.refNumber);
-
-                // Update Balances (Simplified Atomic Update for Performance)
-                // Inventory (Asset): Debit (+), Balance Increases
-                await tx.run(sql`UPDATE gl_accounts SET balance = balance + ${totalAmountTiyin} WHERE code = ${ACCOUNTS.INVENTORY_RAW}`);
-
-                // AP (Liability): Credit (-), Balance Decreases (if using Dr-Cr logic)
-                // But wait, if we follow the pattern "Balance = Sum(Dr) - Sum(Cr)":
-                // Credit 100 means Net Change -100.
-                // Liability of 1000 would be -1000. New Bill 100 -> -1100.
-                await tx.run(sql`UPDATE gl_accounts SET balance = balance - ${totalAmountTiyin} WHERE code = ${ACCOUNTS.AP_LOCAL}`);
-
-                // Revalidate inventory paths if we created inventory layers
-                if (val.warehouseId) {
-                    revalidatePath('/inventory');
-                }
-
-                return { success: true, billId: bill.id };
-
-            } catch (dbError: any) {
-                console.error('❌ Database transaction error:', {
-                    message: dbError.message,
-                    code: dbError.code,
-                    constraint: dbError.constraint,
-                });
-                throw dbError;
-            }
-        });
-
-        try {
-            revalidatePath('/purchasing/vendors');
-        } catch (e) {
-            console.error('Revalidate failed:', e);
-        }
-        return result;
-
-    } catch (error: any) {
-        console.error('❌ Save Vendor Bill Error:', error);
-
-        // Detailed error logging for debugging
-        if (error.name === 'ZodError') {
-            console.error('📋 Validation Errors:');
-            error.errors.forEach((err: any) => {
-                console.error(`  - ${err.path.join('.')}: ${err.message}`);
-            });
-            return {
-                success: false,
-                error: `Validation failed: ${error.errors.map((e: any) => `${e.path.join('.')}: ${e.message}`).join(', ')}`
-            };
-        } else if (error.code === 'SQLITE_CONSTRAINT') {
-            console.error('Database constraint violation:', error.message);
-            return { success: false, error: 'Database constraint error. Please check vendor and item references.' };
-        }
-
-        console.error("🔥 DATABASE ERROR (Safe Log):", String(error));
-        return { success: false, error: String(error) };
     }
 }
 
@@ -707,12 +729,33 @@ export async function updateVendorBill(billId: number, data: any) {
         // Validate input
         const val = purchasingDocumentSchema.parse(data);
 
+        // Check period lock (GAAP/IFRS compliance - prevent posting to closed periods)
+        await checkPeriodLock(val.transactionDate);
+
         // Calculate totals
         const totalAmountTiyin = val.items.reduce((sum, item) => {
             const qty = Number(item.quantity);
-            const price = Number(item.unitPrice);
+            const price = Number(item.unitPrice); // Assuming validation returns decimal
             return sum + Math.round(qty * price * 100);
         }, 0);
+
+        // Pre-validation: Load all items and validate
+        const itemIds = val.items.map(item => Number(item.itemId));
+        const itemsData = await db.select({
+            id: items.id,
+            name: items.name,
+            assetAccountCode: items.assetAccountCode,
+            itemClass: items.itemClass,
+            valuationMethod: items.valuationMethod,
+        }).from(items).where(inArray(items.id, itemIds));
+
+        const itemsMap = new Map(itemsData.map(i => [i.id, i]));
+
+        // Validate all items exist
+        for (const item of val.items) {
+            const itemData = itemsMap.get(Number(item.itemId));
+            if (!itemData) throw new Error(`Item ${item.itemId} not found`);
+        }
 
         // Update in transaction
         const result = await db.transaction(async (tx) => {
@@ -721,68 +764,39 @@ export async function updateVendorBill(billId: number, data: any) {
             const bill = billResults[0];
 
             if (!bill) throw new Error('Bill not found');
+            if (bill.status === 'PAID') throw new Error('Cannot edit a paid bill. Delete the payment first.');
 
-            // Load lines and vendor separately
-            const lines = await tx.select().from(vendorBillLines).where(eq(vendorBillLines.billId, billId));
-            const vendorResults = await tx.select().from(vendors).where(eq(vendors.id, bill.vendorId)).limit(1);
-            const vendor = vendorResults[0];
+            // STEP 2: "SAFE SWAP" - DELETE EXISTING LINES & GL
+            // The user requested: "Delete all existing vendor_bill_lines... Delete all existing gl_entries... Insert new..."
+            // This ensures no "Ghost" entries remain.
 
-            const billWithRelations = { ...bill, lines, vendor };
-
-            console.log(`✅ Bill loaded: ${bill.billNumber} (Status: ${bill.status})`);
-
-            // STEP 3: SKIP INVENTORY CHECK
-            // Note: Bills don't directly affect inventory layers in current schema
-            // Inventory is controlled by Item Receipts, not Bills
-            // Bills only clear GRNI accruals
-
-            // STEP 4: FIND & REVERSE ORIGINAL GL ENTRIES
-            const originalJEResults = await tx.select().from(journalEntries).where(or(
-                eq(journalEntries.transactionId, `bill-${billId}`),
-                like(journalEntries.reference, `%${bill.billNumber}%`)
-            )).limit(1);
-            const originalJE = originalJEResults[0];
-
-            // Load lines for original JE
-            let originalJEWithLines: any = null;
-            if (originalJE) {
-                const originalLines = await tx.select().from(journalEntryLines).where(eq(journalEntryLines.journalEntryId, originalJE.id));
-                originalJEWithLines = { ...originalJE, lines: originalLines };
-            }
-
-            if (originalJEWithLines && originalJEWithLines.lines.length > 0) {
-                console.log(`✅ Found original GL entry: ${originalJEWithLines.id}`);
-
-                // Create reversal entry
-                const [reversalJE] = await tx.insert(journalEntries).values({
-                    date: new Date(),
-                    description: `Reversal: Edited Bill ${bill.billNumber}`,
-                    reference: `REV-${bill.billNumber}`,
-                    transactionId: `bill-${billId}-reversal`,
-                    entryType: 'REVERSAL',
-                    isPosted: true,
-                }).returning();
-
-                console.log(`✅ Reversal entry created: ${reversalJE.id}`);
-
-                // Reverse each line (swap debit and credit)
-                for (const line of originalJEWithLines.lines) {
-                    await tx.insert(journalEntryLines).values({
-                        journalEntryId: reversalJE.id,
-                        accountCode: line.accountCode,
-                        debit: line.credit,   // Swap
-                        credit: line.debit,   // Swap
-                        description: `Reversal: ${line.description}`,
-                    });
+            // 2.1 Delete GL Entries linked to this bill
+            const glEntries = await tx.select().from(journalEntries).where(eq(journalEntries.transactionId, `bill-${billId}`));
+            for (const entry of glEntries) {
+                // Reverse balance updates
+                const lines = await tx.select().from(journalEntryLines).where(eq(journalEntryLines.journalEntryId, entry.id));
+                for (const line of lines) {
+                    const inverseNetChange = -(line.debit - line.credit);
+                    await tx.run(sql`UPDATE gl_accounts SET balance = balance + ${inverseNetChange} WHERE code = ${line.accountCode}`);
                 }
 
-                // Update account balances for reversal
-                await updateAccountBalances(tx, reversalJE.id);
-            } else {
-                console.warn(`⚠️ No GL entry found for bill ${bill.billNumber} - skipping reversal`);
+                await tx.delete(journalEntryLines).where(eq(journalEntryLines.journalEntryId, entry.id));
+                await tx.delete(journalEntries).where(eq(journalEntries.id, entry.id));
             }
+            console.log('✅ Old GL entries deleted and balances reverted');
 
-            // STEP 5: UPDATE BILL HEADER
+            // 2.2 Delete Bill Lines
+            await tx.delete(vendorBillLines).where(eq(vendorBillLines.billId, billId));
+            console.log('✅ Old Bill Lines deleted');
+
+            // 2.3 Delete Old Inventory Layers (CRITICAL FIX)
+            await tx.run(sql`
+                DELETE FROM inventory_layers
+                WHERE batch_number LIKE ${'BILL-' + billId + '-%'}
+            `);
+            console.log('✅ Old inventory layers deleted');
+
+            // STEP 3: UPDATE HEADER
             await tx.update(vendorBills)
                 .set({
                     billDate: new Date(val.transactionDate),
@@ -792,85 +806,217 @@ export async function updateVendorBill(billId: number, data: any) {
                 })
                 .where(eq(vendorBills.id, billId));
 
-            console.log('✅ Bill header updated:', billId);
+            console.log('✅ Bill header updated');
 
-            // STEP 6: UPDATE LINE ITEMS (delete old, insert new)
-            await tx.delete(vendorBillLines)
-                .where(eq(vendorBillLines.billId, billId));
+            // STEP 4: INSERT NEW LINES
+            if (val.items.length > 0) {
+                await tx.insert(vendorBillLines).values(
+                    val.items.map((item, index) => ({
+                        billId: billId,
+                        itemId: Number(item.itemId),
+                        description: item.description || '',
+                        quantity: Number(item.quantity),
+                        unitPrice: Math.round(Number(item.unitPrice) * 100),
+                        amount: Math.round(Number(item.quantity) * Number(item.unitPrice) * 100),
+                        lineNumber: index + 1,
+                    }))
+                );
+            }
+            console.log('✅ New Lines inserted');
 
-            await tx.insert(vendorBillLines).values(
-                val.items.map((item, index) => ({
-                    billId: billId,
+            // STEP 4.5: RECREATE INVENTORY LAYERS (NEW)
+            for (const item of val.items) {
+                const qty = Number(item.quantity);
+                const price = Number(item.unitPrice);
+                const unitCostTiyin = Math.round(price * 100);
+
+                await tx.insert(inventoryLayers).values({
                     itemId: Number(item.itemId),
-                    description: item.description || '',
-                    quantity: Number(item.quantity),
-                    unitPrice: Math.round(Number(item.unitPrice) * 100),
-                    amount: Math.round(Number(item.quantity) * Number(item.unitPrice) * 100),
-                    lineNumber: index + 1,
-                }))
-            );
+                    batchNumber: `BILL-${billId}-${item.itemId}`,
+                    initialQty: qty,
+                    remainingQty: qty,
+                    unitCost: unitCostTiyin,
+                    receiveDate: val.transactionDate,
+                    isDepleted: false,
+                });
+            }
+            console.log('✅ New inventory layers created');
 
-            console.log('✅ Bill line items updated:', val.items.length);
+            // STEP 4.6: UPDATE DENORMALIZED INVENTORY FIELDS
+            const uniqueItemIds = [...new Set(val.items.map(item => Number(item.itemId)))];
+            for (const itemId of uniqueItemIds) {
+                try {
+                    await updateItemInventoryFields(itemId, tx);
+                } catch (syncError) {
+                    console.error(`[CRITICAL] Failed to sync denormalized fields for item ${itemId}:`, syncError);
+                    console.error(`[ACTION NEEDED] Inventory layers are saved. Run resync from Settings → Inventory Tools`);
+                    // Don't throw - bill transaction should succeed even if sync fails
+                    // Layers are source of truth and are already saved
+                }
+            }
+            console.log('✅ Inventory fields recalculated for updated items');
 
-            // STEP 7: RE-POST NEW GL ENTRIES
-            const [newJE] = await tx.insert(journalEntries).values({
+            // STEP 5: RE-RUN GL LOGIC WITH ITEM-SPECIFIC ACCOUNTS
+            // Group line amounts by asset account
+            const accountTotals = new Map<string, number>();
+
+            for (const item of val.items) {
+                const itemData = itemsMap.get(Number(item.itemId))!;
+                const qty = Number(item.quantity);
+                const price = Number(item.unitPrice);
+                const lineAmount = Math.round(qty * price * 100);
+
+                // Determine asset account (item-specific or class default)
+                let assetAccount = itemData.assetAccountCode;
+                if (!assetAccount) {
+                    const classDefaults: Record<string, string> = {
+                        'RAW_MATERIAL': '1310',
+                        'WIP': '1330',
+                        'FINISHED_GOODS': '1340',
+                        'SERVICE': '5100',
+                    };
+                    assetAccount = classDefaults[itemData.itemClass] || '1310';
+                }
+
+                // Accumulate by account
+                accountTotals.set(
+                    assetAccount,
+                    (accountTotals.get(assetAccount) || 0) + lineAmount
+                );
+            }
+
+            // Create journal entry
+            const [je] = await tx.insert(journalEntries).values({
                 date: new Date(val.transactionDate),
-                description: `Vendor Bill (Edited): ${val.refNumber}`,
+                description: `Vendor Bill: ${val.refNumber}`,
                 reference: val.refNumber,
                 transactionId: `bill-${billId}`,
-                entryType: 'TRANSACTION',
                 isPosted: true,
             }).returning();
 
-            console.log(`✅ New GL entry created: ${newJE.id}`);
+            // Post one debit entry per unique asset account
+            for (const [accountCode, amount] of accountTotals.entries()) {
+                await tx.insert(journalEntryLines).values({
+                    journalEntryId: je.id,
+                    accountCode: accountCode,
+                    debit: amount,
+                    credit: 0,
+                    description: `Inventory/Expense - Bill ${val.refNumber}`,
+                });
+            }
 
-            // Dr. Accrued Liability (2110) - Clear GRNI
+            // Single credit to AP
             await tx.insert(journalEntryLines).values({
-                journalEntryId: newJE.id,
-                accountCode: '2110',
-                debit: totalAmountTiyin,
-                credit: 0,
-                description: `Clear Accrual for Bill ${val.refNumber}`,
-            });
-
-            // Cr. Accounts Payable (2100)
-            await tx.insert(journalEntryLines).values({
-                journalEntryId: newJE.id,
-                accountCode: '2100',
+                journalEntryId: je.id,
+                accountCode: ACCOUNTS.AP_LOCAL, // 2100
                 debit: 0,
                 credit: totalAmountTiyin,
-                description: `Vendor Liability ${val.refNumber}`,
+                description: `Vendor Liability - ${val.refNumber}`,
             });
 
-            // Update account balances for new entry
-            await updateAccountBalances(tx, newJE.id);
+            // Update GL balances
+            for (const [accountCode, amount] of accountTotals.entries()) {
+                await tx.run(sql`
+                    UPDATE gl_accounts
+                    SET balance = balance + ${amount},
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE code = ${accountCode}
+                `);
+            }
 
-            return { success: true, billId };
+            await tx.run(sql`
+                UPDATE gl_accounts
+                SET balance = balance - ${totalAmountTiyin},
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE code = ${ACCOUNTS.AP_LOCAL}
+            `);
+
+            console.log('✅ New GL entries posted and balances updated');
+
+            return { success: true };
         });
 
-        try {
-            revalidatePath('/purchasing/vendors');
-        } catch (e) {
-            console.error('Revalidate failed:', e);
-        }
-
+        revalidatePath('/purchasing/vendors');
         return result;
 
     } catch (error: any) {
         console.error('❌ Update Bill Error:', error);
-
         if (error.name === 'ZodError') {
-            console.error('📋 Validation Errors:');
-            error.errors.forEach((err: any) => {
-                console.error(`  - ${err.path.join('.')}: ${err.message}`);
-            });
-            return {
-                success: false,
-                error: `Validation failed: ${error.errors.map((e: any) => `${e.path.join('.')}: ${e.message}`).join(', ')}`
-            };
+            return { success: false, error: 'Validation failed' };
         }
+        return { success: false, error: error.message || 'Failed to update bill' };
+    }
+}
 
-        return { success: false, error: String(error) };
+export async function deleteVendorBill(billId: number) {
+    'use server';
+    try {
+        console.log('🗑️ Deleting vendor bill:', billId);
+
+        await db.transaction(async (tx) => {
+            // 1. Check Status
+            const billResults = await tx.select().from(vendorBills).where(eq(vendorBills.id, billId)).limit(1);
+            const bill = billResults[0];
+
+            if (!bill) throw new Error('Bill not found');
+
+            // Check period lock - cannot delete bills in closed periods (GAAP/IFRS compliance)
+            await checkPeriodLock(bill.billDate);
+            if (bill.status === 'PAID') throw new Error('Cannot delete a paid bill. Delete payment first.');
+
+            // 2. Delete GL Entries (Reverse Balances first)
+            const glEntries = await tx.select().from(journalEntries).where(eq(journalEntries.transactionId, `bill-${billId}`));
+            for (const entry of glEntries) {
+                const lines = await tx.select().from(journalEntryLines).where(eq(journalEntryLines.journalEntryId, entry.id));
+                for (const line of lines) {
+                    const inverseNetChange = -(line.debit - line.credit);
+                    await tx.run(sql`UPDATE gl_accounts SET balance = balance + ${inverseNetChange} WHERE code = ${line.accountCode}`);
+                }
+                await tx.delete(journalEntryLines).where(eq(journalEntryLines.journalEntryId, entry.id));
+                await tx.delete(journalEntries).where(eq(journalEntries.id, entry.id));
+            }
+
+            // 3. Delete Bill Lines
+            await tx.delete(vendorBillLines).where(eq(vendorBillLines.billId, billId));
+
+            // 4. Get affected item IDs before deleting layers
+            const affectedLayers = await tx.select({
+                itemId: inventoryLayers.itemId
+            }).from(inventoryLayers).where(
+                sql`${inventoryLayers.batchNumber} LIKE ${'BILL-' + billId + '-%'}`
+            );
+            const uniqueItemIds = [...new Set(affectedLayers.map(l => l.itemId))];
+
+            // 5. Delete Inventory Layers (CRITICAL FIX)
+            await tx.run(sql`
+                DELETE FROM inventory_layers
+                WHERE batch_number LIKE ${'BILL-' + billId + '-%'}
+            `);
+            console.log('✅ Inventory layers deleted');
+
+            // 5.5. Update denormalized inventory fields after deletion
+            for (const itemId of uniqueItemIds) {
+                try {
+                    await updateItemInventoryFields(itemId, tx);
+                } catch (syncError) {
+                    console.error(`[CRITICAL] Failed to sync denormalized fields for item ${itemId}:`, syncError);
+                    console.error(`[ACTION NEEDED] Inventory layers are deleted. Run resync from Settings → Inventory Tools`);
+                    // Don't throw - bill transaction should succeed even if sync fails
+                    // Layers are source of truth and are already deleted
+                }
+            }
+            console.log('✅ Inventory fields updated after bill deletion');
+
+            // 6. Delete Bill
+            await tx.delete(vendorBills).where(eq(vendorBills.id, billId));
+        });
+
+        revalidatePath('/purchasing/vendors');
+        return { success: true };
+
+    } catch (error: any) {
+        console.error('Delete Bill Error:', error);
+        return { success: false, error: error.message };
     }
 }
 
@@ -922,98 +1068,6 @@ export async function getBillById(billId: number) {
     }
 }
 
-/**
- * Delete Vendor Bill
- * Deletes an OPEN bill and reverses all GL entries
- *
- * @param billId - The ID of the bill to delete
- * @returns Success/error result
- */
-export async function deleteVendorBill(billId: number) {
-    'use server';
-
-    try {
-        // 1. Fetch bill with validation
-        const billResults = await db.select().from(vendorBills).where(eq(vendorBills.id, billId)).limit(1);
-        const bill = billResults[0];
-
-        if (!bill) {
-            return {
-                success: false,
-                error: 'Bill not found'
-            };
-        }
-
-        // 2. Perform deletion in transaction
-        await db.transaction(async (tx) => {
-            // 3a. Find the journal entry associated with this bill
-            const jeResults = await tx.select().from(journalEntries).where(eq(journalEntries.reference, bill.billNumber || '')).limit(1);
-            const jeToReverse = jeResults[0];
-
-            // Load lines if journal entry exists
-            let jeToReverseWithLines: any = null;
-            if (jeToReverse) {
-                const jeLines = await tx.select().from(journalEntryLines).where(eq(journalEntryLines.journalEntryId, jeToReverse.id));
-                jeToReverseWithLines = { ...jeToReverse, lines: jeLines };
-            }
-
-            // 3b. Create reversal journal entry
-            if (jeToReverseWithLines) {
-                const [reversalJE] = await tx.insert(journalEntries).values({
-                    date: new Date(),
-                    description: `Reversal: Deleted Bill ${bill.billNumber}`,
-                    reference: `REV-${bill.billNumber}`,
-                    transactionId: `bill-${billId}-deleted`,
-                    isPosted: true,
-                }).returning();
-
-                // 3c. Reverse each line (swap debit and credit)
-                for (const line of jeToReverseWithLines.lines) {
-                    await tx.insert(journalEntryLines).values({
-                        journalEntryId: reversalJE.id,
-                        accountCode: line.accountCode,
-                        debit: line.credit,  // Swap credit -> debit
-                        credit: line.debit,  // Swap debit -> credit
-                        description: `Reversal: ${line.description}`,
-                    });
-                }
-
-                // 3d. Update account balances for reversal entry
-                await updateAccountBalances(tx, reversalJE.id);
-
-                console.log(`✅ GL Reversal Created: ${reversalJE.id} for Bill ${bill.billNumber}`);
-            } else {
-                console.warn(`⚠️ No GL entry found for Bill ${bill.billNumber} - skipping reversal`);
-            }
-
-            // 3e. Delete all bill lines first (foreign key constraint)
-            await tx.delete(vendorBillLines).where(eq(vendorBillLines.billId, billId));
-            console.log(`✅ Bill Lines Deleted for Bill ${bill.billNumber}`);
-
-            // 3f. Delete the bill
-            await tx.delete(vendorBills).where(eq(vendorBills.id, billId));
-
-            console.log(`🗑️ Bill Deleted: ${bill.billNumber} (ID: ${billId})`);
-        });
-
-        // 4. Revalidate paths to refresh UI
-        revalidatePath('/purchasing/vendors');
-        revalidatePath('/purchasing/bills');
-
-        return {
-            success: true,
-            message: `Bill ${bill.billNumber} deleted successfully. GL entries have been reversed.`
-        };
-
-    } catch (error: any) {
-        console.error('❌ Delete Bill Error:', error);
-        return {
-            success: false,
-            error: error.message || 'An unexpected error occurred while deleting the bill'
-        };
-    }
-}
-
 export async function getPurchaseOrders() {
     const orders = await db.select().from(purchaseOrders).orderBy(desc(purchaseOrders.date));
 
@@ -1043,6 +1097,152 @@ export async function getPurchaseOrder(id: number) {
     }));
 
     return { ...po, vendor: vendorResults[0] || null, lines: linesWithItems };
+}
+
+/**
+ * Get Purchase Order for Editing
+ * Fetches a PO and transforms it to form-compatible format
+ */
+export async function getPurchaseOrderForEdit(poId: number) {
+    'use server';
+
+    try {
+        // Fetch PO
+        const poResults = await db.select().from(purchaseOrders).where(eq(purchaseOrders.id, poId)).limit(1);
+        const po = poResults[0];
+
+        if (!po) {
+            return { success: false, error: 'Purchase order not found' };
+        }
+
+        // Load lines
+        const lines = await db.select().from(purchaseOrderLines).where(eq(purchaseOrderLines.poId, poId)).orderBy(asc(purchaseOrderLines.id));
+
+        // Load vendor
+        const vendorResults = await db.select().from(vendors).where(eq(vendors.id, po.vendorId)).limit(1);
+        const vendor = vendorResults[0];
+
+        const poWithRelations = { ...po, lines, vendor };
+
+        // Transform to form format (matching purchasingDocumentSchema)
+        const formData = {
+            vendorId: String(po.vendorId),
+            transactionDate: po.date instanceof Date
+                ? po.date.toISOString().split('T')[0]
+                : new Date(po.date).toISOString().split('T')[0],
+            refNumber: po.orderNumber || '',
+            terms: 'Net 30', // Default
+            items: lines.map(line => ({
+                itemId: String(line.itemId),
+                description: line.description || '',
+                quantity: line.qtyOrdered,
+                unitPrice: line.unitCost / 100, // Convert from Tiyin to Decimal
+                amount: (line.qtyOrdered * line.unitCost) / 100,
+            })),
+            memo: po.notes || '',
+        };
+
+        console.log('✅ PO loaded for editing:', poId);
+        return { success: true, data: formData, po: poWithRelations };
+
+    } catch (error: any) {
+        console.error('❌ Get PO for Edit Error:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Update Purchase Order
+ * Updates PO header and lines. Prevents editing if:
+ * - PO status is CLOSED
+ * - Any items have been received (qtyReceived > 0)
+ *
+ * Note: POs don't create GL entries - GL is created on receipt/bill
+ */
+export async function updatePurchaseOrder(poId: number, data: any) {
+    'use server';
+
+    try {
+        console.log('💾 Updating purchase order...', { poId, refNumber: data.refNumber });
+
+        // Validate input using the shared schema
+        const val = purchasingDocumentSchema.parse(data);
+
+        // Calculate total amount in Tiyin
+        const totalAmountTiyin = val.items.reduce((sum, item) => {
+            const qty = Number(item.quantity);
+            const price = Number(item.unitPrice);
+            return sum + Math.round(qty * price * 100);
+        }, 0);
+
+        const result = await db.transaction(async (tx) => {
+            // STEP 1: LOAD & VALIDATE
+            const poResults = await tx.select().from(purchaseOrders).where(eq(purchaseOrders.id, poId)).limit(1);
+            const po = poResults[0];
+
+            if (!po) {
+                throw new Error('Purchase order not found');
+            }
+
+            // Check if PO is closed
+            if (po.status === 'CLOSED') {
+                throw new Error('Cannot edit a closed purchase order');
+            }
+
+            // Check if any items have been received
+            const lines = await tx.select().from(purchaseOrderLines).where(eq(purchaseOrderLines.poId, poId));
+            const hasReceivedItems = lines.some(line => line.qtyReceived > 0);
+
+            if (hasReceivedItems) {
+                throw new Error('Cannot edit purchase order after items have been received. Create a new PO instead.');
+            }
+
+            // STEP 2: DELETE OLD LINES
+            await tx.delete(purchaseOrderLines).where(eq(purchaseOrderLines.poId, poId));
+            console.log('✅ Old PO lines deleted');
+
+            // STEP 3: UPDATE HEADER
+            await tx.update(purchaseOrders)
+                .set({
+                    vendorId: Number(val.vendorId),
+                    date: new Date(val.transactionDate),
+                    orderNumber: val.refNumber,
+                    notes: val.memo || null,
+                    totalAmount: totalAmountTiyin,
+                    updatedAt: sql`(unixepoch())`,
+                })
+                .where(eq(purchaseOrders.id, poId));
+
+            console.log('✅ PO header updated');
+
+            // STEP 4: INSERT NEW LINES
+            for (const item of val.items) {
+                await tx.insert(purchaseOrderLines).values({
+                    poId: poId,
+                    itemId: Number(item.itemId),
+                    qtyOrdered: Number(item.quantity),
+                    qtyReceived: 0,
+                    unitCost: Math.round(Number(item.unitPrice) * 100), // Convert to Tiyin
+                    description: item.description || null,
+                });
+            }
+
+            console.log('✅ New PO lines inserted');
+
+            return { success: true };
+        });
+
+        revalidatePath('/purchasing/vendors');
+        revalidatePath('/purchasing/orders');
+        return result;
+
+    } catch (error: any) {
+        console.error('❌ Update PO Error:', error);
+        if (error.name === 'ZodError') {
+            return { success: false, error: 'Validation failed' };
+        }
+        return { success: false, error: error.message || 'Failed to update purchase order' };
+    }
 }
 
 /**
@@ -1178,6 +1378,24 @@ export async function payVendorBill(data: z.infer<typeof payBillSchema>) {
 
             for (const bill of vendorOpenBills) {
                 if (remainingToPay <= 0) break;
+
+                // THREE-WAY MATCH CONTROL: Cannot pay for undelivered goods
+                if (bill.poId) {
+                    const poLines = await tx.select().from(purchaseOrderLines)
+                        .where(eq(purchaseOrderLines.poId, bill.poId));
+
+                    const allReceived = poLines.every(pl => pl.qtyReceived >= pl.qtyOrdered);
+
+                    if (!allReceived) {
+                        const unreceived = poLines.filter(pl => pl.qtyReceived < pl.qtyOrdered);
+                        console.warn(
+                            `⚠️ PAYMENT BLOCKED: Bill #${bill.id} linked to PO #${bill.poId} has ${unreceived.length} unreceived line items. ` +
+                            `Three-way match control prevents payment.`
+                        );
+                        // Skip this bill and continue to next
+                        continue;
+                    }
+                }
 
                 const amountDue = bill.totalAmount;
 
