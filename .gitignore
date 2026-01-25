@@ -20,3 +20,6 @@ coverage/
 .DS_Store
 *.log
 tests/.auth/user.json
+
+# Git worktrees
+.worktrees/
