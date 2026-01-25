@@ -1487,3 +1487,197 @@ export async function receiveItems(poId: number, items: { lineId: number; qtyRec
         return { success: false, error: error.message || 'Failed to receive items' };
     }
 }
+
+/**
+ * Approve or Reject Vendor Bill
+ * ADMIN-only action to approve/reject bills pending approval
+ *
+ * @param billId - The ID of the bill to approve/reject
+ * @param action - 'APPROVE' or 'REJECT'
+ * @returns Success/error result with message
+ */
+export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') {
+    'use server';
+
+    try {
+        console.log(`📋 Processing bill ${action.toLowerCase()}: ${billId}`);
+
+        // 1. Require ADMIN role
+        const session = await auth();
+        if (!session?.user) {
+            return { success: false, error: 'Not authenticated' };
+        }
+
+        const userRole = (session.user as any)?.role as UserRole;
+        if (userRole !== UserRole.ADMIN) {
+            return { success: false, error: 'Admin access required for bill approval' };
+        }
+
+        // 2. Get current user ID
+        const userId = (session.user as any)?.id;
+        if (!userId) {
+            return { success: false, error: 'User ID not found in session' };
+        }
+
+        // 3. Process in transaction
+        const result = await db.transaction(async (tx) => {
+            // 4. Load bill and verify exists
+            const billResults = await tx.select().from(vendorBills).where(eq(vendorBills.id, billId)).limit(1);
+            const bill = billResults[0];
+
+            if (!bill) {
+                throw new Error('Bill not found');
+            }
+
+            // 5. Verify bill is in PENDING status
+            if (bill.approvalStatus !== 'PENDING') {
+                throw new Error(`Cannot ${action.toLowerCase()} bill with approval status: ${bill.approvalStatus}`);
+            }
+
+            // 6. Handle APPROVE action
+            if (action === 'APPROVE') {
+                // 6a. Update bill status
+                await tx.update(vendorBills)
+                    .set({
+                        approvalStatus: 'APPROVED',
+                        approvedBy: userId,
+                        approvedAt: new Date(),
+                        updatedAt: new Date(),
+                    })
+                    .where(eq(vendorBills.id, billId));
+
+                console.log(`✅ Bill ${billId} approved by user ${userId}`);
+
+                // 6b. Load bill lines to calculate GL entries
+                const billLines = await tx.select().from(vendorBillLines).where(eq(vendorBillLines.billId, billId));
+
+                // Load items for asset account mapping
+                const itemIds = billLines.map(line => line.itemId);
+                const itemsData = await tx.select({
+                    id: items.id,
+                    name: items.name,
+                    assetAccountCode: items.assetAccountCode,
+                    itemClass: items.itemClass,
+                }).from(items).where(inArray(items.id, itemIds));
+
+                const itemsMap = new Map(itemsData.map(i => [i.id, i]));
+
+                // 6c. Group line amounts by asset account
+                const accountTotals = new Map<string, number>();
+
+                for (const line of billLines) {
+                    const itemData = itemsMap.get(line.itemId);
+                    if (!itemData) {
+                        throw new Error(`Item ${line.itemId} not found`);
+                    }
+
+                    // Determine asset account (item-specific or class default)
+                    let assetAccount = itemData.assetAccountCode;
+                    if (!assetAccount) {
+                        const classDefaults: Record<string, string> = {
+                            'RAW_MATERIAL': '1310',
+                            'WIP': '1330',
+                            'FINISHED_GOODS': '1340',
+                            'SERVICE': '5100',
+                        };
+                        assetAccount = classDefaults[itemData.itemClass] || '1310';
+                    }
+
+                    // Accumulate by account
+                    accountTotals.set(
+                        assetAccount,
+                        (accountTotals.get(assetAccount) || 0) + line.amount
+                    );
+                }
+
+                // 6d. Create journal entry
+                const [je] = await tx.insert(journalEntries).values({
+                    date: bill.billDate,
+                    description: `Vendor Bill: ${bill.billNumber} (Approved)`,
+                    reference: bill.billNumber || `BILL-${billId}`,
+                    transactionId: `bill-${billId}`,
+                    isPosted: true,
+                }).returning();
+
+                // 6e. Create JE lines - Debit asset accounts
+                for (const [accountCode, amount] of accountTotals.entries()) {
+                    await tx.insert(journalEntryLines).values({
+                        journalEntryId: je.id,
+                        accountCode: accountCode,
+                        debit: amount,
+                        credit: 0,
+                        description: `Inventory/Expense - Bill ${bill.billNumber} (Approved)`,
+                    });
+                }
+
+                // 6f. Create JE line - Credit AP
+                await tx.insert(journalEntryLines).values({
+                    journalEntryId: je.id,
+                    accountCode: ACCOUNTS.AP_LOCAL, // 2100
+                    debit: 0,
+                    credit: bill.totalAmount,
+                    description: `Vendor Liability - ${bill.billNumber} (Approved)`,
+                });
+
+                // 6g. Update GL balances
+                for (const [accountCode, amount] of accountTotals.entries()) {
+                    await tx.run(sql`
+                        UPDATE gl_accounts
+                        SET balance = balance + ${amount},
+                            updated_at = CURRENT_TIMESTAMP
+                        WHERE code = ${accountCode}
+                    `);
+                }
+
+                await tx.run(sql`
+                    UPDATE gl_accounts
+                    SET balance = balance - ${bill.totalAmount},
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE code = ${ACCOUNTS.AP_LOCAL}
+                `);
+
+                console.log(`✅ GL entries posted for approved bill ${billId}`);
+
+                return {
+                    success: true,
+                    message: `Bill ${bill.billNumber} approved successfully. GL entries have been posted.`
+                };
+            }
+
+            // 7. Handle REJECT action
+            if (action === 'REJECT') {
+                // Update bill status only - NO GL posting
+                await tx.update(vendorBills)
+                    .set({
+                        approvalStatus: 'REJECTED',
+                        approvedBy: userId,
+                        approvedAt: new Date(),
+                        updatedAt: new Date(),
+                    })
+                    .where(eq(vendorBills.id, billId));
+
+                console.log(`❌ Bill ${billId} rejected by user ${userId}`);
+
+                return {
+                    success: true,
+                    message: `Bill ${bill.billNumber} rejected. No GL entries posted.`
+                };
+            }
+
+            throw new Error(`Invalid action: ${action}`);
+        });
+
+        // 8. Revalidate paths
+        revalidatePath('/purchasing/vendors');
+        revalidatePath(`/purchasing/bills/${billId}`);
+
+        return result;
+
+    } catch (error: any) {
+        console.error('❌ Approve Bill Error:', error);
+        return {
+            success: false,
+            error: error.message || `Failed to ${action.toLowerCase()} bill`
+        };
+    }
+}
