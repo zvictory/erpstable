@@ -523,8 +523,8 @@ export async function getAllUsers() {
             return { success: false, error: 'Not authenticated' };
         }
 
-        const userRole = (session.user as any).role as UserRole;
-        if (userRole !== UserRole.ADMIN) {
+        const userRole = (session.user as any)?.role;
+        if (!userRole || userRole !== UserRole.ADMIN) {
             return { success: false, error: 'Admin access required' };
         }
 
@@ -564,16 +564,20 @@ export async function updateUserRole(userId: number, newRole: string) {
             return { success: false, error: 'Not authenticated' };
         }
 
-        const userRole = (session.user as any).role as UserRole;
-        if (userRole !== UserRole.ADMIN) {
+        const userRole = (session.user as any)?.role;
+        if (!userRole || userRole !== UserRole.ADMIN) {
             return { success: false, error: 'Admin access required' };
         }
 
         // Validate input
         const validated = updateUserRoleSchema.parse({ userId, newRole });
 
-        // Get current user ID from session
-        const currentUserId = parseInt((session.user as any).id || '0');
+        // Get current user ID from session with better error handling
+        const currentUserIdStr = (session.user as any).id;
+        if (!currentUserIdStr) {
+            return { success: false, error: 'Invalid session: user ID not found' };
+        }
+        const currentUserId = parseInt(currentUserIdStr);
 
         // Prevent self-demotion: if current user ID matches userId and newRole is not ADMIN, return error
         if (currentUserId === validated.userId && validated.newRole !== 'ADMIN') {
