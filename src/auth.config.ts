@@ -55,6 +55,12 @@ export const authConfig = {
                 return true;
             }
 
+            if (path.startsWith('/settings/team')) {
+                if (!isLoggedIn) return false;
+                if (ROUTE_ACCESS_RULES['/settings/team'].includes(userRole!)) return true;
+                return Response.redirect(new URL('/unauthorized', nextUrl));
+            }
+
             return true;
         },
         // Adding role to token/session
