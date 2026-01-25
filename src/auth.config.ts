@@ -14,6 +14,7 @@ export const ROUTE_ACCESS_RULES = {
     '/factory': [UserRole.FACTORY_WORKER, UserRole.PLANT_MANAGER, UserRole.ADMIN],
     '/dashboard': [UserRole.PLANT_MANAGER, UserRole.ACCOUNTANT, UserRole.ADMIN],
     '/finance': [UserRole.ACCOUNTANT, UserRole.ADMIN],
+    '/settings/team': [UserRole.ADMIN],
 };
 
 export const authConfig = {
