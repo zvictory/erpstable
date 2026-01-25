@@ -75,9 +75,40 @@
         "deposits": "Депозиты",
         "company_financial": "Компания и Финансы",
         "chart_of_accounts": "План Счетов",
+        "general_ledger": "Журнал проводок",
+        "financial_reports": "Финансовые отчеты",
         "make_journal_entries": "Журнальные Проводки",
         "reports_center": "Центр Отчетов",
-        "back_to_dashboard": "Вернуться к Панели"
+        "back_to_dashboard": "Вернуться к Панели",
+        "dashboard": "Дашборд",
+        "commercial": "Коммерция",
+        "supply_chain": "Цепочка поставок",
+        "finance": "Бухгалтерия",
+        "collapse_sidebar": "Свернуть боковую панель",
+        "search_placeholder": "Поиск или команда...",
+        "settings": "Настройки",
+        "breadcrumbs": {
+            "home": "Главная",
+            "purchasing": "Закупки",
+            "vendors": "Поставщики",
+            "orders": "Заказы поставщику",
+            "inventory": "Склад",
+            "items": "Товары и Услуги",
+            "manufacturing": "Производство",
+            "lines": "Линии",
+            "mixing": "Смешивание",
+            "sublimation": "Сублимация",
+            "sales": "Продажи",
+            "customers": "Клиенты",
+            "invoices": "Счета",
+            "estimates": "Сметы",
+            "finance": "Бухгалтерия",
+            "chart_of_accounts": "План счетов",
+            "reports": "Отчеты",
+            "settings": "Настройки",
+            "new": "Новый",
+            "edit": "Редактировать"
+        }
     },
     "purchasing": {
         "modals": {
@@ -732,7 +763,8 @@
                 "searchPlaceholder": "Поиск по описанию или ссылке...",
                 "fromDate": "Дата С",
                 "toDate": "Дата До",
-                "clear": "Очистить"
+                "clear": "Очистить",
+                "showReversals": "Показать сторнирующие проводки (для аудита)"
             },
             "transactionTable": {
                 "headers": {
@@ -741,7 +773,8 @@
                     "description": "Описание",
                     "debit": "Дебет",
                     "credit": "Кредит",
-                    "balance": "Остаток"
+                    "balance": "Остаток",
+                    "actions": "Действия"
                 }
             },
             "emptyState": {
@@ -753,7 +786,16 @@
                 "edit": "Редактировать",
                 "newEntry": "Новая Запись",
                 "export": "Экспорт",
-                "loadMore": "Загрузить Еще"
+                "loadMore": "Загрузить Еще",
+                "editJournalEntry": "Редактировать Проводку",
+                "deleteJournalEntry": "Удалить Проводку"
+            },
+            "deleteConfirm": {
+                "title": "Удалить проводку №{id}?",
+                "message": "Это создаст сторнирующую проводку и пометит эту запись как удалённую.",
+                "warning": "Это действие нельзя отменить.",
+                "error": "Ошибка",
+                "failedToDelete": "Не удалось удалить"
             },
             "inactiveWarning": {
                 "title": "Неактивный Счет",
@@ -834,6 +876,46 @@
             },
             "outOfBalance": "КРИТИЧНО: ПРОВОДКА НЕ СБАЛАНСИРОВАНА"
         },
+        "generalLedger": {
+            "title": "Журнал проводок",
+            "subtitle": "Поиск и анализ всех бухгалтерских проводок",
+            "filters": {
+                "dateFrom": "Дата с",
+                "dateTo": "Дата по",
+                "account": "Счёт",
+                "allAccounts": "Все счета",
+                "type": "Тип операции",
+                "allTypes": "Все типы",
+                "bills": "Счета поставщиков",
+                "invoices": "Счета клиентам",
+                "payments": "Платежи",
+                "manual": "Ручные проводки",
+                "search": "Поиск",
+                "searchPlaceholder": "Поиск по описанию или ссылке...",
+                "showReversals": "Показать сторнирующие проводки (для аудита)"
+            },
+            "table": {
+                "date": "Дата",
+                "transaction": "Транзакция",
+                "account": "Счёт",
+                "description": "Описание",
+                "debit": "Дебет",
+                "credit": "Кредит"
+            },
+            "emptyState": {
+                "title": "Нет проводок",
+                "message": "Попробуйте изменить фильтры для поиска проводок"
+            },
+            "pagination": {
+                "showing": "Показано",
+                "of": "из",
+                "previous": "Назад",
+                "next": "Вперёд"
+            },
+            "buttons": {
+                "export": "Экспорт в CSV"
+            }
+        },
         "coa": {
             "title": "План счетов",
             "fields": {
@@ -849,7 +931,74 @@
             }
         },
         "reports": {
-            "title": "Отчеты",
+            "title": "Финансовые отчеты",
+            "subtitle": "Отчет о прибылях и убытках и балансовый отчет",
+            "tabs": {
+                "profitLoss": "Отчет о прибылях и убытках",
+                "balanceSheet": "Балансовый отчет"
+            },
+            "profitLoss": {
+                "title": "Отчет о прибылях и убытках",
+                "sections": {
+                    "revenue": "Доходы",
+                    "costOfGoodsSold": "Себестоимость продаж",
+                    "operatingExpenses": "Операционные расходы"
+                },
+                "totals": {
+                    "totalRevenue": "Итого доходы",
+                    "totalCOGS": "Итого себестоимость",
+                    "grossProfit": "Валовая прибыль",
+                    "totalExpenses": "Итого расходы",
+                    "netIncome": "Чистая прибыль (убыток)"
+                }
+            },
+            "balanceSheet": {
+                "title": "Балансовый отчет",
+                "asOf": "По состоянию на",
+                "sections": {
+                    "assets": "АКТИВЫ",
+                    "currentAssets": "Оборотные активы",
+                    "nonCurrentAssets": "Внеоборотные активы",
+                    "liabilities": "ОБЯЗАТЕЛЬСТВА",
+                    "currentLiabilities": "Краткосрочные обязательства",
+                    "nonCurrentLiabilities": "Долгосрочные обязательства",
+                    "equity": "КАПИТАЛ"
+                },
+                "totals": {
+                    "totalCurrentAssets": "Итого оборотные активы",
+                    "totalNonCurrentAssets": "Итого внеоборотные активы",
+                    "totalAssets": "ИТОГО АКТИВЫ",
+                    "totalCurrentLiabilities": "Итого краткосрочные обязательства",
+                    "totalNonCurrentLiabilities": "Итого долгосрочные обязательства",
+                    "totalLiabilities": "Итого обязательства",
+                    "totalEquity": "Итого капитал",
+                    "totalLiabilitiesAndEquity": "ИТОГО ОБЯЗАТЕЛЬСТВА И КАПИТАЛ"
+                },
+                "verification": {
+                    "title": "Проверка балансового уравнения",
+                    "assets": "Активы",
+                    "liabilitiesEquity": "Обязательства + Капитал",
+                    "difference": "Разница"
+                }
+            },
+            "datePresets": {
+                "thisMonth": "Этот месяц",
+                "lastMonth": "Прошлый месяц",
+                "thisQuarter": "Этот квартал",
+                "yearToDate": "С начала года",
+                "custom": "Произвольный период",
+                "today": "Сегодня",
+                "endOfLastMonth": "Конец прошлого месяца",
+                "endOfThisMonth": "Конец этого месяца",
+                "endOfYear": "Конец года"
+            },
+            "buttons": {
+                "print": "Печать",
+                "exportCSV": "Экспорт в CSV",
+                "refresh": "Обновить"
+            },
+            "loading": "Загрузка отчета...",
+            "noData": "Нет данных за выбранный период",
             "fields": {
                 "net_profit": "Чистая прибыль",
                 "fiscal_year": "Финансовый год"

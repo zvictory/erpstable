@@ -8,7 +8,7 @@ import {
     CreditCard, Banknote, Package, Activity, Hammer,
     BoxSelect, PieChart, FileBarChart, Receipt,
     FlaskConical, Snowflake, Building2, Factory,
-    LayoutDashboard, Settings, ChevronRight
+    LayoutDashboard, Settings, ChevronRight, BookOpen
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { UserRole } from '@/auth.config';
@@ -29,7 +29,7 @@ export default function Sidebar({ className, isCollapsed, toggleCollapse, userRo
     const NavGroup = ({ title, children }: { title: string; children: React.ReactNode }) => (
         <div className="mb-6">
             {!isCollapsed && (
-                <h3 className="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                <h3 className="px-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 mt-6">
                     {title}
                 </h3>
             )}
@@ -45,16 +45,16 @@ export default function Sidebar({ className, isCollapsed, toggleCollapse, userRo
             className={cn(
                 "flex items-center gap-3 px-3 py-2 mx-2 rounded-md transition-all duration-200 group relative",
                 active
-                    ? "bg-blue-600/10 text-blue-400"
-                    : "text-slate-400 hover:text-slate-100 hover:bg-slate-800",
+                    ? "bg-indigo-600 text-white shadow-md"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800/60",
                 isCollapsed && "justify-center px-2"
             )}
             title={isCollapsed ? label : undefined}
         >
-            <Icon size={20} className={cn("flex-shrink-0", active && "text-blue-400")} />
+            <Icon className={cn("w-5 h-5 flex-shrink-0")} />
             {!isCollapsed && <span className="text-sm font-medium">{label}</span>}
             {isCollapsed && active && (
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-500 rounded-l-full" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-indigo-600 rounded-l-full" />
             )}
         </Link>
     );
@@ -70,7 +70,7 @@ export default function Sidebar({ className, isCollapsed, toggleCollapse, userRo
             {/* Header / Logo */}
             <div className="h-16 flex items-center px-4 border-b border-slate-800">
                 <div className={cn("flex items-center gap-3", isCollapsed && "justify-center w-full")}>
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-blue-900/20">
+                    <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-900/20">
                         L
                     </div>
                     {!isCollapsed && <span className="font-bold text-slate-100 text-lg tracking-tight">LazaERP</span>}
@@ -80,32 +80,31 @@ export default function Sidebar({ className, isCollapsed, toggleCollapse, userRo
             {/* Navigation Content */}
             <div className="flex-1 overflow-y-auto py-6 custom-scrollbar">
 
-                <NavGroup title={t('mainTitle')}>
-                    <NavItem href="/" icon={LayoutDashboard} label="Dashboard" active={pathname === '/'} />
+                {/* Commercial */}
+                <NavGroup title={t('commercial')}>
+                    <NavItem href="/" icon={LayoutDashboard} label={t('dashboard')} active={pathname === '/'} />
+                    <NavItem href="/sales/customers" icon={Users} label={t('customers')} active={isActive('/sales/customers')} />
+                    <NavItem href="/sales/invoices" icon={Receipt} label={t('invoices')} active={isActive('/sales/invoices')} />
+                    <NavItem href="/sales/estimates" icon={FileText} label={t('estimates')} active={isActive('/sales/estimates')} />
                 </NavGroup>
 
-                <NavGroup title={t('purchasing')}>
+                {/* Supply Chain */}
+                <NavGroup title={t('supply_chain')}>
                     <NavItem href="/purchasing/vendors" icon={Users} label={t('vendors')} active={isActive('/purchasing/vendors')} />
                     <NavItem href="/purchasing/orders" icon={ShoppingCart} label={t('purchase_orders')} active={isActive('/purchasing/orders')} />
-                </NavGroup>
-
-                <NavGroup title={t('manufacturing')}>
                     <NavItem href="/inventory/items" icon={Package} label={t('items_services')} active={isActive('/inventory/items')} />
-                    <NavItem href="/manufacturing/lines" icon={Factory} label="Production Lines" active={isActive('/manufacturing/lines')} />
+                    <NavItem href="/manufacturing/lines" icon={Factory} label={t('production_lines')} active={isActive('/manufacturing/lines')} />
                     <NavItem href="/manufacturing/mixing" icon={FlaskConical} label={t('mixing')} active={isActive('/manufacturing/mixing')} />
                     <NavItem href="/manufacturing/sublimation" icon={Snowflake} label={t('sublimation')} active={isActive('/manufacturing/sublimation')} />
                 </NavGroup>
 
-                <NavGroup title={t('sales')}>
-                    <NavItem href="/sales/customers" icon={Users} label={t('customers')} active={isActive('/sales/customers')} />
-                    <NavItem href="/sales/estimates" icon={FileText} label={t('estimates')} active={isActive('/sales/estimates')} />
-                    <NavItem href="/sales/invoices" icon={Receipt} label={t('new_invoice')} active={isActive('/sales/invoices')} />
-                </NavGroup>
-
-                <NavGroup title={t('company_financial')}>
+                {/* Finance */}
+                <NavGroup title={t('finance')}>
                     <NavItem href="/finance/chart-of-accounts" icon={FileBarChart} label={t('chart_of_accounts')} active={isActive('/finance/chart-of-accounts')} />
+                    <NavItem href="/finance/general-ledger" icon={BookOpen} label={t('general_ledger')} active={isActive('/finance/general-ledger')} />
+                    <NavItem href="/finance/reports" icon={PieChart} label={t('financial_reports')} active={isActive('/finance/reports')} />
                     <NavItem href="/reports" icon={PieChart} label={t('reports_center')} active={isActive('/reports')} />
-                    <NavItem href="/settings" icon={Settings} label={t('settings') || "Settings"} active={isActive('/settings')} />
+                    <NavItem href="/settings" icon={Settings} label={t('settings')} active={isActive('/settings')} />
                 </NavGroup>
             </div>
 
@@ -115,7 +114,7 @@ export default function Sidebar({ className, isCollapsed, toggleCollapse, userRo
                     onClick={toggleCollapse}
                     className="w-full flex items-center justify-center p-2 rounded-md text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
                 >
-                    {isCollapsed ? <ChevronRight size={20} /> : <div className="flex items-center gap-2"><ChevronLeft size={16} /> <span className="text-sm">Collapse Sidebar</span></div>}
+                    {isCollapsed ? <ChevronRight size={20} /> : <div className="flex items-center gap-2"><ChevronLeft size={16} /> <span className="text-sm">{t('collapse_sidebar')}</span></div>}
                 </button>
             </div>
         </aside>
