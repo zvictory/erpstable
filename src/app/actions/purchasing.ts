@@ -1032,8 +1032,21 @@ export async function getBillById(billId: number) {
     'use server';
 
     try {
-        // Fetch bill with lines
-        const billResults = await db.select().from(vendorBills).where(eq(vendorBills.id, billId)).limit(1);
+        // Fetch bill with lines - Include approval fields for banner
+        const billResults = await db.select({
+            id: vendorBills.id,
+            vendorId: vendorBills.vendorId,
+            poId: vendorBills.poId,
+            billDate: vendorBills.billDate,
+            billNumber: vendorBills.billNumber,
+            totalAmount: vendorBills.totalAmount,
+            status: vendorBills.status,
+            approvalStatus: vendorBills.approvalStatus,
+            approvedBy: vendorBills.approvedBy,
+            approvedAt: vendorBills.approvedAt,
+            createdAt: vendorBills.createdAt,
+            updatedAt: vendorBills.updatedAt,
+        }).from(vendorBills).where(eq(vendorBills.id, billId)).limit(1);
         const bill = billResults[0];
 
         if (!bill) {
