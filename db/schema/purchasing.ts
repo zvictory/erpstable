@@ -3,6 +3,7 @@ import { sql, relations } from 'drizzle-orm';
 import { integer, sqliteTable, text, uniqueIndex, index } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { items } from './inventory';
+import { users } from './auth';
 
 // --- Shared Columns ---
 const timestampFields = {
@@ -51,6 +52,7 @@ export const purchaseOrderLines = sqliteTable('purchase_order_lines', {
 
     qtyOrdered: integer('qty_ordered').notNull(), // In Base UOM
     qtyReceived: integer('qty_received').default(0).notNull(),
+    qtyBilled: integer('qty_billed').default(0).notNull(), // Three-way match control
 
     unitCost: integer('unit_cost').notNull(), // Agreed price per unit (Tiyin)
 
@@ -70,8 +72,15 @@ export const vendorBills = sqliteTable('vendor_bills', {
     totalAmount: integer('total_amount').notNull(),
     status: text('status').default('OPEN').notNull(), // OPEN, PAID, PARTIAL
 
+    approvalStatus: text('approval_status', { enum: ['APPROVED', 'PENDING', 'REJECTED', 'NOT_REQUIRED'] }).default('NOT_REQUIRED').notNull(),
+    approvedBy: integer('approved_by').references(() => users.id),
+    approvedAt: integer('approved_at', { mode: 'timestamp' }),
+
     ...timestampFields,
-});
+}, (table) => ({
+    approvalStatusIdx: index('vendor_bills_approval_status_idx').on(table.approvalStatus),
+    approvedByIdx: index('vendor_bills_approved_by_idx').on(table.approvedBy),
+}));
 
 export const vendorBillLines = sqliteTable('vendor_bill_lines', {
     id: integer('id').primaryKey({ autoIncrement: true }),
@@ -123,6 +132,10 @@ export const vendorBillsRelations = relations(vendorBills, ({ one, many }) => ({
     purchaseOrder: one(purchaseOrders, {
         fields: [vendorBills.poId],
         references: [purchaseOrders.id],
+    }),
+    approver: one(users, {
+        fields: [vendorBills.approvedBy],
+        references: [users.id],
     }),
     lines: many(vendorBillLines),
 }));
