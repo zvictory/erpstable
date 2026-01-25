@@ -550,37 +550,41 @@ export async function createVendorBill(data: any) {
                 console.log(`✅ Updated qtyBilled for PO #${val.poId}`);
             }
 
-            // 3. Create inventory layers (FIFO tracking)
-            for (let i = 0; i < val.items.length; i++) {
-                const item = val.items[i];
-                const qty = parseFloat(item.quantity as any) || 0;
-                const price = parseFloat(item.unitPrice as any) || 0;
-                const unitCostTiyin = Math.round(price * 100);
+            // 3. Create inventory layers (FIFO tracking) - Only if approval not required
+            if (!requiresApproval) {
+                for (let i = 0; i < val.items.length; i++) {
+                    const item = val.items[i];
+                    const qty = parseFloat(item.quantity as any) || 0;
+                    const price = parseFloat(item.unitPrice as any) || 0;
+                    const unitCostTiyin = Math.round(price * 100);
 
-                await tx.insert(inventoryLayers).values({
-                    itemId: Number(item.itemId),
-                    batchNumber: `BILL-${bill.id}-${item.itemId}`,
-                    initialQty: qty,
-                    remainingQty: qty,
-                    unitCost: unitCostTiyin,
-                    receiveDate: val.transactionDate,
-                    isDepleted: false,
-                });
-            }
-
-            // 3b. Update denormalized inventory fields after creating layers
-            const uniqueItemIds = [...new Set(val.items.map(item => Number(item.itemId)))];
-            for (const itemId of uniqueItemIds) {
-                try {
-                    await updateItemInventoryFields(itemId, tx);
-                } catch (syncError) {
-                    console.error(`[CRITICAL] Failed to sync denormalized fields for item ${itemId}:`, syncError);
-                    console.error(`[ACTION NEEDED] Inventory layers are saved. Run resync from Settings → Inventory Tools`);
-                    // Don't throw - bill transaction should succeed even if sync fails
-                    // Layers are source of truth and are already saved
+                    await tx.insert(inventoryLayers).values({
+                        itemId: Number(item.itemId),
+                        batchNumber: `BILL-${bill.id}-${item.itemId}`,
+                        initialQty: qty,
+                        remainingQty: qty,
+                        unitCost: unitCostTiyin,
+                        receiveDate: val.transactionDate,
+                        isDepleted: false,
+                    });
                 }
+
+                // 3b. Update denormalized inventory fields after creating layers
+                const uniqueItemIds = [...new Set(val.items.map(item => Number(item.itemId)))];
+                for (const itemId of uniqueItemIds) {
+                    try {
+                        await updateItemInventoryFields(itemId, tx);
+                    } catch (syncError) {
+                        console.error(`[CRITICAL] Failed to sync denormalized fields for item ${itemId}:`, syncError);
+                        console.error(`[ACTION NEEDED] Inventory layers are saved. Run resync from Settings → Inventory Tools`);
+                        // Don't throw - bill transaction should succeed even if sync fails
+                        // Layers are source of truth and are already saved
+                    }
+                }
+                console.log('✅ Inventory fields updated for all items');
+            } else {
+                console.log('⏸️  Inventory layer creation skipped - Bill requires approval');
             }
-            console.log('✅ Inventory fields updated for all items');
 
             // 4. GL Entry: Post to item-specific asset accounts (ONLY if no approval required)
             if (!requiresApproval) {
@@ -1536,6 +1540,9 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
 
             // 6. Handle APPROVE action
             if (action === 'APPROVE') {
+                // Check period lock (GAAP/IFRS compliance - prevent posting to closed periods)
+                await checkPeriodLock(bill.billDate);
+
                 // 6a. Update bill status
                 await tx.update(vendorBills)
                     .set({
@@ -1548,10 +1555,34 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
 
                 console.log(`✅ Bill ${billId} approved by user ${userId}`);
 
-                // 6b. Load bill lines to calculate GL entries
+                // 6b. Create inventory layers (deferred until approval)
                 const billLines = await tx.select().from(vendorBillLines).where(eq(vendorBillLines.billId, billId));
 
-                // Load items for asset account mapping
+                for (const line of billLines) {
+                    await tx.insert(inventoryLayers).values({
+                        itemId: line.itemId,
+                        batchNumber: `BILL-${billId}-${line.itemId}`,
+                        initialQty: line.quantity,
+                        remainingQty: line.quantity,
+                        unitCost: line.unitPrice,
+                        receiveDate: bill.billDate,
+                        isDepleted: false,
+                    });
+                }
+
+                // Update denormalized inventory fields
+                const uniqueItemIds = [...new Set(billLines.map(l => l.itemId))];
+                for (const itemId of uniqueItemIds) {
+                    try {
+                        await updateItemInventoryFields(itemId, tx);
+                    } catch (syncError) {
+                        console.error(`[CRITICAL] Failed to sync denormalized fields for item ${itemId}:`, syncError);
+                    }
+                }
+
+                console.log(`✅ Inventory layers created for approved bill ${billId}`);
+
+                // 6c. Load items for asset account mapping
                 const itemIds = billLines.map(line => line.itemId);
                 const itemsData = await tx.select({
                     id: items.id,
@@ -1562,7 +1593,7 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
 
                 const itemsMap = new Map(itemsData.map(i => [i.id, i]));
 
-                // 6c. Group line amounts by asset account
+                // 6d. Group line amounts by asset account
                 const accountTotals = new Map<string, number>();
 
                 for (const line of billLines) {
@@ -1590,7 +1621,7 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
                     );
                 }
 
-                // 6d. Create journal entry
+                // 6e. Create journal entry
                 const [je] = await tx.insert(journalEntries).values({
                     date: bill.billDate,
                     description: `Vendor Bill: ${bill.billNumber} (Approved)`,
@@ -1599,7 +1630,7 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
                     isPosted: true,
                 }).returning();
 
-                // 6e. Create JE lines - Debit asset accounts
+                // 6f. Create JE lines - Debit asset accounts
                 for (const [accountCode, amount] of accountTotals.entries()) {
                     await tx.insert(journalEntryLines).values({
                         journalEntryId: je.id,
@@ -1610,7 +1641,7 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
                     });
                 }
 
-                // 6f. Create JE line - Credit AP
+                // 6g. Create JE line - Credit AP
                 await tx.insert(journalEntryLines).values({
                     journalEntryId: je.id,
                     accountCode: ACCOUNTS.AP_LOCAL, // 2100
@@ -1619,7 +1650,7 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
                     description: `Vendor Liability - ${bill.billNumber} (Approved)`,
                 });
 
-                // 6g. Update GL balances
+                // 6h. Update GL balances
                 for (const [accountCode, amount] of accountTotals.entries()) {
                     await tx.run(sql`
                         UPDATE gl_accounts
