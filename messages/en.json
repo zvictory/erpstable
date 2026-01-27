@@ -699,6 +699,7 @@
             "total": "TOTAL",
             "bankDetails": "Bank Details",
             "bankName": "Bank Name",
+            "mfo": "MFO",
             "accountNumber": "Account Number",
             "director": "Director",
             "accountant": "Chief Accountant",

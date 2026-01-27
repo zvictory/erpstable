@@ -699,6 +699,7 @@
             "total": "TOPLAM",
             "bankDetails": "Banka Bilgileri",
             "bankName": "Banka Adı",
+            "mfo": "MFO",
             "accountNumber": "Hesap Numarası",
             "director": "Müdür",
             "accountant": "Baş Muhasebeci",

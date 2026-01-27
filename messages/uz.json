@@ -699,6 +699,7 @@
             "total": "JAMI",
             "bankDetails": "Bank rekvizitlari",
             "bankName": "Bank nomi",
+            "mfo": "MFO",
             "accountNumber": "Hisob raqami",
             "director": "Direktor",
             "accountant": "Bosh hisobchi",
