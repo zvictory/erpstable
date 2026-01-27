@@ -7,6 +7,7 @@
         "save": "Сохранить",
         "cancel": "Отмена",
         "delete": "Удалить",
+        "deleting": "Удаление...",
         "edit": "Редактировать",
         "create": "Создать",
         "actions": "Действия",
@@ -36,7 +37,10 @@
         "archived": "Архивировано",
         "active": "Активно",
         "inactive": "Неактивно",
-        "optional": "Опционально"
+        "optional": "Опционально",
+        "select_placeholder": "Выбрать...",
+        "search_placeholder": "Поиск...",
+        "no_results": "Результаты не найдены"
     },
     "status": {
         "open": "Открыто",
@@ -53,6 +57,62 @@
     "dashboard": {
         "title": "Панель управления",
         "mainTitle": "Stable ERP",
+        "page": {
+            "title": "Обзор",
+            "subtitle": "Финансовый снимок и недавняя активность",
+            "quick_actions": "Быстрые Действия"
+        },
+        "metrics": {
+            "cash_on_hand": "Денежные средства",
+            "accounts_receivable": "Дебиторская задолженность",
+            "accounts_payable": "Кредиторская задолженность",
+            "net_working_capital": "Чистый оборотный капитал",
+            "sublabels": {
+                "coming_in": "Поступает",
+                "going_out": "Расходуется"
+            }
+        },
+        "actions": {
+            "new_invoice": "Новый Счет",
+            "new_bill": "Новый Счет Поставщика",
+            "receive_payment": "Получить Платеж",
+            "add_product": "Добавить Товар"
+        },
+        "recent_activity": {
+            "title": "Недавняя Активность",
+            "empty": "Нет недавних транзакций",
+            "headers": {
+                "date": "Дата",
+                "type": "Тип",
+                "party": "Контрагент",
+                "amount": "Сумма"
+            },
+            "types": {
+                "invoice": "Счет",
+                "bill": "Счет поставщика",
+                "customer_payment": "Платеж от клиента",
+                "vendor_payment": "Платеж поставщику"
+            }
+        },
+        "alerts": {
+            "title": "Оповещения",
+            "empty_title": "Все в порядке!",
+            "empty_subtitle": "Нет оповещений на данный момент",
+            "types": {
+                "low_stock": {
+                    "title": "Товары с низким запасом",
+                    "description": "{count, plural, =1 {# товар} few {# товара} other {# товаров}} ниже точки заказа"
+                },
+                "overdue_invoice": {
+                    "title": "Просроченные Счета",
+                    "description": "{count, plural, =1 {# счет} few {# счета} other {# счетов}} просрочен"
+                },
+                "pending_approval": {
+                    "title": "Ожидают Утверждения",
+                    "description": "{count, plural, =1 {# заказ} few {# заказа} other {# заказов}} ожидает проверки"
+                }
+            }
+        },
         "purchasing": "Закупки и Кредиторская Задолженность",
         "vendors": "Поставщики",
         "purchase_orders": "Заказы Поставщику",
@@ -84,6 +144,7 @@
         "commercial": "Коммерция",
         "supply_chain": "Цепочка поставок",
         "finance": "Бухгалтерия",
+        "reconciliation": "Сверка складских остатков",
         "collapse_sidebar": "Свернуть боковую панель",
         "search_placeholder": "Поиск или команда...",
         "settings": "Настройки",
@@ -94,6 +155,7 @@
             "orders": "Заказы поставщику",
             "inventory": "Склад",
             "items": "Товары и Услуги",
+            "reconciliation": "Сверка",
             "manufacturing": "Производство",
             "lines": "Линии",
             "mixing": "Смешивание",
@@ -111,6 +173,53 @@
         }
     },
     "purchasing": {
+        "purchase_orders_page": {
+            "title": "Заказы поставщику",
+            "description": "Отслеживайте заказы и полученные товары.",
+            "new_order": "Новый заказ",
+            "loading": "Загрузка заказов..."
+        },
+        "bill_approval": {
+            "pending_approval": "Ожидает утверждения",
+            "waiting_approval": "Ожидает утверждения администратором",
+            "amount_label": "Сумма:",
+            "processing": "Обработка...",
+            "approve": "Утвердить",
+            "reject": "Отклонить",
+            "approved": "Утверждено",
+            "rejected": "Отклонено",
+            "rejected_message": "Этот счёт был отклонён и не будет обработан"
+        },
+        "payment_modal": {
+            "title": "Зарегистрировать платёж",
+            "paying_bill": "Оплата счёта",
+            "to": "для",
+            "amount": "Сумма",
+            "payment_date": "Дата платежа",
+            "bank_account": "Банковский счёт",
+            "reference": "Ссылка",
+            "confirm_payment": "Подтвердить платёж"
+        },
+        "bills_page": {
+            "title": "Счета поставщиков",
+            "coming_soon": "Модуль счетов поставщиков скоро появится.",
+            "start_hint": "Начните с создания заказов на закупку и приёмки товаров."
+        },
+        "po_detail": {
+            "loading": "Загрузка заказа...",
+            "edit": "Редактировать",
+            "delete": "Удалить",
+            "receive_items": "Принять товары",
+            "order_items": "Товары заказа",
+            "sku": "Артикул",
+            "received": "получено",
+            "remaining": "осталось",
+            "vendor_details": "Информация о поставщике",
+            "name": "Название",
+            "email": "Email",
+            "phone": "Телефон",
+            "notes": "Примечания"
+        },
         "modals": {
             "delete_po": {
                 "title": "Удалить заказ на закупку {orderNumber}",
@@ -387,6 +496,7 @@
             "center_title": "Центр клиентов",
             "command_center": "Командный центр продаж",
             "new_customer": "Новый клиент",
+            "new_customer_title": "Новый клиент",
             "search_placeholder": "Поиск клиентов...",
             "filters": {
                 "all": "Все",
@@ -557,6 +667,93 @@
                     "update_balance": "Обновить баланс клиента"
                 }
             }
+        },
+        "grid": {
+            "headers": {
+                "item": "Товар",
+                "description": "Описание",
+                "quantity": "Кол-во",
+                "uom": "Ед. изм.",
+                "unit_price": "Цена",
+                "amount": "Сумма",
+                "warehouse": "Склад"
+            },
+            "placeholders": {
+                "select_item": "Выберите товар...",
+                "description": "Описание...",
+                "select_warehouse": "Выберите склад..."
+            },
+            "add_line": "Добавить строку",
+            "delete_confirmation": {
+                "title": "Удалить строку?",
+                "description": "Это действие нельзя отменить."
+            }
+        },
+        "document_form": {
+            "fields": {
+                "customer": "Клиент",
+                "invoice_date": "Дата счета",
+                "payment_terms": "Условия оплаты",
+                "memo": "Заметка"
+            },
+            "placeholders": {
+                "customer": "Выберите клиента...",
+                "memo": "Дополнительная информация..."
+            },
+            "payment_terms": {
+                "net_30": "Нетто 30",
+                "net_15": "Нетто 15",
+                "due_on_receipt": "При получении"
+            }
+        },
+        "stock_validation": {
+            "service_item": "Услуга (запас не требуется)",
+            "insufficient_stock": "Недостаточный запас",
+            "stock_details": "Запрошено: {requested} | Доступно: {available}",
+            "low_stock_warning": "Предупреждение о низком запасе ({available} доступно, {remaining} останется)",
+            "stock_ok": "Запас в порядке ({available} доступно)"
+        },
+        "picking_locations": {
+            "title": "Места отбора (порядок FIFO)",
+            "loading": "Загрузка мест отбора...",
+            "warning_title": "Места склада не полностью настроены",
+            "warning_detail": "Товар #{itemId} требует еще {shortQty} единиц в складских местах.",
+            "warning_explanation": "Товар есть на складе, но не размещен в конкретных ячейках.",
+            "warning_generic": "Некоторые товары не размещены в складских местах.",
+            "can_proceed": "✓ Вы все еще можете создать этот счет",
+            "future_steps_intro": "Для включения мест отбора:",
+            "future_steps": {
+                "receive_inventory": "Принимайте товары через Счета/Заказы поставщику",
+                "use_transfer": "Используйте Перемещение для назначения запасов"
+            },
+            "item_label": "Товар",
+            "unassigned": "НЕ НАЗНАЧЕНО",
+            "batch_label": "Партия",
+            "units": "единиц",
+            "no_stock_available": "⚠️ Нет запаса для этого товара"
+        },
+        "pdf": {
+            "companyName": "Stable ERP",
+            "invoice": "СЧЕТ",
+            "invoiceNumber": "№ Счета",
+            "date": "Дата",
+            "dueDate": "Срок оплаты",
+            "billTo": "Счет для",
+            "taxId": "ИНН",
+            "phone": "Телефон",
+            "email": "Email",
+            "itemColumn": "Наименование",
+            "qtyColumn": "Кол-во",
+            "priceColumn": "Цена",
+            "amountColumn": "Сумма",
+            "subtotal": "Промежуточный итог",
+            "total": "ИТОГО",
+            "bankDetails": "Банковские реквизиты",
+            "bankName": "Название банка",
+            "accountNumber": "Расчетный счет",
+            "director": "Директор",
+            "accountant": "Главный бухгалтер",
+            "signature": "Подпись"
         }
     },
     "manufacturing": {
@@ -721,6 +918,7 @@
             "title": "План Счетов",
             "subtitle": "Финансовое положение и остатки на счетах в реальном времени",
             "loading": "Загрузка счетов...",
+            "enter_opening_balances": "Ввести начальные остатки",
             "accountTypes": {
                 "asset": "Актив",
                 "liability": "Обязательство",
@@ -1018,6 +1216,26 @@
         "new_item": "Новый Товар",
         "edit_item": "Редактировать Товар",
         "no_sku": "Нет артикула",
+        "reconciliation_page": {
+            "title": "Сверка остатков на складе",
+            "meta_title": "Сверка остатков на складе",
+            "description": "Сравните стоимость запасов в Главной книге (финансовые данные) со значениями в Журнале товаров (физические остатки). Выявляйте и устраняйте расхождения между бухгалтерскими и складскими данными."
+        },
+        "category_combobox": {
+            "select_category": "Выберите категорию...",
+            "search_categories": "Поиск категорий...",
+            "no_categories": "Категории не найдены",
+            "create_new_category": "Создать новую категорию"
+        },
+        "data_grid": {
+            "sort": {
+                "name": "Название",
+                "qty_on_hand": "Кол-во на складе",
+                "price": "Цена",
+                "date_added": "Дата добавления",
+                "label": "Сортировка"
+            }
+        },
         "table": {
             "item": "Товар",
             "type": "Тип",
@@ -1170,6 +1388,49 @@
         "title": "Настройки",
         "uom": "Единицы измерения",
         "categories": "Категории",
+        "preferences": {
+            "title": "Предпочтения системы",
+            "description": "Настройте глобальные правила и функции системы",
+            "open": "Открыть настройки",
+            "error_loading": "Ошибка загрузки настроек",
+            "category": {
+                "purchasing": "Закупки",
+                "inventory": "Склад",
+                "finance": "Финансы",
+                "system": "Система"
+            },
+            "bill_approval_enabled": "Включить утверждение счетов",
+            "bill_approval_enabled_desc": "Требовать утверждение администратором для крупных счетов поставщиков перед проводкой в ГК и складской учет",
+            "bill_approval_threshold": "Порог утверждения (тийины)",
+            "bill_approval_threshold_desc": "Счета выше этой суммы требуют утверждения. Значение в тийинах (10M UZS = 1,000,000,000 тийин)",
+            "negative_stock_allowed": "Разрешить отрицательный остаток",
+            "negative_stock_allowed_desc": "Разрешить продажу товаров с отрицательным остатком на складе (не рекомендуется для производства)",
+            "update_success": "Настройка обновлена",
+            "update_error": "Ошибка обновления настройки",
+            "reset_to_default": "Сбросить к значению по умолчанию",
+            "reset_success": "Настройка сброшена"
+        },
+        "inventory_integrity": {
+            "title": "Целостность данных склада",
+            "sync_status": "Статус синхронизации",
+            "reconciliation_dashboard": "Панель сверки",
+            "reconciliation_description": "Сравните стоимость запасов в ГК с физическими остатками. Выявляйте и устраняйте расхождения между бухгалтерскими и складскими данными.",
+            "open_reconciliation": "Открыть панель сверки"
+        },
+        "inventory_tools": {
+            "title": "Инструменты склада",
+            "description": "Обновляет количество на складе и среднюю стоимость из существующих слоев запасов. Безопасно запускать, если денормализованные поля кажутся неверными."
+        },
+        "danger_zone": {
+            "title": "Опасная зона",
+            "rebuild_layers": "Пересоздать слои запасов (Крайняя мера)"
+        },
+        "system_admin": {
+            "title": "Системное администрирование",
+            "reset_title": "Сброс при запуске в эксплуатацию",
+            "reset_description": "Удалить все тестовые транзакционные данные (счета, заказы на закупку, слои запасов и т.д.) с сохранением мастер-данных (товары, поставщики, клиенты, план счетов).",
+            "reset_warning": "Это действие нельзя отменить."
+        },
         "uom_section": {
             "title": "Единицы измерения",
             "description": "Управляйте единицами измерения для товаров на складе",

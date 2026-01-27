@@ -37,6 +37,8 @@ export const journalEntries = sqliteTable('journal_entries', {
     ...timestampFields,
 }, (t) => ({
     dateIdx: index('je_date_idx').on(t.date),
+    transactionIdIdx: index('idx_je_transaction_id').on(t.transactionId),
+    referenceIdx: index('idx_je_reference').on(t.reference),
 }));
 
 export const journalEntryLines = sqliteTable('journal_entry_lines', {
@@ -50,7 +52,9 @@ export const journalEntryLines = sqliteTable('journal_entry_lines', {
     credit: integer('credit').default(0).notNull(),
 
     description: text('description'), // Line item desc
-});
+}, (t) => ({
+    accountCodeIdx: index('idx_je_lines_account').on(t.accountCode),
+}));
 
 // Single row table for global settings
 export const systemSettings = sqliteTable('system_settings', {
@@ -58,6 +62,7 @@ export const systemSettings = sqliteTable('system_settings', {
     key: text('key').notNull().unique(), // e.g. "financials"
 
     lockDate: integer('lock_date', { mode: 'timestamp' }), // Books closed up to this date
+    preferences: text('preferences', { mode: 'json' }).notNull().default(sql`'{}'`), // Global preferences (feature flags, thresholds)
 
     updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
 });

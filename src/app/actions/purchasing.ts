@@ -15,6 +15,8 @@ import { updateItemInventoryFields } from './inventory-tools';
 import { checkPeriodLock } from './finance';
 import { auth } from '@/auth';
 import { UserRole } from '@/auth.config';
+import { getPreferences } from './preferences';
+import { getPreferenceBoolean, getPreferenceInteger } from '@/lib/preferences';
 
 // --- Validation Schemas ---
 const vendorSchema = z.object({
@@ -479,9 +481,27 @@ export async function createVendorBill(data: any) {
 
         const totalAmountTiyin = totalSubtotalTiyin;
 
-        // Check if approval required: amount > 10M UZS AND user is not ADMIN
-        const APPROVAL_THRESHOLD = 10_000_000 * 100; // 10M UZS in Tiyin
-        const requiresApproval = totalAmountTiyin > APPROVAL_THRESHOLD && userRole !== UserRole.ADMIN;
+        // Fetch preferences to determine if approval is required
+        const prefsResult = await getPreferences();
+        const prefs = prefsResult.success ? prefsResult.preferences : {};
+
+        // Check if approval workflow is enabled
+        const billApprovalEnabled = getPreferenceBoolean(
+            prefs['BILL_APPROVAL_ENABLED'],
+            true // default: enabled
+        );
+
+        // Get current approval threshold
+        const approvalThreshold = getPreferenceInteger(
+            prefs['BILL_APPROVAL_THRESHOLD'],
+            1_000_000_000 // default: 10M UZS in Tiyin
+        );
+
+        // Determine if this bill requires approval
+        const requiresApproval =
+            billApprovalEnabled && // Feature enabled
+            totalAmountTiyin > approvalThreshold && // Amount exceeds threshold
+            userRole !== UserRole.ADMIN; // User is not admin
 
         // Pre-validation: Load all items and validate
         const itemIds = val.items.map(item => Number(item.itemId));
@@ -504,8 +524,8 @@ export async function createVendorBill(data: any) {
         await db.transaction(async (tx) => {
             // 1. Create Bill
             const [bill] = await tx.insert(vendorBills).values({
-                vendorId: val.vendorId,
-                poId: val.poId,
+                vendorId: Number(val.vendorId),
+                poId: val.poId ? Number(val.poId) : null,
                 billDate: val.transactionDate, // purchasingDocumentSchema already coerces to Date
                 billNumber: val.refNumber,
                 totalAmount: totalAmountTiyin,

@@ -1,182 +1,182 @@
 {
     "dashboard": {
         "mainTitle": "Stable ERP",
-        "title": "Dashboard",
+        "title": "Kontrol Paneli",
+        "purchasing": "Satın Alma ve Ödenecek Hesaplar",
+        "vendors": "Tedarikçiler",
+        "purchase_orders": "Satın Alma Siparişleri",
+        "receive_items": "Ürün Al",
+        "enter_bills": "Fatura Gir",
+        "pay_bills": "Fatura Öde",
+        "manufacturing": "Üretim ve Envanter",
+        "items_services": "Ürünler ve Hizmetler",
+        "mixing": "Karıştırma",
+        "sublimation": "Süblimleşme",
+        "packing": "Paketleme",
+        "yield_analysis": "Verim Analizi",
+        "sales": "Satışlar ve Alacak Hesapları",
+        "customers": "Müşteriler",
+        "estimates": "Teklifler",
+        "new_invoice": "Yeni Fatura",
+        "invoices": "Faturalar",
+        "receive_pay": "Ödeme Al",
+        "deposits": "Depozitolar",
+        "company_financial": "Şirket ve Finans",
+        "chart_of_accounts": "Hesap Planı",
+        "make_journal_entries": "Yevmiye Kayıtları Yap",
+        "reports_center": "Rapor Merkezi",
+        "back_to_dashboard": "Kontrol Paneline Dön",
         "page": {
-            "title": "Overview",
-            "subtitle": "Financial snapshot and recent activity",
-            "quick_actions": "Quick Actions"
+            "title": "Genel Bakış",
+            "subtitle": "Finansal durum ve son aktiviteler",
+            "quick_actions": "Hızlı İşlemler"
         },
         "metrics": {
-            "cash_on_hand": "Cash on Hand",
-            "accounts_receivable": "Accounts Receivable",
-            "accounts_payable": "Accounts Payable",
-            "net_working_capital": "Net Working Capital",
+            "cash_on_hand": "Nakit Para",
+            "accounts_receivable": "Alacak Hesapları",
+            "accounts_payable": "Borç Hesapları",
+            "net_working_capital": "Net İşletme Sermayesi",
             "sublabels": {
-                "coming_in": "Coming In",
-                "going_out": "Going Out"
+                "coming_in": "Giriş",
+                "going_out": "Çıkış"
             }
         },
         "actions": {
-            "new_invoice": "New Invoice",
-            "new_bill": "New Bill",
-            "receive_payment": "Receive Payment",
-            "add_product": "Add Product"
+            "new_invoice": "Yeni Fatura",
+            "new_bill": "Yeni Fatura",
+            "receive_payment": "Ödeme Al",
+            "add_product": "Ürün Ekle"
         },
         "recent_activity": {
-            "title": "Recent Activity",
-            "empty": "No recent transactions",
+            "title": "Son Aktiviteler",
+            "empty": "Son işlem yok",
             "headers": {
-                "date": "Date",
-                "type": "Type",
-                "party": "Party",
-                "amount": "Amount"
+                "date": "Tarih",
+                "type": "Tür",
+                "party": "Taraf",
+                "amount": "Tutar"
             },
             "types": {
-                "invoice": "Invoice",
-                "bill": "Bill",
-                "customer_payment": "Payment In",
-                "vendor_payment": "Payment Out"
+                "invoice": "Fatura",
+                "bill": "Fatura",
+                "customer_payment": "Müşteriden Ödeme",
+                "vendor_payment": "Tedarikçiye Ödeme"
             }
         },
         "alerts": {
-            "title": "Alerts",
-            "empty_title": "All clear!",
-            "empty_subtitle": "No alerts at this time",
+            "title": "Uyarılar",
+            "empty_title": "Her şey yolunda!",
+            "empty_subtitle": "Şu anda uyarı yok",
             "types": {
                 "low_stock": {
-                    "title": "Low Stock Items",
-                    "description": "{count, plural, =1 {# item} other {# items}} below reorder point"
+                    "title": "Düşük Stoklu Ürünler",
+                    "description": "{count, plural, =1 {# ürün} other {# ürün}} yeniden sipariş noktasının altında"
                 },
                 "overdue_invoice": {
-                    "title": "Overdue Invoices",
-                    "description": "{count, plural, =1 {# invoice} other {# invoices}} past due date"
+                    "title": "Vadesi Geçmiş Faturalar",
+                    "description": "{count, plural, =1 {# fatura} other {# fatura}} vadesi geçmiş"
                 },
                 "pending_approval": {
-                    "title": "Pending Approvals",
-                    "description": "{count, plural, =1 {# purchase order} other {# purchase orders}} awaiting review"
+                    "title": "Onay Bekleyenler",
+                    "description": "{count, plural, =1 {# sipariş} other {# sipariş}} inceleme bekliyor"
                 }
             }
         },
-        "purchasing": "Purchasing & Accounts Payable",
-        "vendors": "Vendors",
-        "purchase_orders": "Purchase Orders",
-        "receive_items": "Receive Items",
-        "enter_bills": "Enter Bills",
-        "pay_bills": "Pay Bills",
-        "manufacturing": "Manufacturing & Inventory",
-        "items_services": "Items & Services",
-        "mixing": "Mixing",
-        "sublimation": "Sublimation",
-        "packing": "Packing",
-        "yield_analysis": "Yield Analysis",
-        "sales": "Sales & Accounts Receivable",
-        "customers": "Customers",
-        "estimates": "Estimates",
-        "new_invoice": "New Invoice",
-        "invoices": "Invoices",
-        "receive_pay": "Receive Payment",
-        "deposits": "Deposits",
-        "company_financial": "Company & Financial",
-        "chart_of_accounts": "Chart of Accounts",
-        "make_journal_entries": "Make Journal Entries",
-        "reports_center": "Reports Center",
-        "back_to_dashboard": "Back to Dashboard",
-        "reconciliation": "Inventory Reconciliation",
+        "reconciliation": "Envanter Mutabakatı",
         "breadcrumbs": {
-            "home": "Home",
-            "purchasing": "Purchasing",
-            "vendors": "Vendors",
-            "orders": "Purchase Orders",
-            "inventory": "Inventory",
-            "items": "Items & Services",
-            "reconciliation": "Reconciliation",
-            "manufacturing": "Manufacturing",
-            "lines": "Lines",
-            "mixing": "Mixing",
-            "sublimation": "Sublimation",
-            "sales": "Sales",
-            "customers": "Customers",
-            "invoices": "Invoices",
-            "estimates": "Estimates",
-            "finance": "Finance",
-            "chart_of_accounts": "Chart of Accounts",
-            "reports": "Reports",
-            "settings": "Settings",
-            "new": "New",
-            "edit": "Edit"
+            "home": "Ana Sayfa",
+            "purchasing": "Satın Alma",
+            "vendors": "Tedarikçiler",
+            "orders": "Satın Alma Siparişleri",
+            "inventory": "Envanter",
+            "items": "Ürünler ve Hizmetler",
+            "reconciliation": "Mutabakat",
+            "manufacturing": "Üretim",
+            "lines": "Hatlar",
+            "mixing": "Karıştırma",
+            "sublimation": "Süblimleşme",
+            "sales": "Satışlar",
+            "customers": "Müşteriler",
+            "invoices": "Faturalar",
+            "estimates": "Teklifler",
+            "finance": "Finans",
+            "chart_of_accounts": "Hesap planı",
+            "reports": "Raporlar",
+            "settings": "Ayarlar",
+            "new": "Yeni",
+            "edit": "Düzenle"
         }
     },
     "common": {
-        "save": "Save",
-        "cancel": "Cancel",
-        "delete": "Delete",
-        "deleting": "Deleting...",
-        "edit": "Edit",
-        "create": "Create",
-        "actions": "Actions",
-        "none": "None",
-        "saving": "Saving...",
-        "loading": "Loading...",
-        "status": "Status",
-        "archived": "Archived",
-        "active": "Active",
-        "inactive": "Inactive",
-        "confirm": "Confirm",
-        "back": "Back",
-        "search": "Search",
-        "optional": "Optional",
-        "select_placeholder": "Select...",
-        "search_placeholder": "Search...",
-        "no_results": "No results found"
+        "save": "Kaydet",
+        "cancel": "İptal",
+        "delete": "Sil",
+        "deleting": "Siliniyor...",
+        "edit": "Düzenle",
+        "create": "Oluştur",
+        "actions": "İşlemler",
+        "none": "Hiçbiri",
+        "saving": "Kaydediliyor...",
+        "loading": "Yükleniyor...",
+        "status": "Durum",
+        "archived": "Arşivlenmiş",
+        "active": "Aktif",
+        "inactive": "Pasif",
+        "confirm": "Onayla",
+        "back": "Geri",
+        "search": "Ara",
+        "optional": "İsteğe bağlı",
+        "select_placeholder": "Seç...",
+        "search_placeholder": "Ara...",
+        "no_results": "Sonuç bulunamadı"
     },
     "purchasing": {
         "purchase_orders_page": {
-            "title": "Purchase Orders",
-            "description": "Track orders and received goods.",
-            "new_order": "New Order",
-            "loading": "Loading orders..."
+            "title": "Satın Alma Siparişleri",
+            "description": "Siparişleri ve alınan malları takip edin.",
+            "new_order": "Yeni Sipariş",
+            "loading": "Siparişler yükleniyor..."
         },
         "bill_approval": {
-            "pending_approval": "Pending approval",
-            "waiting_approval": "Waiting for admin approval",
-            "amount_label": "Amount:",
-            "processing": "Processing...",
-            "approve": "Approve",
-            "reject": "Reject",
-            "approved": "Approved",
-            "rejected": "Rejected",
-            "rejected_message": "This bill has been rejected and will not be processed"
+            "pending_approval": "Onay bekliyor",
+            "waiting_approval": "Yönetici onayı bekleniyor",
+            "amount_label": "Tutar:",
+            "processing": "İşleniyor...",
+            "approve": "Onayla",
+            "reject": "Reddet",
+            "approved": "Onaylandı",
+            "rejected": "Reddedildi",
+            "rejected_message": "Bu fatura reddedildi ve işlenmeyecek"
         },
         "payment_modal": {
-            "title": "Register Payment",
-            "paying_bill": "Paying Bill",
-            "to": "to",
-            "amount": "Amount",
-            "payment_date": "Payment Date",
-            "bank_account": "Bank Account",
-            "reference": "Reference",
-            "confirm_payment": "Confirm Payment"
+            "title": "Ödeme Kaydet",
+            "paying_bill": "Fatura Ödeme",
+            "to": "için",
+            "amount": "Tutar",
+            "payment_date": "Ödeme Tarihi",
+            "bank_account": "Banka Hesabı",
+            "reference": "Referans",
+            "confirm_payment": "Ödemeyi Onayla"
         },
         "bills_page": {
-            "title": "Vendor Bills",
-            "coming_soon": "Vendor Bills module is coming soon.",
-            "start_hint": "Start by creating Purchase Orders and Receiving Items."
+            "title": "Tedarikçi Faturaları",
+            "coming_soon": "Tedarikçi Faturaları modülü yakında gelecek.",
+            "start_hint": "Satın Alma Siparişleri oluşturarak ve Ürün Alarak başlayın."
         },
         "po_detail": {
-            "loading": "Loading Order...",
-            "edit": "Edit",
-            "delete": "Delete",
-            "receive_items": "Receive Items",
-            "order_items": "Order Items",
+            "loading": "Sipariş yükleniyor...",
+            "edit": "Düzenle",
+            "delete": "Sil",
+            "receive_items": "Ürünleri Al",
+            "order_items": "Sipariş Ürünleri",
             "sku": "SKU",
-            "received": "received",
-            "remaining": "remaining",
-            "vendor_details": "Vendor Details",
-            "name": "Name",
+            "received": "alındı",
+            "remaining": "kalan",
+            "vendor_details": "Tedarikçi Detayları",
+            "name": "İsim",
             "email": "Email",
-            "phone": "Phone",
-            "notes": "Notes"
+            "phone": "Telefon",
+            "notes": "Notlar"
         },
         "modals": {
             "delete_po": {
@@ -453,9 +453,9 @@
             "empty_state": "No customers found",
             "total_count": "Total Count",
             "status_overdue": "Overdue",
-            "new_customer": "New Customer",
-            "new_customer_title": "New Customer",
-            "edit": "Edit",
+            "new_customer": "Yeni Müşteri",
+            "new_customer_title": "Yeni Müşteri",
+            "edit": "Düzenle",
             "delete": "Delete",
             "fields": {
                 "credit_limit": "Credit Limit"
@@ -609,100 +609,100 @@
                     "status": "Status"
                 },
                 "consequences": {
-                    "title": "This will:",
-                    "delete_invoice": "Delete invoice and all line items",
-                    "reverse_gl": "Reverse General Ledger entries",
-                    "restore_inventory": "Restore inventory to stock",
-                    "update_balance": "Update customer balance"
+                    "title": "Bu işlem:",
+                    "delete_invoice": "Faturayı ve tüm satırları sil",
+                    "reverse_gl": "Genel Muhasebe kayıtlarını tersine çevir",
+                    "restore_inventory": "Envanteri stoğa geri yükle",
+                    "update_balance": "Müşteri bakiyesini güncelle"
                 }
             }
         },
         "grid": {
             "headers": {
-                "item": "Item",
-                "description": "Description",
-                "quantity": "Qty",
-                "uom": "UOM",
-                "unit_price": "Unit Price",
-                "amount": "Amount",
-                "warehouse": "Warehouse"
+                "item": "Ürün",
+                "description": "Açıklama",
+                "quantity": "Miktar",
+                "uom": "Birim",
+                "unit_price": "Fiyat",
+                "amount": "Tutar",
+                "warehouse": "Depo"
             },
             "placeholders": {
-                "select_item": "Select item...",
-                "description": "Description...",
-                "select_warehouse": "Select warehouse..."
+                "select_item": "Ürün seçin...",
+                "description": "Açıklama...",
+                "select_warehouse": "Depo seçin..."
             },
-            "add_line": "Add line",
+            "add_line": "Satır ekle",
             "delete_confirmation": {
-                "title": "Delete line?",
-                "description": "This action cannot be undone."
+                "title": "Satırı sil?",
+                "description": "Bu işlem geri alınamaz."
             }
         },
         "document_form": {
             "fields": {
-                "customer": "Customer",
-                "invoice_date": "Invoice Date",
-                "payment_terms": "Payment Terms",
-                "memo": "Memo"
+                "customer": "Müşteri",
+                "invoice_date": "Fatura tarihi",
+                "payment_terms": "Ödeme koşulları",
+                "memo": "Not"
             },
             "placeholders": {
-                "customer": "Select customer...",
-                "memo": "Additional information..."
+                "customer": "Müşteri seçin...",
+                "memo": "Ek bilgi..."
             },
             "payment_terms": {
                 "net_30": "Net 30",
                 "net_15": "Net 15",
-                "due_on_receipt": "Due on Receipt"
+                "due_on_receipt": "Teslimatta"
             }
         },
         "stock_validation": {
-            "service_item": "Service Item (No Stock Required)",
-            "insufficient_stock": "Insufficient Stock",
-            "stock_details": "Requested: {requested} | Available: {available}",
-            "low_stock_warning": "Low Stock Warning ({available} available, {remaining} remaining)",
-            "stock_ok": "Stock OK ({available} available)"
+            "service_item": "Hizmet (stok gerekmiyor)",
+            "insufficient_stock": "Yetersiz stok",
+            "stock_details": "İstenen: {requested} | Mevcut: {available}",
+            "low_stock_warning": "Düşük stok uyarısı ({available} mevcut, {remaining} kalacak)",
+            "stock_ok": "Stok yeterli ({available} mevcut)"
         },
         "picking_locations": {
-            "title": "Picking Locations (FIFO Order)",
-            "loading": "Loading picking locations...",
-            "warning_title": "Warehouse Locations Not Fully Configured",
-            "warning_detail": "Item #{itemId} needs {shortQty} more units allocated.",
-            "warning_explanation": "The item has stock but hasn't been received into bins.",
-            "warning_generic": "Some items not properly received into locations.",
-            "can_proceed": "✓ You can still create this invoice",
-            "future_steps_intro": "To enable picking locations:",
+            "title": "Toplama Konumları (FIFO Sırası)",
+            "loading": "Toplama konumları yükleniyor...",
+            "warning_title": "Depo Konumları Tam Yapılandırılmamış",
+            "warning_detail": "Ürün #{itemId} için {shortQty} birim daha gerekli.",
+            "warning_explanation": "Ürün depoda var ama konumu atanmamış.",
+            "warning_generic": "Bazı ürünler konumlarına yerleştirilmemiş.",
+            "can_proceed": "✓ Yine de bu faturayı oluşturabilirsiniz",
+            "future_steps_intro": "Toplama konumlarını etkinleştirmek için:",
             "future_steps": {
-                "receive_inventory": "Receive inventory through Bills/POs",
-                "use_transfer": "Use Inventory Transfer to assign stock"
+                "receive_inventory": "Ürünleri Fatura/Siparişler üzerinden kabul edin",
+                "use_transfer": "Stok atamak için Transfer kullanın"
             },
-            "item_label": "Item",
-            "unassigned": "UNASSIGNED",
-            "batch_label": "Batch",
-            "units": "units",
-            "no_stock_available": "⚠️ No stock available"
+            "item_label": "Ürün",
+            "unassigned": "ATANMAMIŞ",
+            "batch_label": "Parti",
+            "units": "birim",
+            "no_stock_available": "⚠️ Stok yok"
         },
         "pdf": {
             "companyName": "Stable ERP",
-            "invoice": "INVOICE",
-            "invoiceNumber": "Invoice #",
-            "date": "Date",
-            "dueDate": "Due Date",
-            "billTo": "Bill To",
-            "taxId": "Tax ID",
-            "phone": "Phone",
-            "email": "Email",
-            "itemColumn": "Item",
-            "qtyColumn": "Qty",
-            "priceColumn": "Price",
-            "amountColumn": "Amount",
-            "subtotal": "Subtotal",
-            "total": "TOTAL",
-            "bankDetails": "Bank Details",
-            "bankName": "Bank Name",
-            "accountNumber": "Account Number",
-            "director": "Director",
-            "accountant": "Chief Accountant",
-            "signature": "Signature"
+            "invoice": "FATURA",
+            "invoiceNumber": "Fatura No",
+            "date": "Tarih",
+            "dueDate": "Vade Tarihi",
+            "billTo": "Fatura Edilecek",
+            "taxId": "Vergi No",
+            "phone": "Telefon",
+            "email": "E-posta",
+            "itemColumn": "Ürün",
+            "qtyColumn": "Miktar",
+            "priceColumn": "Fiyat",
+            "amountColumn": "Tutar",
+            "subtotal": "Ara Toplam",
+            "total": "TOPLAM",
+            "bankDetails": "Banka Bilgileri",
+            "bankName": "Banka Adı",
+            "accountNumber": "Hesap Numarası",
+            "director": "Müdür",
+            "accountant": "Baş Muhasebeci",
+            "signature": "İmza"
         }
     },
     "manufacturing": {
@@ -858,34 +858,34 @@
     },
     "finance": {
         "coa": {
-            "title": "Chart of Accounts",
+            "title": "Hesap Planı",
             "fields": {
-                "asset": "Asset",
-                "liability": "Liability"
+                "asset": "Varlık",
+                "liability": "Yükümlülük"
             }
         },
         "chartOfAccounts": {
-            "title": "Chart of Accounts",
-            "subtitle": "Real-time financial position and account balances",
-            "loading": "Loading accounts...",
-            "enter_opening_balances": "Enter Opening Balances",
+            "title": "Hesap Planı",
+            "subtitle": "Gerçek zamanlı finansal durum ve hesap bakiyeleri",
+            "loading": "Hesaplar yükleniyor...",
+            "enter_opening_balances": "Açılış Bakiyelerini Girin",
             "accountTypes": {
-                "asset": "Asset",
-                "liability": "Liability",
-                "equity": "Equity",
-                "revenue": "Revenue",
-                "expense": "Expense",
-                "assets": "Assets",
-                "liabilities": "Liabilities",
-                "revenues": "Revenues",
-                "expenses": "Expenses"
+                "asset": "Varlık",
+                "liability": "Yükümlülük",
+                "equity": "Özkaynak",
+                "revenue": "Gelir",
+                "expense": "Gider",
+                "assets": "Varlıklar",
+                "liabilities": "Yükümlülükler",
+                "revenues": "Gelirler",
+                "expenses": "Giderler"
             },
             "tableHeaders": {
-                "code": "Code",
-                "accountName": "Account Name",
-                "balance": "Balance (UZS)"
+                "code": "Kod",
+                "accountName": "Hesap Adı",
+                "balance": "Bakiye (UZS)"
             },
-            "totalLabel": "Total"
+            "totalLabel": "Toplam"
         },
         "journal_entry": {
             "title": "Journal Entry",
@@ -915,27 +915,27 @@
         "finished_goods": "Finished Goods",
         "services": "Services",
         "scan": "Scan",
-        "new_item": "New Item",
-        "edit_item": "Edit Item",
-        "no_sku": "No SKU",
+        "new_item": "Yeni Ürün",
+        "edit_item": "Ürünü Düzenle",
+        "no_sku": "SKU Yok",
         "reconciliation_page": {
-            "title": "Inventory Reconciliation",
-            "meta_title": "Inventory Reconciliation",
-            "description": "Compare General Ledger (financial) inventory values with Item Ledger (physical) stock values. Identify and resolve discrepancies between accounting and warehouse data."
+            "title": "Envanter Mutabakatı",
+            "meta_title": "Envanter Mutabakatı",
+            "description": "Genel Muhasebe (finansal) envanter değerlerini Ürün Defteri (fiziksel) stok değerleri ile karşılaştırın. Muhasebe ve depo verileri arasındaki tutarsızlıkları belirleyin ve çözün."
         },
         "category_combobox": {
-            "select_category": "Select category...",
-            "search_categories": "Search categories...",
-            "no_categories": "No categories found",
-            "create_new_category": "Create New Category"
+            "select_category": "Kategori seçin...",
+            "search_categories": "Kategorileri ara...",
+            "no_categories": "Kategori bulunamadı",
+            "create_new_category": "Yeni Kategori Oluştur"
         },
         "data_grid": {
             "sort": {
-                "name": "Name",
-                "qty_on_hand": "Qty on Hand",
-                "price": "Price",
-                "date_added": "Date Added",
-                "label": "Sort"
+                "name": "Ad",
+                "qty_on_hand": "Eldeki Miktar",
+                "price": "Fiyat",
+                "date_added": "Eklenme Tarihi",
+                "label": "Sırala"
             }
         },
         "table": {
@@ -1087,51 +1087,51 @@
         }
     },
     "settings": {
-        "title": "Settings",
-        "uom": "Units of Measure",
-        "categories": "Categories",
+        "title": "Ayarlar",
+        "uom": "Ölçü Birimleri",
+        "categories": "Kategoriler",
         "preferences": {
-            "title": "System Preferences",
-            "description": "Configure global business rules and feature flags",
-            "open": "Open Preferences",
-            "error_loading": "Error loading preferences",
+            "title": "Sistem Tercihleri",
+            "description": "Global iş kurallarını ve özellik bayraklarını yapılandırın",
+            "open": "Tercihleri Aç",
+            "error_loading": "Tercihler yüklenirken hata",
             "category": {
-                "purchasing": "Purchasing",
-                "inventory": "Inventory",
-                "finance": "Finance",
-                "system": "System"
+                "purchasing": "Satın Alma",
+                "inventory": "Envanter",
+                "finance": "Finans",
+                "system": "Sistem"
             },
-            "bill_approval_enabled": "Enable Bill Approval",
-            "bill_approval_enabled_desc": "Require admin approval for large vendor bills before posting to GL and inventory",
-            "bill_approval_threshold": "Approval Threshold (Tiyin)",
-            "bill_approval_threshold_desc": "Bills above this amount require approval. Value in Tiyin (10M UZS = 1,000,000,000 Tiyin)",
-            "negative_stock_allowed": "Allow Negative Stock",
-            "negative_stock_allowed_desc": "Allow selling items with negative stock quantities (not recommended for production)",
-            "update_success": "Preference updated",
-            "update_error": "Error updating preference",
-            "reset_to_default": "Reset to default",
-            "reset_success": "Preference reset"
+            "bill_approval_enabled": "Fatura Onayını Etkinleştir",
+            "bill_approval_enabled_desc": "Büyük tedarikçi faturaları için genel muhasebeye ve envantere aktarmadan önce yönetici onayı gerektir",
+            "bill_approval_threshold": "Onay Eşiği (Tiyin)",
+            "bill_approval_threshold_desc": "Bu tutarın üzerindeki faturalar onay gerektirir. Değer Tiyin cinsindendir (10M UZS = 1.000.000.000 Tiyin)",
+            "negative_stock_allowed": "Negatif Stoka İzin Ver",
+            "negative_stock_allowed_desc": "Negatif stok miktarlarıyla ürün satışına izin ver (üretim için önerilmez)",
+            "update_success": "Tercih güncellendi",
+            "update_error": "Tercih güncellenirken hata",
+            "reset_to_default": "Varsayılana sıfırla",
+            "reset_success": "Tercih sıfırlandı"
         },
         "inventory_integrity": {
-            "title": "Inventory Data Integrity",
-            "sync_status": "Sync Status",
-            "reconciliation_dashboard": "Reconciliation Dashboard",
-            "reconciliation_description": "Compare GL inventory values with physical stock. Identify and fix discrepancies between accounting and warehouse data.",
-            "open_reconciliation": "Open Reconciliation Dashboard"
+            "title": "Envanter Veri Bütünlüğü",
+            "sync_status": "Senkronizasyon Durumu",
+            "reconciliation_dashboard": "Mutabakat Panosu",
+            "reconciliation_description": "Genel muhasebe envanter değerlerini fiziksel stok ile karşılaştırın. Muhasebe ve depo verileri arasındaki tutarsızlıkları belirleyin ve düzeltin.",
+            "open_reconciliation": "Mutabakat Panosunu Aç"
         },
         "inventory_tools": {
-            "title": "Inventory Tools",
-            "description": "Updates quantity on hand and average cost from existing inventory layers. Safe to run if denormalized fields appear incorrect."
+            "title": "Envanter Araçları",
+            "description": "Mevcut envanter katmanlarından eldeki miktarı ve ortalama maliyeti günceller. Denormalize edilmiş alanlar yanlış görünüyorsa çalıştırmak güvenlidir."
         },
         "danger_zone": {
-            "title": "Danger Zone",
-            "rebuild_layers": "Rebuild Inventory Layers (Nuclear Option)"
+            "title": "Tehlike Bölgesi",
+            "rebuild_layers": "Envanter Katmanlarını Yeniden Oluştur (Nükleer Seçenek)"
         },
         "system_admin": {
-            "title": "System Administration",
-            "reset_title": "Go-Live Reset",
-            "reset_description": "Delete all transactional test data (invoices, purchase orders, inventory layers, etc.) while preserving master data (items, vendors, customers, chart of accounts).",
-            "reset_warning": "This action cannot be undone."
+            "title": "Sistem Yönetimi",
+            "reset_title": "Canlı Yayına Geçiş Sıfırlama",
+            "reset_description": "Ana verileri (ürünler, tedarikçiler, müşteriler, hesap planı) korurken tüm işlemsel test verilerini (faturalar, satın alma siparişleri, envanter katmanları vb.) silin.",
+            "reset_warning": "Bu işlem geri alınamaz."
         },
         "uom_section": {
             "title": "Units of Measure",

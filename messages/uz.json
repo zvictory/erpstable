@@ -25,12 +25,93 @@
         "chart_of_accounts": "Hisoblar Rejasi",
         "make_journal_entries": "Jurnal O'tkazmalari",
         "reports_center": "Hisobotlar Markazi",
-        "back_to_dashboard": "Boshqaruv Paneliga Qaytish"
+        "back_to_dashboard": "Boshqaruv Paneliga Qaytish",
+        "page": {
+            "title": "Ko'rib chiqish",
+            "subtitle": "Moliyaviy tashabbus va so'nggi faoliyat",
+            "quick_actions": "Tezkor harakatlar"
+        },
+        "metrics": {
+            "cash_on_hand": "Naqd pul",
+            "accounts_receivable": "Debitorlik qarz",
+            "accounts_payable": "Kreditorlik qarz",
+            "net_working_capital": "Sof aylanma kapital",
+            "sublabels": {
+                "coming_in": "Kirib keladi",
+                "going_out": "Chiqib ketadi"
+            }
+        },
+        "actions": {
+            "new_invoice": "Yangi hisob-faktura",
+            "new_bill": "Yangi hisob",
+            "receive_payment": "To'lovni qabul qilish",
+            "add_product": "Mahsulot qo'shish"
+        },
+        "recent_activity": {
+            "title": "So'nggi faoliyat",
+            "empty": "So'nggi tranzaksiyalar yo'q",
+            "headers": {
+                "date": "Sana",
+                "type": "Turi",
+                "party": "Tomon",
+                "amount": "Summa"
+            },
+            "types": {
+                "invoice": "Hisob-faktura",
+                "bill": "Hisob",
+                "customer_payment": "Mijozdan to'lov",
+                "vendor_payment": "Yetkazib beruvchiga to'lov"
+            }
+        },
+        "alerts": {
+            "title": "Ogohlantirishlar",
+            "empty_title": "Hammasi joyida!",
+            "empty_subtitle": "Hozir ogohlantirishlar yo'q",
+            "types": {
+                "low_stock": {
+                    "title": "Kam zaxirali mahsulotlar",
+                    "description": "{count, plural, =1 {# mahsulot} other {# mahsulot}} qayta buyurtma nuqtasidan past"
+                },
+                "overdue_invoice": {
+                    "title": "Muddati o'tgan hisob-fakturalar",
+                    "description": "{count, plural, =1 {# hisob-faktura} other {# hisob-faktura}} muddati o'tgan"
+                },
+                "pending_approval": {
+                    "title": "Tasdiqlash kutilmoqda",
+                    "description": "{count, plural, =1 {# buyurtma} other {# buyurtma}} ko'rib chiqishni kutmoqda"
+                }
+            }
+        },
+        "reconciliation": "Inventarizatsiya sverka",
+        "breadcrumbs": {
+            "home": "Bosh sahifa",
+            "purchasing": "Xaridlar",
+            "vendors": "Yetkazib beruvchilar",
+            "orders": "Xarid buyurtmalari",
+            "inventory": "Ombor",
+            "items": "Tovarlar va Xizmatlar",
+            "reconciliation": "Sverka",
+            "manufacturing": "Ishlab chiqarish",
+            "lines": "Liniyalar",
+            "mixing": "Aralashtirish",
+            "sublimation": "Sublimatsiya",
+            "sales": "Sotuvlar",
+            "customers": "Mijozlar",
+            "invoices": "Hisob-fakturalar",
+            "estimates": "Smetalar",
+            "finance": "Moliya",
+            "chart_of_accounts": "Hisoblar rejasi",
+            "reports": "Hisobotlar",
+            "settings": "Sozlamalar",
+            "new": "Yangi",
+            "edit": "Tahrirlash"
+        }
     },
     "common": {
         "save": "Saqlash",
         "cancel": "Bekor qilish",
         "delete": "O'chirish",
+        "deleting": "O'chirilmoqda...",
         "edit": "Tahrirlash",
         "create": "Yaratish",
         "actions": "Harakatlar",
@@ -44,9 +125,59 @@
         "confirm": "Tasdiqlash",
         "back": "Orqaga",
         "search": "Qidirish",
-        "optional": "Ixtiyoriy"
+        "optional": "Ixtiyoriy",
+        "select_placeholder": "Tanlash...",
+        "search_placeholder": "Qidirish...",
+        "no_results": "Natijalar topilmadi"
     },
     "purchasing": {
+        "purchase_orders_page": {
+            "title": "Xarid buyurtmalari",
+            "description": "Buyurtmalar va qabul qilingan tovarlarni kuzatish.",
+            "new_order": "Yangi buyurtma",
+            "loading": "Buyurtmalar yuklanmoqda..."
+        },
+        "bill_approval": {
+            "pending_approval": "Tasdiqlash kutilmoqda",
+            "waiting_approval": "Administrator tomonidan tasdiqlanishi kutilmoqda",
+            "amount_label": "Summa:",
+            "processing": "Qayta ishlanmoqda...",
+            "approve": "Tasdiqlash",
+            "reject": "Rad etish",
+            "approved": "Tasdiqlangan",
+            "rejected": "Rad etilgan",
+            "rejected_message": "Bu hisob rad etildi va qayta ishlanmaydi"
+        },
+        "payment_modal": {
+            "title": "To'lovni ro'yxatdan o'tkazish",
+            "paying_bill": "Hisobni to'lash",
+            "to": "uchun",
+            "amount": "Summa",
+            "payment_date": "To'lov sanasi",
+            "bank_account": "Bank hisobi",
+            "reference": "Havola",
+            "confirm_payment": "To'lovni tasdiqlash"
+        },
+        "bills_page": {
+            "title": "Yetkazib beruvchilar hisoblari",
+            "coming_soon": "Yetkazib beruvchilar hisoblari moduli tez orada keladi.",
+            "start_hint": "Xarid buyurtmalari va tovarlarni qabul qilishdan boshlang."
+        },
+        "po_detail": {
+            "loading": "Buyurtma yuklanmoqda...",
+            "edit": "Tahrirlash",
+            "delete": "O'chirish",
+            "receive_items": "Tovarlarni qabul qilish",
+            "order_items": "Buyurtma tovarlari",
+            "sku": "Artikul",
+            "received": "qabul qilindi",
+            "remaining": "qoldi",
+            "vendor_details": "Yetkazib beruvchi haqida ma'lumot",
+            "name": "Nomi",
+            "email": "Email",
+            "phone": "Telefon",
+            "notes": "Izohlar"
+        },
         "modals": {
             "delete_po": {
                 "title": "Xarid buyurtmasini o'chirish {orderNumber}",
@@ -314,6 +445,7 @@
             "center_title": "Mijoz markazi",
             "command_center": "Sotuvlar buyurtmasi markazi",
             "new_customer": "Yangi mijoz",
+            "new_customer_title": "Yangi mijoz",
             "search_placeholder": "Mijozlarni qidirish...",
             "filters": {
                 "all": "Hammasini",
@@ -484,6 +616,93 @@
                     "update_balance": "Mijoz balansi yangilash"
                 }
             }
+        },
+        "grid": {
+            "headers": {
+                "item": "Mahsulot",
+                "description": "Tavsif",
+                "quantity": "Miqdor",
+                "uom": "O'lchov",
+                "unit_price": "Narxi",
+                "amount": "Summa",
+                "warehouse": "Ombor"
+            },
+            "placeholders": {
+                "select_item": "Mahsulotni tanlang...",
+                "description": "Tavsif...",
+                "select_warehouse": "Omborni tanlang..."
+            },
+            "add_line": "Qator qo'shish",
+            "delete_confirmation": {
+                "title": "Qatorni o'chirish?",
+                "description": "Bu amalni bekor qilish mumkin emas."
+            }
+        },
+        "document_form": {
+            "fields": {
+                "customer": "Mijoz",
+                "invoice_date": "Hisob-faktura sanasi",
+                "payment_terms": "To'lov shartlari",
+                "memo": "Eslatma"
+            },
+            "placeholders": {
+                "customer": "Mijozni tanlang...",
+                "memo": "Qo'shimcha ma'lumot..."
+            },
+            "payment_terms": {
+                "net_30": "Net 30",
+                "net_15": "Net 15",
+                "due_on_receipt": "Qabul qilganda"
+            }
+        },
+        "stock_validation": {
+            "service_item": "Xizmat (zaxira talab qilinmaydi)",
+            "insufficient_stock": "Yetarli emas",
+            "stock_details": "So'ralgan: {requested} | Mavjud: {available}",
+            "low_stock_warning": "Kam zaxira ogohlantirish ({available} mavjud, {remaining} qoladi)",
+            "stock_ok": "Zaxira yaxshi ({available} mavjud)"
+        },
+        "picking_locations": {
+            "title": "Yig'ish joylari (FIFO tartibi)",
+            "loading": "Yig'ish joylari yuklanmoqda...",
+            "warning_title": "Ombor joylari to'liq sozlanmagan",
+            "warning_detail": "Mahsulot #{itemId} yana {shortQty} birlik kerak.",
+            "warning_explanation": "Mahsulot omborida bor, lekin joy belgilanmagan.",
+            "warning_generic": "Ba'zi mahsulotlar joyiga qo'yilmagan.",
+            "can_proceed": "✓ Siz baribir hisob-faktura yaratishingiz mumkin",
+            "future_steps_intro": "Yig'ish joylarini yoqish uchun:",
+            "future_steps": {
+                "receive_inventory": "Mahsulotlarni Hisob-faktura/Buyurtma orqali qabul qiling",
+                "use_transfer": "Zaxiralarni tayinlash uchun Ko'chirish dan foydalaning"
+            },
+            "item_label": "Mahsulot",
+            "unassigned": "TAYINLANMAGAN",
+            "batch_label": "Partiya",
+            "units": "birlik",
+            "no_stock_available": "⚠️ Zaxira yo'q"
+        },
+        "pdf": {
+            "companyName": "Stable ERP",
+            "invoice": "HISOB-FAKTURA",
+            "invoiceNumber": "Hisob №",
+            "date": "Sana",
+            "dueDate": "To'lov muddati",
+            "billTo": "To'lovchi",
+            "taxId": "STIR",
+            "phone": "Telefon",
+            "email": "Email",
+            "itemColumn": "Nomi",
+            "qtyColumn": "Miqdor",
+            "priceColumn": "Narxi",
+            "amountColumn": "Summa",
+            "subtotal": "Oraliq jami",
+            "total": "JAMI",
+            "bankDetails": "Bank rekvizitlari",
+            "bankName": "Bank nomi",
+            "accountNumber": "Hisob raqami",
+            "director": "Direktor",
+            "accountant": "Bosh hisobchi",
+            "signature": "Imzo"
         }
     },
     "manufacturing": {
@@ -567,6 +786,29 @@
                 "liability": "Majburiyat"
             }
         },
+        "chartOfAccounts": {
+            "title": "Hisoblar rejasi",
+            "subtitle": "Real vaqtda moliyaviy holat va hisob balanslari",
+            "loading": "Hisoblar yuklanmoqda...",
+            "enter_opening_balances": "Boshlang'ich qoldiqlarni kiriting",
+            "accountTypes": {
+                "asset": "Aktiv",
+                "liability": "Majburiyat",
+                "equity": "Kapital",
+                "revenue": "Daromad",
+                "expense": "Xarajat",
+                "assets": "Aktivlar",
+                "liabilities": "Majburiyatlar",
+                "revenues": "Daromadlar",
+                "expenses": "Xarajatlar"
+            },
+            "tableHeaders": {
+                "code": "Kod",
+                "accountName": "Hisob nomi",
+                "balance": "Balans (UZS)"
+            },
+            "totalLabel": "Jami"
+        },
         "journal_entry": {
             "title": "Jurnal o'tkazmasi",
             "fields": {
@@ -598,6 +840,26 @@
         "new_item": "Yangi Tovar",
         "edit_item": "Tovarni Tahrirlash",
         "no_sku": "SKU yo'q",
+        "reconciliation_page": {
+            "title": "Ombor qoldiqlarini sverka qilish",
+            "meta_title": "Ombor qoldiqlarini sverka qilish",
+            "description": "Bosh kitobdagi (moliyaviy) inventar qiymatlarini Tovar jurnali (jismoniy) zahira qiymatlari bilan solishtiring. Buxgalteriya va ombor ma'lumotlari o'rtasidagi nomuvofiqliklarni aniqlang va hal qiling."
+        },
+        "category_combobox": {
+            "select_category": "Kategoriyani tanlang...",
+            "search_categories": "Kategoriyalarni qidirish...",
+            "no_categories": "Kategoriyalar topilmadi",
+            "create_new_category": "Yangi kategoriya yaratish"
+        },
+        "data_grid": {
+            "sort": {
+                "name": "Nomi",
+                "qty_on_hand": "Qo'lda miqdor",
+                "price": "Narx",
+                "date_added": "Qo'shilgan sana",
+                "label": "Saralash"
+            }
+        },
         "table": {
             "item": "Tovar",
             "type": "Turi",
@@ -750,6 +1012,49 @@
         "title": "Sozlamalar",
         "uom": "O'lchov birliklari",
         "categories": "Kategoriyalar",
+        "preferences": {
+            "title": "Tizim afzalliklari",
+            "description": "Global biznes qoidalari va funksiya bayroqlarini sozlash",
+            "open": "Afzalliklarni ochish",
+            "error_loading": "Afzalliklarni yuklashda xato",
+            "category": {
+                "purchasing": "Xaridlar",
+                "inventory": "Inventar",
+                "finance": "Moliya",
+                "system": "Tizim"
+            },
+            "bill_approval_enabled": "Hisob-faktura tasdiqlashni yoqish",
+            "bill_approval_enabled_desc": "Katta yetkazib beruvchi hisob-faktorlarini GK va inventarga o'tkazishdan oldin admin tasdiqlashini talab qilish",
+            "bill_approval_threshold": "Tasdiqlash chegarasi (tiyin)",
+            "bill_approval_threshold_desc": "Bu miqdordan yuqori hisob-fakturalar tasdiqlashni talab qiladi. Qiymat tiyinda (10M UZS = 1,000,000,000 tiyin)",
+            "negative_stock_allowed": "Salbiy zaxirani ruxsat berish",
+            "negative_stock_allowed_desc": "Salbiy zaxira miqdorlari bilan tovarlarni sotishga ruxsat berish (ishlab chiqarish uchun tavsiya etilmaydi)",
+            "update_success": "Afzallik yangilandi",
+            "update_error": "Afzallikni yangilashda xato",
+            "reset_to_default": "Standartga qaytarish",
+            "reset_success": "Afzallik qayta o'rnatildi"
+        },
+        "inventory_integrity": {
+            "title": "Inventar ma'lumotlarining yaxlitligi",
+            "sync_status": "Sinxronizatsiya holati",
+            "reconciliation_dashboard": "Sverka paneli",
+            "reconciliation_description": "GKdagi inventar qiymatlarini jismoniy zahiralar bilan solishtiring. Buxgalteriya va ombor ma'lumotlari o'rtasidagi nomutanosibl ikini aniqlang va tuzating.",
+            "open_reconciliation": "Sverka panelini ochish"
+        },
+        "inventory_tools": {
+            "title": "Inventar vositalari",
+            "description": "Mavjud inventar qatlamlaridan qo'lda miqdor va o'rtacha qiymatni yangilaydi. Denormalizatsiya qilingan maydonlar noto'g'ri ko'rinsa, ishga tushirish xavfsiz."
+        },
+        "danger_zone": {
+            "title": "Xavfli zona",
+            "rebuild_layers": "Inventar qatlamlarini qayta qurish (Yadroli variant)"
+        },
+        "system_admin": {
+            "title": "Tizim boshqaruvi",
+            "reset_title": "Ishga tushirish uchun qayta o'rnatish",
+            "reset_description": "Barcha test tranzaksiya ma'lumotlarini (hisob-fakturalar, xarid buyurtmalari, inventar qatlamlari va boshqalar) o'chirish, master ma'lumotlarni (tovarlar, yetkazib beruvchilar, mijozlar, hisoblar rejasi) saqlab qolish bilan.",
+            "reset_warning": "Bu harakatni bekor qilib bo'lmaydi."
+        },
         "uom_section": {
             "title": "O'lchov biriklari",
             "description": "Inventar tovarlar uchun o'lchov birliklarini boshqarish",
