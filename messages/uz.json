@@ -2354,6 +2354,103 @@
                     "error_renewing": "Shartnomani yangilashda xatolik",
                     "error_cancelling": "Shartnomani bekor qilishda xatolik"
                 }
+            },
+            "assets_page": {
+                "title": "Mijoz aktivlari",
+                "description": "Uskunalar ro'yxati va xizmat tarixi",
+                "loading": "Aktivlar yuklanmoqda..."
+            },
+            "assets_list": {
+                "filters": {
+                    "title": "Filtrlar",
+                    "customer": "Mijoz",
+                    "status": "Holat",
+                    "warranty": "Kafolat",
+                    "serial_number": "Seriya raqami",
+                    "serial_placeholder": "Seriya bo'yicha qidirish...",
+                    "all": "Barchasi"
+                },
+                "status": {
+                    "pending_installation": "O'rnatish kutilmoqda",
+                    "active": "Faol",
+                    "under_service": "Xizmat ko'rsatilmoqda",
+                    "decommissioned": "Foydalanishdan chiqarilgan"
+                },
+                "warranty": {
+                    "active": "Kafolat faol",
+                    "expired": "Kafolat tugagan",
+                    "none": "Kafolatsiz"
+                },
+                "empty": "Aktivlar topilmadi",
+                "showing": "{total}dan {count}ta aktiv ko'rsatilmoqda"
+            },
+            "assets_card": {
+                "serial": "S/N",
+                "installed": "O'rnatilgan",
+                "contract": "Shartnoma",
+                "view_details": "Tafsilotlar",
+                "status": {
+                    "pending_installation": "O'rnatish kutilmoqda",
+                    "active": "Faol",
+                    "under_service": "Xizmat ko'rsatilmoqda",
+                    "decommissioned": "Foydalanishdan chiqarilgan"
+                }
+            },
+            "warranty_badge": {
+                "no_warranty": "Kafolatsiz",
+                "active": "Kafolat faol",
+                "expires": "Tugaydi",
+                "expired": "Kafolat tugagan",
+                "expired_on": "Tugagan sana"
+            },
+            "asset_detail": {
+                "subtitle": "Uskuna tafsilotlari va xizmat tarixi",
+                "loading": "Yuklanmoqda...",
+                "equipment_info": "Uskuna ma'lumotlari",
+                "customer_info": "Mijoz ma'lumotlari",
+                "installation_info": "O'rnatish tafsilotlari",
+                "warranty_contract": "Kafolat va shartnoma",
+                "service_history": "Xizmat tarixi",
+                "asset_number": "Aktiv raqami",
+                "serial_number": "Seriya raqami",
+                "item_name": "Uskuna turi",
+                "status": "Holat",
+                "customer_name": "Mijoz",
+                "email": "Email",
+                "phone": "Telefon",
+                "installation_address": "O'rnatish manzili",
+                "installation_date": "O'rnatish sanasi",
+                "source_invoice": "Asl hisob-faktura",
+                "warranty_status": "Kafolat holati",
+                "service_contract": "Xizmat shartnomasi",
+                "contract_type": "Turi",
+                "expires": "Tugaydi",
+                "technician": "Texnik",
+                "close": "Yopish",
+                "status": {
+                    "pending_installation": "O'rnatish kutilmoqda",
+                    "active": "Faol",
+                    "under_service": "Xizmat ko'rsatilmoqda",
+                    "decommissioned": "Foydalanishdan chiqarilgan"
+                }
+            },
+            "service_history": {
+                "no_history": "Xizmat tarixi hali yo'q",
+                "view_ticket": "Chiptani ko'rish",
+                "status": {
+                    "open": "Ochiq",
+                    "scheduled": "Rejalashtirilgan",
+                    "in_progress": "Jarayonda",
+                    "completed": "Yakunlangan",
+                    "cancelled": "Bekor qilingan"
+                },
+                "type": {
+                    "installation": "O'rnatish",
+                    "repair": "Ta'mirlash",
+                    "maintenance": "Texnik xizmat",
+                    "support": "Qo'llab-quvvatlash",
+                    "emergency": "Favqulodda"
+                }
             }
         }
     }

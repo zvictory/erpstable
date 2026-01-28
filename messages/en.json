@@ -2539,6 +2539,103 @@
                     "error_renewing": "Failed to renew contract",
                     "error_cancelling": "Failed to cancel contract"
                 }
+            },
+            "assets_page": {
+                "title": "Customer Assets",
+                "description": "Equipment registry and service history",
+                "loading": "Loading assets..."
+            },
+            "assets_list": {
+                "filters": {
+                    "title": "Filters",
+                    "customer": "Customer",
+                    "status": "Status",
+                    "warranty": "Warranty",
+                    "serial_number": "Serial Number",
+                    "serial_placeholder": "Search by serial...",
+                    "all": "All"
+                },
+                "status": {
+                    "pending_installation": "Pending Installation",
+                    "active": "Active",
+                    "under_service": "Under Service",
+                    "decommissioned": "Decommissioned"
+                },
+                "warranty": {
+                    "active": "Active Warranty",
+                    "expired": "Expired Warranty",
+                    "none": "No Warranty"
+                },
+                "empty": "No assets found",
+                "showing": "Showing {count} of {total} assets"
+            },
+            "assets_card": {
+                "serial": "S/N",
+                "installed": "Installed",
+                "contract": "Contract",
+                "view_details": "View Details",
+                "status": {
+                    "pending_installation": "Pending Installation",
+                    "active": "Active",
+                    "under_service": "Under Service",
+                    "decommissioned": "Decommissioned"
+                }
+            },
+            "warranty_badge": {
+                "no_warranty": "No Warranty",
+                "active": "Warranty Active",
+                "expires": "Expires",
+                "expired": "Warranty Expired",
+                "expired_on": "Expired on"
+            },
+            "asset_detail": {
+                "subtitle": "Equipment details and service history",
+                "loading": "Loading...",
+                "equipment_info": "Equipment Information",
+                "customer_info": "Customer Information",
+                "installation_info": "Installation Details",
+                "warranty_contract": "Warranty & Contract",
+                "service_history": "Service History",
+                "asset_number": "Asset Number",
+                "serial_number": "Serial Number",
+                "item_name": "Equipment Type",
+                "status": "Status",
+                "customer_name": "Customer",
+                "email": "Email",
+                "phone": "Phone",
+                "installation_address": "Installation Address",
+                "installation_date": "Installation Date",
+                "source_invoice": "Source Invoice",
+                "warranty_status": "Warranty Status",
+                "service_contract": "Service Contract",
+                "contract_type": "Type",
+                "expires": "Expires",
+                "technician": "Technician",
+                "close": "Close",
+                "status": {
+                    "pending_installation": "Pending Installation",
+                    "active": "Active",
+                    "under_service": "Under Service",
+                    "decommissioned": "Decommissioned"
+                }
+            },
+            "service_history": {
+                "no_history": "No service history yet",
+                "view_ticket": "View Ticket",
+                "status": {
+                    "open": "Open",
+                    "scheduled": "Scheduled",
+                    "in_progress": "In Progress",
+                    "completed": "Completed",
+                    "cancelled": "Cancelled"
+                },
+                "type": {
+                    "installation": "Installation",
+                    "repair": "Repair",
+                    "maintenance": "Maintenance",
+                    "support": "Support",
+                    "emergency": "Emergency"
+                }
             }
         }
     }

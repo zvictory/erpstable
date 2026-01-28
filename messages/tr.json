@@ -2432,6 +2432,103 @@
                     "error_renewing": "Sözleşme yenilenemedi",
                     "error_cancelling": "Sözleşme iptal edilemedi"
                 }
+            },
+            "assets_page": {
+                "title": "Müşteri Varlıkları",
+                "description": "Ekipman kayıt defteri ve hizmet geçmişi",
+                "loading": "Varlıklar yükleniyor..."
+            },
+            "assets_list": {
+                "filters": {
+                    "title": "Filtreler",
+                    "customer": "Müşteri",
+                    "status": "Durum",
+                    "warranty": "Garanti",
+                    "serial_number": "Seri Numarası",
+                    "serial_placeholder": "Seri numarasına göre ara...",
+                    "all": "Tümü"
+                },
+                "status": {
+                    "pending_installation": "Kurulum Bekliyor",
+                    "active": "Aktif",
+                    "under_service": "Hizmet Altında",
+                    "decommissioned": "Hizmet Dışı"
+                },
+                "warranty": {
+                    "active": "Garanti Aktif",
+                    "expired": "Garanti Süresi Dolmuş",
+                    "none": "Garantisiz"
+                },
+                "empty": "Varlık bulunamadı",
+                "showing": "{total} varlıktan {count} tanesi gösteriliyor"
+            },
+            "assets_card": {
+                "serial": "S/N",
+                "installed": "Kuruldu",
+                "contract": "Sözleşme",
+                "view_details": "Detayları Görüntüle",
+                "status": {
+                    "pending_installation": "Kurulum Bekliyor",
+                    "active": "Aktif",
+                    "under_service": "Hizmet Altında",
+                    "decommissioned": "Hizmet Dışı"
+                }
+            },
+            "warranty_badge": {
+                "no_warranty": "Garantisiz",
+                "active": "Garanti Aktif",
+                "expires": "Sona Eriyor",
+                "expired": "Garanti Süresi Dolmuş",
+                "expired_on": "Sona Erme Tarihi"
+            },
+            "asset_detail": {
+                "subtitle": "Ekipman detayları ve hizmet geçmişi",
+                "loading": "Yükleniyor...",
+                "equipment_info": "Ekipman Bilgileri",
+                "customer_info": "Müşteri Bilgileri",
+                "installation_info": "Kurulum Detayları",
+                "warranty_contract": "Garanti ve Sözleşme",
+                "service_history": "Hizmet Geçmişi",
+                "asset_number": "Varlık Numarası",
+                "serial_number": "Seri Numarası",
+                "item_name": "Ekipman Türü",
+                "status": "Durum",
+                "customer_name": "Müşteri",
+                "email": "E-posta",
+                "phone": "Telefon",
+                "installation_address": "Kurulum Adresi",
+                "installation_date": "Kurulum Tarihi",
+                "source_invoice": "Kaynak Fatura",
+                "warranty_status": "Garanti Durumu",
+                "service_contract": "Hizmet Sözleşmesi",
+                "contract_type": "Tür",
+                "expires": "Sona Eriyor",
+                "technician": "Teknisyen",
+                "close": "Kapat",
+                "status": {
+                    "pending_installation": "Kurulum Bekliyor",
+                    "active": "Aktif",
+                    "under_service": "Hizmet Altında",
+                    "decommissioned": "Hizmet Dışı"
+                }
+            },
+            "service_history": {
+                "no_history": "Henüz hizmet geçmişi yok",
+                "view_ticket": "Bileti Görüntüle",
+                "status": {
+                    "open": "Açık",
+                    "scheduled": "Planlandı",
+                    "in_progress": "Devam Ediyor",
+                    "completed": "Tamamlandı",
+                    "cancelled": "İptal Edildi"
+                },
+                "type": {
+                    "installation": "Kurulum",
+                    "repair": "Onarım",
+                    "maintenance": "Bakım",
+                    "support": "Destek",
+                    "emergency": "Acil"
+                }
             }
         }
     }

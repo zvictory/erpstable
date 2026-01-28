@@ -1649,3 +1649,193 @@ export async function getTechnicians() {
 
   return technicians;
 }
+
+// --- Customer Assets Actions ---
+
+/**
+ * 25. getCustomerAssets()
+ * List all customer assets with optional filters
+ */
+export async function getCustomerAssets(filters?: {
+  customerId?: number;
+  status?: string;
+  warrantyStatus?: 'active' | 'expired';
+  serialNumber?: string;
+}) {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error('Unauthorized');
+  }
+
+  // Build dynamic WHERE conditions
+  const conditions = [];
+  if (filters?.customerId) {
+    conditions.push(eq(customerAssets.customerId, filters.customerId));
+  }
+  if (filters?.status) {
+    conditions.push(eq(customerAssets.status, filters.status as any));
+  }
+  if (filters?.serialNumber) {
+    conditions.push(sql`${customerAssets.serialNumber} LIKE ${`%${filters.serialNumber}%`}`);
+  }
+
+  // Get all assets (we'll filter warranty status after fetching)
+  const assets = await db.query.customerAssets.findMany({
+    where: conditions.length > 0 ? and(...conditions) : undefined,
+    orderBy: desc(customerAssets.createdAt),
+    with: {
+      customer: {
+        columns: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+        },
+      },
+      item: {
+        columns: {
+          id: true,
+          name: true,
+          sku: true,
+        },
+      },
+      serviceContract: {
+        columns: {
+          id: true,
+          contractNumber: true,
+          contractType: true,
+          status: true,
+          endDate: true,
+        },
+      },
+      invoiceLine: {
+        with: {
+          invoice: {
+            columns: {
+              id: true,
+              invoiceNumber: true,
+              date: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  // Filter by warranty status if specified
+  if (filters?.warrantyStatus) {
+    const currentDate = new Date();
+    return assets.filter((asset) => {
+      if (!asset.warrantyEndDate) return false;
+      const warrantyEndDate = new Date(asset.warrantyEndDate);
+      if (filters.warrantyStatus === 'active') {
+        return warrantyEndDate > currentDate;
+      } else {
+        return warrantyEndDate <= currentDate;
+      }
+    });
+  }
+
+  return assets;
+}
+
+/**
+ * 26. getCustomerAsset()
+ * Get single customer asset with all relations including service history
+ */
+export async function getCustomerAsset(id: number) {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error('Unauthorized');
+  }
+
+  const asset = await db.query.customerAssets.findFirst({
+    where: eq(customerAssets.id, id),
+    with: {
+      customer: true,
+      item: true,
+      serviceContract: {
+        with: {
+          assignedTechnician: {
+            columns: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
+      invoiceLine: {
+        with: {
+          invoice: {
+            columns: {
+              id: true,
+              invoiceNumber: true,
+              date: true,
+              totalAmount: true,
+            },
+          },
+        },
+      },
+      serviceTicketAssets: {
+        with: {
+          ticket: {
+            with: {
+              assignedTechnician: {
+                columns: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: (serviceTicketAssets, { desc }) => [
+          desc(serviceTicketAssets.createdAt),
+        ],
+      },
+    },
+  });
+
+  if (!asset) {
+    throw new Error(`Customer asset #${id} not found`);
+  }
+
+  return asset;
+}
+
+/**
+ * 27. getCustomersWithAssets()
+ * Get list of customers who have assets (for filter dropdown)
+ */
+export async function getCustomersWithAssets() {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error('Unauthorized');
+  }
+
+  // Get unique customer IDs from assets
+  const assetsWithCustomers = await db
+    .select({
+      customerId: customerAssets.customerId,
+    })
+    .from(customerAssets)
+    .groupBy(customerAssets.customerId);
+
+  const customerIds = assetsWithCustomers.map((a) => a.customerId);
+
+  if (customerIds.length === 0) {
+    return [];
+  }
+
+  // Get customer details
+  const customersWithAssets = await db.query.customers.findMany({
+    where: sql`${customers.id} IN (${sql.join(customerIds.map((id) => sql`${id}`), sql`, `)})`,
+    columns: {
+      id: true,
+      name: true,
+    },
+    orderBy: (customers, { asc }) => [asc(customers.name)],
+  });
+
+  return customersWithAssets;
+}

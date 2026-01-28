@@ -3065,6 +3065,103 @@
                     "error_renewing": "Не удалось продлить контракт",
                     "error_cancelling": "Не удалось отменить контракт"
                 }
+            },
+            "assets_page": {
+                "title": "Активы клиентов",
+                "description": "Реестр оборудования и история обслуживания",
+                "loading": "Загрузка активов..."
+            },
+            "assets_list": {
+                "filters": {
+                    "title": "Фильтры",
+                    "customer": "Клиент",
+                    "status": "Статус",
+                    "warranty": "Гарантия",
+                    "serial_number": "Серийный номер",
+                    "serial_placeholder": "Поиск по серийному номеру...",
+                    "all": "Все"
+                },
+                "status": {
+                    "pending_installation": "Ожидает установки",
+                    "active": "Активный",
+                    "under_service": "На обслуживании",
+                    "decommissioned": "Выведен из эксплуатации"
+                },
+                "warranty": {
+                    "active": "Гарантия активна",
+                    "expired": "Гарантия истекла",
+                    "none": "Без гарантии"
+                },
+                "empty": "Активы не найдены",
+                "showing": "Показано {count} из {total} активов"
+            },
+            "assets_card": {
+                "serial": "С/Н",
+                "installed": "Установлено",
+                "contract": "Контракт",
+                "view_details": "Подробнее",
+                "status": {
+                    "pending_installation": "Ожидает установки",
+                    "active": "Активный",
+                    "under_service": "На обслуживании",
+                    "decommissioned": "Выведен из эксплуатации"
+                }
+            },
+            "warranty_badge": {
+                "no_warranty": "Без гарантии",
+                "active": "Гарантия активна",
+                "expires": "Истекает",
+                "expired": "Гарантия истекла",
+                "expired_on": "Истекла"
+            },
+            "asset_detail": {
+                "subtitle": "Подробная информация об оборудовании и история обслуживания",
+                "loading": "Загрузка...",
+                "equipment_info": "Информация об оборудовании",
+                "customer_info": "Информация о клиенте",
+                "installation_info": "Детали установки",
+                "warranty_contract": "Гарантия и контракт",
+                "service_history": "История обслуживания",
+                "asset_number": "Номер актива",
+                "serial_number": "Серийный номер",
+                "item_name": "Тип оборудования",
+                "status": "Статус",
+                "customer_name": "Клиент",
+                "email": "Эл. почта",
+                "phone": "Телефон",
+                "installation_address": "Адрес установки",
+                "installation_date": "Дата установки",
+                "source_invoice": "Исходный счет",
+                "warranty_status": "Статус гарантии",
+                "service_contract": "Сервисный контракт",
+                "contract_type": "Тип",
+                "expires": "Истекает",
+                "technician": "Техник",
+                "close": "Закрыть",
+                "status": {
+                    "pending_installation": "Ожидает установки",
+                    "active": "Активный",
+                    "under_service": "На обслуживании",
+                    "decommissioned": "Выведен из эксплуатации"
+                }
+            },
+            "service_history": {
+                "no_history": "История обслуживания пока отсутствует",
+                "view_ticket": "Просмотр заявки",
+                "status": {
+                    "open": "Открыта",
+                    "scheduled": "Запланирована",
+                    "in_progress": "В процессе",
+                    "completed": "Завершена",
+                    "cancelled": "Отменена"
+                },
+                "type": {
+                    "installation": "Установка",
+                    "repair": "Ремонт",
+                    "maintenance": "Техническое обслуживание",
+                    "support": "Поддержка",
+                    "emergency": "Срочная"
+                }
             }
         }
     }
