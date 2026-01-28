@@ -2211,7 +2211,335 @@
             "clear_filters": "Clear Filters",
             "export": "Export",
             "import": "Import",
-            "settings": "Settings"
+            "settings": "Settings",
+            "view": "View",
+            "actions": "Actions"
+        },
+        "service": {
+            "dashboard": {
+                "page_title": "Field Service Dashboard",
+                "page_description": "Monitor service operations, tickets, and contracts",
+                "kpi": {
+                    "open_tickets": "Open Tickets",
+                    "open_tickets_desc": "Open, scheduled, and in progress",
+                    "pending_installations": "Pending Installations",
+                    "pending_installations_desc": "Equipment awaiting installation",
+                    "active_contracts": "Active Contracts",
+                    "active_contracts_desc": "Service contracts currently active",
+                    "refills_due": "Refills Due",
+                    "refills_due_desc": "Contracts with pending refills"
+                },
+                "recent_tickets": "Recent Tickets",
+                "view_all_tickets": "View All Tickets",
+                "no_tickets": "No tickets found",
+                "upcoming_service": "Upcoming Service",
+                "next_7_days": "Next 7 days",
+                "no_upcoming": "No scheduled service in the next 7 days"
+            },
+            "ticket": {
+                "ticket_number": "Ticket #",
+                "customer": "Customer",
+                "type": "Type",
+                "priority": "Priority",
+                "scheduled_date": "Scheduled Date",
+                "technician": "Technician",
+                "assets": "Assets",
+                "unassigned": "Unassigned",
+                "status": {
+                    "open": "Open",
+                    "scheduled": "Scheduled",
+                    "in_progress": "In Progress",
+                    "completed": "Completed",
+                    "cancelled": "Cancelled"
+                },
+                "priority": {
+                    "low": "Low",
+                    "medium": "Medium",
+                    "high": "High",
+                    "critical": "Critical"
+                },
+                "type": {
+                    "installation": "Installation",
+                    "repair": "Repair",
+                    "maintenance": "Maintenance",
+                    "support": "Support",
+                    "emergency": "Emergency"
+                }
+            },
+            "tickets_page": {
+                "title": "Service Tickets",
+                "description": "Manage service tickets and field operations",
+                "new_ticket": "New Ticket",
+                "loading": "Loading tickets..."
+            },
+            "new_ticket_page": {
+                "title": "Create Service Ticket",
+                "description": "Create a new service ticket for customer support"
+            },
+            "tickets_list": {
+                "filters": {
+                    "title": "Filters",
+                    "status": "Status",
+                    "type": "Type",
+                    "priority": "Priority",
+                    "all": "All"
+                },
+                "table": {
+                    "ticket_number": "Ticket #",
+                    "customer": "Customer",
+                    "title": "Title",
+                    "type": "Type",
+                    "priority": "Priority",
+                    "status": "Status",
+                    "technician": "Technician",
+                    "scheduled": "Scheduled",
+                    "actions": "Actions"
+                },
+                "status": {
+                    "open": "Open",
+                    "scheduled": "Scheduled",
+                    "in_progress": "In Progress",
+                    "completed": "Completed",
+                    "cancelled": "Cancelled"
+                },
+                "priority": {
+                    "low": "Low",
+                    "medium": "Medium",
+                    "high": "High",
+                    "critical": "Critical"
+                },
+                "type": {
+                    "installation": "Installation",
+                    "repair": "Repair",
+                    "maintenance": "Maintenance",
+                    "support": "Support",
+                    "emergency": "Emergency"
+                },
+                "unassigned": "Unassigned",
+                "view": "View",
+                "empty": "No tickets found",
+                "showing": "Showing {count} of {total} tickets"
+            },
+            "ticket_form": {
+                "customer_id": "Customer ID",
+                "customer_id_placeholder": "Enter customer ID",
+                "customer_id_hint": "In production, this would be a searchable dropdown",
+                "title": "Ticket Title",
+                "title_placeholder": "Brief description of the issue",
+                "description": "Description",
+                "description_placeholder": "Detailed description of the issue...",
+                "ticket_type": "Ticket Type",
+                "priority": "Priority",
+                "scheduled_date": "Scheduled Date",
+                "assign_technician": "Assign Technician",
+                "unassigned": "Unassigned",
+                "create_ticket": "Create Ticket",
+                "creating": "Creating...",
+                "cancel": "Cancel",
+                "type": {
+                    "installation": "Installation",
+                    "repair": "Repair",
+                    "maintenance": "Maintenance",
+                    "support": "Support",
+                    "emergency": "Emergency"
+                },
+                "priority": {
+                    "low": "Low",
+                    "medium": "Medium",
+                    "high": "High",
+                    "critical": "Critical"
+                },
+                "error": {
+                    "required_fields": "Please fill all required fields",
+                    "generic": "Failed to create ticket"
+                }
+            },
+            "ticket_detail": {
+                "loading": "Loading ticket details...",
+                "mark_in_progress": "Mark In Progress",
+                "complete_ticket": "Complete Ticket",
+                "tabs": {
+                    "overview": "Overview",
+                    "timeline": "Timeline",
+                    "work_details": "Work Details"
+                },
+                "customer_info": "Customer Information",
+                "customer_name": "Customer Name",
+                "email": "Email",
+                "phone": "Phone",
+                "ticket_info": "Ticket Information",
+                "ticket_type": "Ticket Type",
+                "created_at": "Created At",
+                "scheduled_date": "Scheduled Date",
+                "contract": "Contract",
+                "description": "Description",
+                "assigned_technician": "Assigned Technician",
+                "unassigned": "Unassigned",
+                "linked_assets": "Linked Assets",
+                "labor_hours": "Labor Hours",
+                "hours": "hours",
+                "parts_used": "Parts Used",
+                "part_item_id": "Item #{id}",
+                "completion_notes": "Completion Notes",
+                "customer_signature": "Customer Signature",
+                "service_invoice": "Service Invoice",
+                "work_details_empty": "Work details will appear here after the ticket is completed",
+                "status": {
+                    "open": "Open",
+                    "scheduled": "Scheduled",
+                    "in_progress": "In Progress",
+                    "completed": "Completed",
+                    "cancelled": "Cancelled"
+                },
+                "priority": {
+                    "low": "Low",
+                    "medium": "Medium",
+                    "high": "High",
+                    "critical": "Critical"
+                },
+                "error": {
+                    "generic": "An error occurred"
+                }
+            },
+            "ticket_timeline": {
+                "created": "Created",
+                "created_description": "Ticket was created",
+                "assigned": "Assigned",
+                "assigned_description": "Assigned to {name}",
+                "scheduled": "Scheduled",
+                "scheduled_description": "Scheduled for {date}",
+                "in_progress": "In Progress",
+                "in_progress_description": "Work started",
+                "completed": "Completed",
+                "completed_description": "Ticket completed successfully",
+                "cancelled": "Cancelled",
+                "cancelled_description": "Ticket was cancelled"
+            },
+            "completion_form": {
+                "title": "Complete Service Ticket",
+                "completion_notes": "Completion Notes",
+                "completion_notes_placeholder": "Describe the work performed...",
+                "minimum_10_chars": "Minimum 10 characters required",
+                "labor_hours": "Labor Hours",
+                "labor_hours_hint": "Enter decimal hours (e.g., 2.5 for 2 hours 30 minutes)",
+                "parts_used": "Parts Used",
+                "add_part": "Add Part",
+                "no_parts_added": "No parts added yet",
+                "item_id": "Item ID",
+                "quantity": "Quantity",
+                "unit_cost": "Unit Cost (Tiyin)",
+                "customer_signature": "Customer Signature",
+                "signature_placeholder": "Customer name or signature",
+                "signature_hint": "Text input for now (can be enhanced with signature pad)",
+                "complete_ticket": "Complete Ticket",
+                "completing": "Completing...",
+                "cancel": "Cancel",
+                "error": {
+                    "notes_required": "Completion notes are required (minimum 10 characters)",
+                    "labor_hours_required": "Labor hours are required",
+                    "invalid_parts": "All parts must have valid item ID, quantity, and unit cost",
+                    "generic": "Failed to complete ticket"
+                }
+            },
+            "contract": {
+                "page_title": "Service Contracts",
+                "page_description": "Manage service contracts and AMC agreements",
+                "create_contract": "Create Contract",
+                "edit_contract": "Edit Contract",
+                "contract_number": "Contract #",
+                "contract_details": "Contract Details",
+                "customer": "Customer",
+                "contract_type": "Contract Type",
+                "start_date": "Start Date",
+                "end_date": "End Date",
+                "billing_frequency": "Billing Frequency",
+                "monthly_value": "Monthly Value",
+                "next_billing_date": "Next Billing Date",
+                "source_invoice": "Source Invoice",
+                "assigned_technician": "Assigned Technician",
+                "auto_generate_refills": "Auto-Generate Refills",
+                "suspension_reason": "Suspension Reason",
+                "filter_all": "All Contracts",
+                "filter_active": "Active",
+                "filter_suspended": "Suspended",
+                "filter_expired": "Expired",
+                "filter_cancelled": "Cancelled",
+                "no_contracts": "No contracts found",
+                "view_contract": "View Contract",
+                "suspend_contract": "Suspend Contract",
+                "renew_contract": "Renew Contract",
+                "cancel_contract": "Cancel Contract",
+                "edit_refill_items": "Edit Refill Items",
+                "changes_affect_future": "Changes affect future refills only",
+                "cannot_edit_status": "Cannot edit {status} contract",
+                "read_only_view": "Read-only view",
+                "status": {
+                    "active": "Active",
+                    "suspended": "Suspended",
+                    "expired": "Expired",
+                    "cancelled": "Cancelled"
+                },
+                "type": {
+                    "warranty": "Warranty",
+                    "maintenance": "Maintenance",
+                    "full_service": "Full Service",
+                    "supplies_only": "Supplies Only"
+                },
+                "billing_frequency_options": {
+                    "monthly": "Monthly",
+                    "quarterly": "Quarterly (3 months)",
+                    "semi_annual": "Semi-Annual (6 months)",
+                    "annual": "Annual (12 months)"
+                },
+                "tabs": {
+                    "basic_info": "Basic Info",
+                    "refill_items": "Refill Items",
+                    "billing_history": "Billing History",
+                    "associated_tickets": "Service Tickets"
+                },
+                "refill_items": {
+                    "title": "Refill Items Configuration",
+                    "add_item": "Add Item",
+                    "item": "Item",
+                    "quantity_per_cycle": "Quantity per Cycle",
+                    "unit_price": "Unit Price",
+                    "cycle_total": "Cycle Total",
+                    "no_items": "No refill items configured",
+                    "remove_item": "Remove Item"
+                },
+                "billing_history": {
+                    "title": "Billing History",
+                    "invoice_number": "Invoice #",
+                    "date": "Date",
+                    "amount": "Amount",
+                    "status": "Status",
+                    "no_invoices": "No invoices generated yet"
+                },
+                "tickets": {
+                    "title": "Associated Service Tickets",
+                    "no_tickets": "No service tickets linked to this contract"
+                },
+                "actions": {
+                    "save": "Save Contract",
+                    "cancel": "Cancel",
+                    "confirm_suspend": "Are you sure you want to suspend this contract?",
+                    "confirm_renew": "Renew this contract?",
+                    "confirm_cancel": "Are you sure you want to cancel this contract? This action cannot be undone.",
+                    "suspend_reason_placeholder": "Enter suspension reason...",
+                    "cancel_reason_placeholder": "Enter cancellation reason...",
+                    "new_end_date": "New End Date",
+                    "success_created": "Contract created successfully",
+                    "success_updated": "Contract updated successfully",
+                    "success_suspended": "Contract suspended",
+                    "success_renewed": "Contract renewed",
+                    "success_cancelled": "Contract cancelled",
+                    "error_creating": "Failed to create contract",
+                    "error_updating": "Failed to update contract",
+                    "error_suspending": "Failed to suspend contract",
+                    "error_renewing": "Failed to renew contract",
+                    "error_cancelling": "Failed to cancel contract"
+                }
+            }
         }
     }
 }

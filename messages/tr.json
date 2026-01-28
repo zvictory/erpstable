@@ -2104,7 +2104,335 @@
             "clear_filters": "Filtreleri Temizle",
             "export": "Dışa Aktar",
             "import": "İçe Aktar",
-            "settings": "Ayarlar"
+            "settings": "Ayarlar",
+            "view": "Görüntüle",
+            "actions": "İşlemler"
+        },
+        "service": {
+            "dashboard": {
+                "page_title": "Saha Servisi Paneli",
+                "page_description": "Servis operasyonlarını, biletleri ve sözleşmeleri izleyin",
+                "kpi": {
+                    "open_tickets": "Açık Biletler",
+                    "open_tickets_desc": "Açık, planlanmış ve devam eden",
+                    "pending_installations": "Bekleyen Kurulumlar",
+                    "pending_installations_desc": "Kurulum bekleyen ekipmanlar",
+                    "active_contracts": "Aktif Sözleşmeler",
+                    "active_contracts_desc": "Şu anda aktif servis sözleşmeleri",
+                    "refills_due": "Dolum Gereken",
+                    "refills_due_desc": "Bekleyen dolumlara sahip sözleşmeler"
+                },
+                "recent_tickets": "Son Biletler",
+                "view_all_tickets": "Tüm Biletleri Görüntüle",
+                "no_tickets": "Bilet bulunamadı",
+                "upcoming_service": "Yaklaşan Servis",
+                "next_7_days": "Sonraki 7 gün",
+                "no_upcoming": "Sonraki 7 gün içinde planlanmış servis yok"
+            },
+            "ticket": {
+                "ticket_number": "Bilet №",
+                "customer": "Müşteri",
+                "type": "Tür",
+                "priority": "Öncelik",
+                "scheduled_date": "Planlanan Tarih",
+                "technician": "Teknisyen",
+                "assets": "Varlıklar",
+                "unassigned": "Atanmamış",
+                "status": {
+                    "open": "Açık",
+                    "scheduled": "Planlandı",
+                    "in_progress": "Devam Ediyor",
+                    "completed": "Tamamlandı",
+                    "cancelled": "İptal Edildi"
+                },
+                "priority": {
+                    "low": "Düşük",
+                    "medium": "Orta",
+                    "high": "Yüksek",
+                    "critical": "Kritik"
+                },
+                "type": {
+                    "installation": "Kurulum",
+                    "repair": "Onarım",
+                    "maintenance": "Bakım",
+                    "support": "Destek",
+                    "emergency": "Acil"
+                }
+            },
+            "tickets_page": {
+                "title": "Servis Biletleri",
+                "description": "Servis biletlerini ve saha operasyonlarını yönetin",
+                "new_ticket": "Yeni Bilet",
+                "loading": "Biletler yükleniyor..."
+            },
+            "new_ticket_page": {
+                "title": "Servis Bileti Oluştur",
+                "description": "Müşteri desteği için yeni bir servis bileti oluşturun"
+            },
+            "tickets_list": {
+                "filters": {
+                    "title": "Filtreler",
+                    "status": "Durum",
+                    "type": "Tür",
+                    "priority": "Öncelik",
+                    "all": "Tümü"
+                },
+                "table": {
+                    "ticket_number": "Bilet №",
+                    "customer": "Müşteri",
+                    "title": "Başlık",
+                    "type": "Tür",
+                    "priority": "Öncelik",
+                    "status": "Durum",
+                    "technician": "Teknisyen",
+                    "scheduled": "Planlandı",
+                    "actions": "İşlemler"
+                },
+                "status": {
+                    "open": "Açık",
+                    "scheduled": "Planlandı",
+                    "in_progress": "Devam Ediyor",
+                    "completed": "Tamamlandı",
+                    "cancelled": "İptal Edildi"
+                },
+                "priority": {
+                    "low": "Düşük",
+                    "medium": "Orta",
+                    "high": "Yüksek",
+                    "critical": "Kritik"
+                },
+                "type": {
+                    "installation": "Kurulum",
+                    "repair": "Onarım",
+                    "maintenance": "Bakım",
+                    "support": "Destek",
+                    "emergency": "Acil"
+                },
+                "unassigned": "Atanmamış",
+                "view": "Görüntüle",
+                "empty": "Bilet bulunamadı",
+                "showing": "{total} biletten {count} tanesi gösteriliyor"
+            },
+            "ticket_form": {
+                "customer_id": "Müşteri ID",
+                "customer_id_placeholder": "Müşteri ID girin",
+                "customer_id_hint": "Üretimde bu aranabilir bir açılır liste olacak",
+                "title": "Bilet Başlığı",
+                "title_placeholder": "Sorunun kısa açıklaması",
+                "description": "Açıklama",
+                "description_placeholder": "Sorunun detaylı açıklaması...",
+                "ticket_type": "Bilet Türü",
+                "priority": "Öncelik",
+                "scheduled_date": "Planlanan Tarih",
+                "assign_technician": "Teknisyen Ata",
+                "unassigned": "Atanmamış",
+                "create_ticket": "Bilet Oluştur",
+                "creating": "Oluşturuluyor...",
+                "cancel": "İptal",
+                "type": {
+                    "installation": "Kurulum",
+                    "repair": "Onarım",
+                    "maintenance": "Bakım",
+                    "support": "Destek",
+                    "emergency": "Acil"
+                },
+                "priority": {
+                    "low": "Düşük",
+                    "medium": "Orta",
+                    "high": "Yüksek",
+                    "critical": "Kritik"
+                },
+                "error": {
+                    "required_fields": "Lütfen tüm gerekli alanları doldurun",
+                    "generic": "Bilet oluşturulamadı"
+                }
+            },
+            "ticket_detail": {
+                "loading": "Bilet detayları yükleniyor...",
+                "mark_in_progress": "Devam Ediyor Olarak İşaretle",
+                "complete_ticket": "Bileti Tamamla",
+                "tabs": {
+                    "overview": "Genel Bakış",
+                    "timeline": "Zaman Çizelgesi",
+                    "work_details": "İş Detayları"
+                },
+                "customer_info": "Müşteri Bilgileri",
+                "customer_name": "Müşteri Adı",
+                "email": "E-posta",
+                "phone": "Telefon",
+                "ticket_info": "Bilet Bilgileri",
+                "ticket_type": "Bilet Türü",
+                "created_at": "Oluşturulma",
+                "scheduled_date": "Planlanan Tarih",
+                "contract": "Sözleşme",
+                "description": "Açıklama",
+                "assigned_technician": "Atanan Teknisyen",
+                "unassigned": "Atanmamış",
+                "linked_assets": "Bağlı Varlıklar",
+                "labor_hours": "İşçilik Saatleri",
+                "hours": "saat",
+                "parts_used": "Kullanılan Parçalar",
+                "part_item_id": "Ürün №{id}",
+                "completion_notes": "Tamamlanma Notları",
+                "customer_signature": "Müşteri İmzası",
+                "service_invoice": "Servis Faturası",
+                "work_details_empty": "İş detayları bilet tamamlandıktan sonra burada görünecek",
+                "status": {
+                    "open": "Açık",
+                    "scheduled": "Planlandı",
+                    "in_progress": "Devam Ediyor",
+                    "completed": "Tamamlandı",
+                    "cancelled": "İptal Edildi"
+                },
+                "priority": {
+                    "low": "Düşük",
+                    "medium": "Orta",
+                    "high": "Yüksek",
+                    "critical": "Kritik"
+                },
+                "error": {
+                    "generic": "Bir hata oluştu"
+                }
+            },
+            "ticket_timeline": {
+                "created": "Oluşturuldu",
+                "created_description": "Bilet oluşturuldu",
+                "assigned": "Atandı",
+                "assigned_description": "{name}'e atandı",
+                "scheduled": "Planlandı",
+                "scheduled_description": "{date} için planlandı",
+                "in_progress": "Devam Ediyor",
+                "in_progress_description": "İş başladı",
+                "completed": "Tamamlandı",
+                "completed_description": "Bilet başarıyla tamamlandı",
+                "cancelled": "İptal Edildi",
+                "cancelled_description": "Bilet iptal edildi"
+            },
+            "completion_form": {
+                "title": "Servis Biletini Tamamla",
+                "completion_notes": "Tamamlanma Notları",
+                "completion_notes_placeholder": "Yapılan işi açıklayın...",
+                "minimum_10_chars": "En az 10 karakter gerekli",
+                "labor_hours": "İşçilik Saatleri",
+                "labor_hours_hint": "Ondalık saat girin (örn. 2 saat 30 dakika için 2.5)",
+                "parts_used": "Kullanılan Parçalar",
+                "add_part": "Parça Ekle",
+                "no_parts_added": "Henüz parça eklenmedi",
+                "item_id": "Ürün ID",
+                "quantity": "Miktar",
+                "unit_cost": "Birim Maliyet (Tiyin)",
+                "customer_signature": "Müşteri İmzası",
+                "signature_placeholder": "Müşteri adı veya imzası",
+                "signature_hint": "Metin girişi (imza tableti ile geliştirilebilir)",
+                "complete_ticket": "Bileti Tamamla",
+                "completing": "Tamamlanıyor...",
+                "cancel": "İptal",
+                "error": {
+                    "notes_required": "Tamamlanma notları gerekli (en az 10 karakter)",
+                    "labor_hours_required": "İşçilik saatleri gerekli",
+                    "invalid_parts": "Tüm parçalar geçerli ürün ID, miktar ve maliyete sahip olmalı",
+                    "generic": "Bilet tamamlanamadı"
+                }
+            },
+            "contract": {
+                "page_title": "Servis Sözleşmeleri",
+                "page_description": "Servis sözleşmelerini ve bakım anlaşmalarını yönetin",
+                "create_contract": "Sözleşme Oluştur",
+                "edit_contract": "Sözleşmeyi Düzenle",
+                "contract_number": "Sözleşme №",
+                "contract_details": "Sözleşme Detayları",
+                "customer": "Müşteri",
+                "contract_type": "Sözleşme Türü",
+                "start_date": "Başlangıç Tarihi",
+                "end_date": "Bitiş Tarihi",
+                "billing_frequency": "Faturalama Sıklığı",
+                "monthly_value": "Aylık Değer",
+                "next_billing_date": "Sonraki Faturalama Tarihi",
+                "source_invoice": "Kaynak Fatura",
+                "assigned_technician": "Atanan Teknisyen",
+                "auto_generate_refills": "Otomatik Dolum Oluştur",
+                "suspension_reason": "Askıya Alma Nedeni",
+                "filter_all": "Tüm Sözleşmeler",
+                "filter_active": "Aktif",
+                "filter_suspended": "Askıya Alınmış",
+                "filter_expired": "Süresi Dolmuş",
+                "filter_cancelled": "İptal Edilmiş",
+                "no_contracts": "Sözleşme bulunamadı",
+                "view_contract": "Sözleşmeyi Görüntüle",
+                "suspend_contract": "Sözleşmeyi Askıya Al",
+                "renew_contract": "Sözleşmeyi Yenile",
+                "cancel_contract": "Sözleşmeyi İptal Et",
+                "edit_refill_items": "Dolum Ürünlerini Düzenle",
+                "changes_affect_future": "Değişiklikler yalnızca gelecekteki dolumları etkiler",
+                "cannot_edit_status": "{status} sözleşme düzenlenemez",
+                "read_only_view": "Salt okunur görünüm",
+                "status": {
+                    "active": "Aktif",
+                    "suspended": "Askıya Alınmış",
+                    "expired": "Süresi Dolmuş",
+                    "cancelled": "İptal Edilmiş"
+                },
+                "type": {
+                    "warranty": "Garanti",
+                    "maintenance": "Bakım",
+                    "full_service": "Tam Servis",
+                    "supplies_only": "Yalnızca Malzeme"
+                },
+                "billing_frequency_options": {
+                    "monthly": "Aylık",
+                    "quarterly": "Üç Aylık (3 ay)",
+                    "semi_annual": "Altı Aylık (6 ay)",
+                    "annual": "Yıllık (12 ay)"
+                },
+                "tabs": {
+                    "basic_info": "Temel Bilgiler",
+                    "refill_items": "Dolum Ürünleri",
+                    "billing_history": "Faturalama Geçmişi",
+                    "associated_tickets": "Servis Biletleri"
+                },
+                "refill_items": {
+                    "title": "Dolum Ürünleri Yapılandırması",
+                    "add_item": "Ürün Ekle",
+                    "item": "Ürün",
+                    "quantity_per_cycle": "Döngü Başına Miktar",
+                    "unit_price": "Birim Fiyat",
+                    "cycle_total": "Döngü Toplamı",
+                    "no_items": "Dolum ürünleri yapılandırılmamış",
+                    "remove_item": "Ürünü Kaldır"
+                },
+                "billing_history": {
+                    "title": "Faturalama Geçmişi",
+                    "invoice_number": "Fatura №",
+                    "date": "Tarih",
+                    "amount": "Tutar",
+                    "status": "Durum",
+                    "no_invoices": "Henüz fatura oluşturulmadı"
+                },
+                "tickets": {
+                    "title": "İlişkili Servis Biletleri",
+                    "no_tickets": "Bu sözleşmeye bağlı servis bileti yok"
+                },
+                "actions": {
+                    "save": "Sözleşmeyi Kaydet",
+                    "cancel": "İptal",
+                    "confirm_suspend": "Bu sözleşmeyi askıya almak istediğinizden emin misiniz?",
+                    "confirm_renew": "Bu sözleşmeyi yenilemek istiyor musunuz?",
+                    "confirm_cancel": "Bu sözleşmeyi iptal etmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+                    "suspend_reason_placeholder": "Askıya alma nedenini girin...",
+                    "cancel_reason_placeholder": "İptal nedenini girin...",
+                    "new_end_date": "Yeni Bitiş Tarihi",
+                    "success_created": "Sözleşme başarıyla oluşturuldu",
+                    "success_updated": "Sözleşme başarıyla güncellendi",
+                    "success_suspended": "Sözleşme askıya alındı",
+                    "success_renewed": "Sözleşme yenilendi",
+                    "success_cancelled": "Sözleşme iptal edildi",
+                    "error_creating": "Sözleşme oluşturulamadı",
+                    "error_updating": "Sözleşme güncellenemedi",
+                    "error_suspending": "Sözleşme askıya alınamadı",
+                    "error_renewing": "Sözleşme yenilenemedi",
+                    "error_cancelling": "Sözleşme iptal edilemedi"
+                }
+            }
         }
     }
 }

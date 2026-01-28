@@ -2737,7 +2737,335 @@
             "clear_filters": "Очистить фильтры",
             "export": "Экспорт",
             "import": "Импорт",
-            "settings": "Настройки"
+            "settings": "Настройки",
+            "view": "Просмотр",
+            "actions": "Действия"
+        },
+        "service": {
+            "dashboard": {
+                "page_title": "Панель полевого сервиса",
+                "page_description": "Мониторинг сервисных операций, заявок и контрактов",
+                "kpi": {
+                    "open_tickets": "Открытые заявки",
+                    "open_tickets_desc": "Открытые, запланированные и в процессе",
+                    "pending_installations": "Ожидающие установки",
+                    "pending_installations_desc": "Оборудование ожидает установки",
+                    "active_contracts": "Активные контракты",
+                    "active_contracts_desc": "Действующие сервисные контракты",
+                    "refills_due": "Требуется пополнение",
+                    "refills_due_desc": "Контракты с ожидающими пополнениями"
+                },
+                "recent_tickets": "Недавние заявки",
+                "view_all_tickets": "Просмотреть все заявки",
+                "no_tickets": "Заявки не найдены",
+                "upcoming_service": "Предстоящие работы",
+                "next_7_days": "Следующие 7 дней",
+                "no_upcoming": "Нет запланированных работ в течение следующих 7 дней"
+            },
+            "ticket": {
+                "ticket_number": "Заявка №",
+                "customer": "Клиент",
+                "type": "Тип",
+                "priority": "Приоритет",
+                "scheduled_date": "Запланированная дата",
+                "technician": "Техник",
+                "assets": "Активы",
+                "unassigned": "Не назначен",
+                "status": {
+                    "open": "Открыта",
+                    "scheduled": "Запланирована",
+                    "in_progress": "В процессе",
+                    "completed": "Завершена",
+                    "cancelled": "Отменена"
+                },
+                "priority": {
+                    "low": "Низкий",
+                    "medium": "Средний",
+                    "high": "Высокий",
+                    "critical": "Критический"
+                },
+                "type": {
+                    "installation": "Установка",
+                    "repair": "Ремонт",
+                    "maintenance": "Обслуживание",
+                    "support": "Поддержка",
+                    "emergency": "Экстренная"
+                }
+            },
+            "tickets_page": {
+                "title": "Сервисные заявки",
+                "description": "Управление сервисными заявками и полевыми операциями",
+                "new_ticket": "Новая заявка",
+                "loading": "Загрузка заявок..."
+            },
+            "new_ticket_page": {
+                "title": "Создать сервисную заявку",
+                "description": "Создать новую заявку для поддержки клиентов"
+            },
+            "tickets_list": {
+                "filters": {
+                    "title": "Фильтры",
+                    "status": "Статус",
+                    "type": "Тип",
+                    "priority": "Приоритет",
+                    "all": "Все"
+                },
+                "table": {
+                    "ticket_number": "Заявка №",
+                    "customer": "Клиент",
+                    "title": "Название",
+                    "type": "Тип",
+                    "priority": "Приоритет",
+                    "status": "Статус",
+                    "technician": "Техник",
+                    "scheduled": "Запланирована",
+                    "actions": "Действия"
+                },
+                "status": {
+                    "open": "Открыта",
+                    "scheduled": "Запланирована",
+                    "in_progress": "В процессе",
+                    "completed": "Завершена",
+                    "cancelled": "Отменена"
+                },
+                "priority": {
+                    "low": "Низкий",
+                    "medium": "Средний",
+                    "high": "Высокий",
+                    "critical": "Критический"
+                },
+                "type": {
+                    "installation": "Установка",
+                    "repair": "Ремонт",
+                    "maintenance": "Обслуживание",
+                    "support": "Поддержка",
+                    "emergency": "Экстренная"
+                },
+                "unassigned": "Не назначен",
+                "view": "Просмотр",
+                "empty": "Заявки не найдены",
+                "showing": "Показано {count} из {total} заявок"
+            },
+            "ticket_form": {
+                "customer_id": "ID клиента",
+                "customer_id_placeholder": "Введите ID клиента",
+                "customer_id_hint": "В продакшене это будет поиск с выпадающим списком",
+                "title": "Название заявки",
+                "title_placeholder": "Краткое описание проблемы",
+                "description": "Описание",
+                "description_placeholder": "Подробное описание проблемы...",
+                "ticket_type": "Тип заявки",
+                "priority": "Приоритет",
+                "scheduled_date": "Запланированная дата",
+                "assign_technician": "Назначить техника",
+                "unassigned": "Не назначен",
+                "create_ticket": "Создать заявку",
+                "creating": "Создание...",
+                "cancel": "Отмена",
+                "type": {
+                    "installation": "Установка",
+                    "repair": "Ремонт",
+                    "maintenance": "Обслуживание",
+                    "support": "Поддержка",
+                    "emergency": "Экстренная"
+                },
+                "priority": {
+                    "low": "Низкий",
+                    "medium": "Средний",
+                    "high": "Высокий",
+                    "critical": "Критический"
+                },
+                "error": {
+                    "required_fields": "Пожалуйста, заполните все обязательные поля",
+                    "generic": "Не удалось создать заявку"
+                }
+            },
+            "ticket_detail": {
+                "loading": "Загрузка деталей заявки...",
+                "mark_in_progress": "Отметить в процессе",
+                "complete_ticket": "Завершить заявку",
+                "tabs": {
+                    "overview": "Обзор",
+                    "timeline": "Временная шкала",
+                    "work_details": "Детали работы"
+                },
+                "customer_info": "Информация о клиенте",
+                "customer_name": "Имя клиента",
+                "email": "Email",
+                "phone": "Телефон",
+                "ticket_info": "Информация о заявке",
+                "ticket_type": "Тип заявки",
+                "created_at": "Создано",
+                "scheduled_date": "Запланированная дата",
+                "contract": "Контракт",
+                "description": "Описание",
+                "assigned_technician": "Назначенный техник",
+                "unassigned": "Не назначен",
+                "linked_assets": "Связанные активы",
+                "labor_hours": "Часы работы",
+                "hours": "часов",
+                "parts_used": "Использованные детали",
+                "part_item_id": "Товар №{id}",
+                "completion_notes": "Примечания о завершении",
+                "customer_signature": "Подпись клиента",
+                "service_invoice": "Сервисный счет",
+                "work_details_empty": "Детали работы появятся здесь после завершения заявки",
+                "status": {
+                    "open": "Открыта",
+                    "scheduled": "Запланирована",
+                    "in_progress": "В процессе",
+                    "completed": "Завершена",
+                    "cancelled": "Отменена"
+                },
+                "priority": {
+                    "low": "Низкий",
+                    "medium": "Средний",
+                    "high": "Высокий",
+                    "critical": "Критический"
+                },
+                "error": {
+                    "generic": "Произошла ошибка"
+                }
+            },
+            "ticket_timeline": {
+                "created": "Создана",
+                "created_description": "Заявка была создана",
+                "assigned": "Назначена",
+                "assigned_description": "Назначена {name}",
+                "scheduled": "Запланирована",
+                "scheduled_description": "Запланирована на {date}",
+                "in_progress": "В процессе",
+                "in_progress_description": "Работа начата",
+                "completed": "Завершена",
+                "completed_description": "Заявка успешно завершена",
+                "cancelled": "Отменена",
+                "cancelled_description": "Заявка была отменена"
+            },
+            "completion_form": {
+                "title": "Завершить сервисную заявку",
+                "completion_notes": "Примечания о завершении",
+                "completion_notes_placeholder": "Опишите выполненную работу...",
+                "minimum_10_chars": "Требуется минимум 10 символов",
+                "labor_hours": "Часы работы",
+                "labor_hours_hint": "Введите десятичные часы (например, 2.5 для 2 часов 30 минут)",
+                "parts_used": "Использованные детали",
+                "add_part": "Добавить деталь",
+                "no_parts_added": "Детали еще не добавлены",
+                "item_id": "ID товара",
+                "quantity": "Количество",
+                "unit_cost": "Стоимость за единицу (тийин)",
+                "customer_signature": "Подпись клиента",
+                "signature_placeholder": "Имя или подпись клиента",
+                "signature_hint": "Текстовое поле (можно улучшить с помощью планшета для подписи)",
+                "complete_ticket": "Завершить заявку",
+                "completing": "Завершение...",
+                "cancel": "Отмена",
+                "error": {
+                    "notes_required": "Требуются примечания о завершении (минимум 10 символов)",
+                    "labor_hours_required": "Требуются часы работы",
+                    "invalid_parts": "Все детали должны иметь валидный ID товара, количество и стоимость",
+                    "generic": "Не удалось завершить заявку"
+                }
+            },
+            "contract": {
+                "page_title": "Сервисные контракты",
+                "page_description": "Управление сервисными контрактами и договорами обслуживания",
+                "create_contract": "Создать контракт",
+                "edit_contract": "Редактировать контракт",
+                "contract_number": "Контракт №",
+                "contract_details": "Детали контракта",
+                "customer": "Клиент",
+                "contract_type": "Тип контракта",
+                "start_date": "Дата начала",
+                "end_date": "Дата окончания",
+                "billing_frequency": "Частота выставления счетов",
+                "monthly_value": "Месячная стоимость",
+                "next_billing_date": "Следующая дата выставления счета",
+                "source_invoice": "Исходный счет",
+                "assigned_technician": "Назначенный техник",
+                "auto_generate_refills": "Автоматическое создание пополнений",
+                "suspension_reason": "Причина приостановки",
+                "filter_all": "Все контракты",
+                "filter_active": "Активные",
+                "filter_suspended": "Приостановленные",
+                "filter_expired": "Истекшие",
+                "filter_cancelled": "Отмененные",
+                "no_contracts": "Контракты не найдены",
+                "view_contract": "Просмотреть контракт",
+                "suspend_contract": "Приостановить контракт",
+                "renew_contract": "Продлить контракт",
+                "cancel_contract": "Отменить контракт",
+                "edit_refill_items": "Редактировать товары пополнения",
+                "changes_affect_future": "Изменения влияют только на будущие пополнения",
+                "cannot_edit_status": "Невозможно редактировать {status} контракт",
+                "read_only_view": "Режим просмотра",
+                "status": {
+                    "active": "Активный",
+                    "suspended": "Приостановлен",
+                    "expired": "Истек",
+                    "cancelled": "Отменен"
+                },
+                "type": {
+                    "warranty": "Гарантия",
+                    "maintenance": "Обслуживание",
+                    "full_service": "Полное обслуживание",
+                    "supplies_only": "Только расходные материалы"
+                },
+                "billing_frequency_options": {
+                    "monthly": "Ежемесячно",
+                    "quarterly": "Ежеквартально (3 месяца)",
+                    "semi_annual": "Полугодие (6 месяцев)",
+                    "annual": "Ежегодно (12 месяцев)"
+                },
+                "tabs": {
+                    "basic_info": "Основная информация",
+                    "refill_items": "Товары пополнения",
+                    "billing_history": "История выставления счетов",
+                    "associated_tickets": "Сервисные заявки"
+                },
+                "refill_items": {
+                    "title": "Настройка товаров пополнения",
+                    "add_item": "Добавить товар",
+                    "item": "Товар",
+                    "quantity_per_cycle": "Количество за цикл",
+                    "unit_price": "Цена за единицу",
+                    "cycle_total": "Итого за цикл",
+                    "no_items": "Товары пополнения не настроены",
+                    "remove_item": "Удалить товар"
+                },
+                "billing_history": {
+                    "title": "История выставления счетов",
+                    "invoice_number": "Счет №",
+                    "date": "Дата",
+                    "amount": "Сумма",
+                    "status": "Статус",
+                    "no_invoices": "Счета еще не выставлены"
+                },
+                "tickets": {
+                    "title": "Связанные сервисные заявки",
+                    "no_tickets": "Нет сервисных заявок, связанных с этим контрактом"
+                },
+                "actions": {
+                    "save": "Сохранить контракт",
+                    "cancel": "Отмена",
+                    "confirm_suspend": "Вы уверены, что хотите приостановить этот контракт?",
+                    "confirm_renew": "Продлить этот контракт?",
+                    "confirm_cancel": "Вы уверены, что хотите отменить этот контракт? Это действие нельзя отменить.",
+                    "suspend_reason_placeholder": "Введите причину приостановки...",
+                    "cancel_reason_placeholder": "Введите причину отмены...",
+                    "new_end_date": "Новая дата окончания",
+                    "success_created": "Контракт успешно создан",
+                    "success_updated": "Контракт успешно обновлен",
+                    "success_suspended": "Контракт приостановлен",
+                    "success_renewed": "Контракт продлен",
+                    "success_cancelled": "Контракт отменен",
+                    "error_creating": "Не удалось создать контракт",
+                    "error_updating": "Не удалось обновить контракт",
+                    "error_suspending": "Не удалось приостановить контракт",
+                    "error_renewing": "Не удалось продлить контракт",
+                    "error_cancelling": "Не удалось отменить контракт"
+                }
+            }
         }
     }
 }

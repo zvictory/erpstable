@@ -2026,7 +2026,335 @@
             "clear_filters": "Filtrlarni tozalash",
             "export": "Eksport",
             "import": "Import",
-            "settings": "Sozlamalar"
+            "settings": "Sozlamalar",
+            "view": "Ko'rish",
+            "actions": "Amallar"
+        },
+        "service": {
+            "dashboard": {
+                "page_title": "Xizmat ko'rsatish paneli",
+                "page_description": "Xizmat operatsiyalarini, chiptalarni va shartnomalarni kuzatish",
+                "kpi": {
+                    "open_tickets": "Ochiq chiptalar",
+                    "open_tickets_desc": "Ochiq, rejalashtirilgan va bajarilayotgan",
+                    "pending_installations": "Kutilayotgan o'rnatishlar",
+                    "pending_installations_desc": "O'rnatishni kutayotgan jihozlar",
+                    "active_contracts": "Faol shartnomalar",
+                    "active_contracts_desc": "Hozirda faol xizmat shartnomalari",
+                    "refills_due": "To'ldirish kerak",
+                    "refills_due_desc": "Kutilayotgan to'ldirishlari bor shartnomalar"
+                },
+                "recent_tickets": "So'nggi chiptalar",
+                "view_all_tickets": "Barcha chiptalarni ko'rish",
+                "no_tickets": "Chiptalar topilmadi",
+                "upcoming_service": "Yaqinlashib kelayotgan xizmatlar",
+                "next_7_days": "Keyingi 7 kun",
+                "no_upcoming": "Keyingi 7 kunda rejalashtirilgan xizmat yo'q"
+            },
+            "ticket": {
+                "ticket_number": "Chipta №",
+                "customer": "Mijoz",
+                "type": "Turi",
+                "priority": "Muhimlik",
+                "scheduled_date": "Rejalashtirilgan sana",
+                "technician": "Texnik",
+                "assets": "Aktivlar",
+                "unassigned": "Tayinlanmagan",
+                "status": {
+                    "open": "Ochiq",
+                    "scheduled": "Rejalashtirilgan",
+                    "in_progress": "Bajarilmoqda",
+                    "completed": "Tugallangan",
+                    "cancelled": "Bekor qilingan"
+                },
+                "priority": {
+                    "low": "Past",
+                    "medium": "O'rta",
+                    "high": "Yuqori",
+                    "critical": "Juda muhim"
+                },
+                "type": {
+                    "installation": "O'rnatish",
+                    "repair": "Ta'mirlash",
+                    "maintenance": "Texnik xizmat",
+                    "support": "Qo'llab-quvvatlash",
+                    "emergency": "Favqulodda"
+                }
+            },
+            "tickets_page": {
+                "title": "Xizmat chiptalar",
+                "description": "Xizmat chiptalari va dala operatsiyalarini boshqarish",
+                "new_ticket": "Yangi chipta",
+                "loading": "Chiptalar yuklanmoqda..."
+            },
+            "new_ticket_page": {
+                "title": "Xizmat chiptasini yaratish",
+                "description": "Mijozlarni qo'llab-quvvatlash uchun yangi chipta yarating"
+            },
+            "tickets_list": {
+                "filters": {
+                    "title": "Filtrlar",
+                    "status": "Holat",
+                    "type": "Turi",
+                    "priority": "Muhimlik",
+                    "all": "Hammasi"
+                },
+                "table": {
+                    "ticket_number": "Chipta №",
+                    "customer": "Mijoz",
+                    "title": "Sarlavha",
+                    "type": "Turi",
+                    "priority": "Muhimlik",
+                    "status": "Holat",
+                    "technician": "Texnik",
+                    "scheduled": "Rejalashtirilgan",
+                    "actions": "Amallar"
+                },
+                "status": {
+                    "open": "Ochiq",
+                    "scheduled": "Rejalashtirilgan",
+                    "in_progress": "Bajarilmoqda",
+                    "completed": "Tugallangan",
+                    "cancelled": "Bekor qilingan"
+                },
+                "priority": {
+                    "low": "Past",
+                    "medium": "O'rta",
+                    "high": "Yuqori",
+                    "critical": "Juda muhim"
+                },
+                "type": {
+                    "installation": "O'rnatish",
+                    "repair": "Ta'mirlash",
+                    "maintenance": "Texnik xizmat",
+                    "support": "Qo'llab-quvvatlash",
+                    "emergency": "Favqulodda"
+                },
+                "unassigned": "Tayinlanmagan",
+                "view": "Ko'rish",
+                "empty": "Chiptalar topilmadi",
+                "showing": "{total}dan {count} ta ko'rsatilmoqda"
+            },
+            "ticket_form": {
+                "customer_id": "Mijoz ID",
+                "customer_id_placeholder": "Mijoz ID ni kiriting",
+                "customer_id_hint": "Ishlab chiqarishda bu qidiruv bilan ochiladigan ro'yxat bo'ladi",
+                "title": "Chipta sarlavhasi",
+                "title_placeholder": "Muammoning qisqacha tavsifi",
+                "description": "Tavsif",
+                "description_placeholder": "Muammoning batafsil tavsifi...",
+                "ticket_type": "Chipta turi",
+                "priority": "Muhimlik",
+                "scheduled_date": "Rejalashtirilgan sana",
+                "assign_technician": "Texnikni tayinlash",
+                "unassigned": "Tayinlanmagan",
+                "create_ticket": "Chipta yaratish",
+                "creating": "Yaratilmoqda...",
+                "cancel": "Bekor qilish",
+                "type": {
+                    "installation": "O'rnatish",
+                    "repair": "Ta'mirlash",
+                    "maintenance": "Texnik xizmat",
+                    "support": "Qo'llab-quvvatlash",
+                    "emergency": "Favqulodda"
+                },
+                "priority": {
+                    "low": "Past",
+                    "medium": "O'rta",
+                    "high": "Yuqori",
+                    "critical": "Juda muhim"
+                },
+                "error": {
+                    "required_fields": "Iltimos, barcha majburiy maydonlarni to'ldiring",
+                    "generic": "Chipta yaratib bo'lmadi"
+                }
+            },
+            "ticket_detail": {
+                "loading": "Chipta tafsilotlari yuklanmoqda...",
+                "mark_in_progress": "Bajarilmoqda deb belgilash",
+                "complete_ticket": "Chiptani yakunlash",
+                "tabs": {
+                    "overview": "Umumiy ko'rinish",
+                    "timeline": "Vaqt chizig'i",
+                    "work_details": "Ish tafsilotlari"
+                },
+                "customer_info": "Mijoz ma'lumotlari",
+                "customer_name": "Mijoz nomi",
+                "email": "Email",
+                "phone": "Telefon",
+                "ticket_info": "Chipta ma'lumotlari",
+                "ticket_type": "Chipta turi",
+                "created_at": "Yaratildi",
+                "scheduled_date": "Rejalashtirilgan sana",
+                "contract": "Shartnoma",
+                "description": "Tavsif",
+                "assigned_technician": "Tayinlangan texnik",
+                "unassigned": "Tayinlanmagan",
+                "linked_assets": "Bog'langan aktivlar",
+                "labor_hours": "Ish soatlari",
+                "hours": "soat",
+                "parts_used": "Ishlatilgan qismlar",
+                "part_item_id": "Mahsulot №{id}",
+                "completion_notes": "Yakunlash eslatmalari",
+                "customer_signature": "Mijoz imzosi",
+                "service_invoice": "Xizmat hisob-fakturasi",
+                "work_details_empty": "Chipta tugallangandan keyin ish tafsilotlari bu yerda paydo bo'ladi",
+                "status": {
+                    "open": "Ochiq",
+                    "scheduled": "Rejalashtirilgan",
+                    "in_progress": "Bajarilmoqda",
+                    "completed": "Tugallangan",
+                    "cancelled": "Bekor qilingan"
+                },
+                "priority": {
+                    "low": "Past",
+                    "medium": "O'rta",
+                    "high": "Yuqori",
+                    "critical": "Juda muhim"
+                },
+                "error": {
+                    "generic": "Xatolik yuz berdi"
+                }
+            },
+            "ticket_timeline": {
+                "created": "Yaratildi",
+                "created_description": "Chipta yaratildi",
+                "assigned": "Tayinlandi",
+                "assigned_description": "{name}ga tayinlandi",
+                "scheduled": "Rejalashtirildi",
+                "scheduled_description": "{date}ga rejalashtirildi",
+                "in_progress": "Bajarilmoqda",
+                "in_progress_description": "Ish boshlandi",
+                "completed": "Tugallandi",
+                "completed_description": "Chipta muvaffaqiyatli tugallandi",
+                "cancelled": "Bekor qilindi",
+                "cancelled_description": "Chipta bekor qilindi"
+            },
+            "completion_form": {
+                "title": "Xizmat chiptasini yakunlash",
+                "completion_notes": "Yakunlash eslatmalari",
+                "completion_notes_placeholder": "Bajarilgan ishni tavsiflang...",
+                "minimum_10_chars": "Kamida 10 belgi talab qilinadi",
+                "labor_hours": "Ish soatlari",
+                "labor_hours_hint": "O'nli soatlarni kiriting (masalan, 2 soat 30 daqiqa uchun 2.5)",
+                "parts_used": "Ishlatilgan qismlar",
+                "add_part": "Qism qo'shish",
+                "no_parts_added": "Hali qismlar qo'shilmagan",
+                "item_id": "Mahsulot ID",
+                "quantity": "Miqdor",
+                "unit_cost": "Birlik narxi (tiyin)",
+                "customer_signature": "Mijoz imzosi",
+                "signature_placeholder": "Mijoz nomi yoki imzosi",
+                "signature_hint": "Matn kiritish (imzo planshetasi bilan yaxshilash mumkin)",
+                "complete_ticket": "Chiptani yakunlash",
+                "completing": "Yakunlanmoqda...",
+                "cancel": "Bekor qilish",
+                "error": {
+                    "notes_required": "Yakunlash eslatmalari talab qilinadi (kamida 10 belgi)",
+                    "labor_hours_required": "Ish soatlari talab qilinadi",
+                    "invalid_parts": "Barcha qismlar to'g'ri mahsulot ID, miqdor va narxga ega bo'lishi kerak",
+                    "generic": "Chiptani yakunlab bo'lmadi"
+                }
+            },
+            "contract": {
+                "page_title": "Xizmat shartnomalari",
+                "page_description": "Xizmat shartnomalari va texnik xizmat shartnomalarini boshqarish",
+                "create_contract": "Shartnoma yaratish",
+                "edit_contract": "Shartnomani tahrirlash",
+                "contract_number": "Shartnoma №",
+                "contract_details": "Shartnoma tafsilotlari",
+                "customer": "Mijoz",
+                "contract_type": "Shartnoma turi",
+                "start_date": "Boshlanish sanasi",
+                "end_date": "Tugash sanasi",
+                "billing_frequency": "Hisob-kitob chastotasi",
+                "monthly_value": "Oylik qiymati",
+                "next_billing_date": "Keyingi hisob-kitob sanasi",
+                "source_invoice": "Dastlabki hisob-faktura",
+                "assigned_technician": "Tayinlangan texnik",
+                "auto_generate_refills": "To'ldirishlarni avtomatik yaratish",
+                "suspension_reason": "To'xtatish sababi",
+                "filter_all": "Barcha shartnomalar",
+                "filter_active": "Faol",
+                "filter_suspended": "To'xtatilgan",
+                "filter_expired": "Muddati o'tgan",
+                "filter_cancelled": "Bekor qilingan",
+                "no_contracts": "Shartnomalar topilmadi",
+                "view_contract": "Shartnomani ko'rish",
+                "suspend_contract": "Shartnomani to'xtatish",
+                "renew_contract": "Shartnomani yangilash",
+                "cancel_contract": "Shartnomani bekor qilish",
+                "edit_refill_items": "To'ldirish mahsulotlarini tahrirlash",
+                "changes_affect_future": "O'zgarishlar faqat kelajakdagi to'ldirishlarga ta'sir qiladi",
+                "cannot_edit_status": "{status} shartnomani tahrirlash mumkin emas",
+                "read_only_view": "Faqat ko'rish rejimi",
+                "status": {
+                    "active": "Faol",
+                    "suspended": "To'xtatilgan",
+                    "expired": "Muddati o'tgan",
+                    "cancelled": "Bekor qilingan"
+                },
+                "type": {
+                    "warranty": "Kafolat",
+                    "maintenance": "Texnik xizmat",
+                    "full_service": "To'liq xizmat",
+                    "supplies_only": "Faqat materiallar"
+                },
+                "billing_frequency_options": {
+                    "monthly": "Oylik",
+                    "quarterly": "Choraklik (3 oy)",
+                    "semi_annual": "Yarim yillik (6 oy)",
+                    "annual": "Yillik (12 oy)"
+                },
+                "tabs": {
+                    "basic_info": "Asosiy ma'lumot",
+                    "refill_items": "To'ldirish mahsulotlari",
+                    "billing_history": "Hisob-kitob tarixi",
+                    "associated_tickets": "Xizmat chiptalari"
+                },
+                "refill_items": {
+                    "title": "To'ldirish mahsulotlarini sozlash",
+                    "add_item": "Mahsulot qo'shish",
+                    "item": "Mahsulot",
+                    "quantity_per_cycle": "Tsikl uchun miqdor",
+                    "unit_price": "Birlik narxi",
+                    "cycle_total": "Tsikl uchun jami",
+                    "no_items": "To'ldirish mahsulotlari sozlanmagan",
+                    "remove_item": "Mahsulotni o'chirish"
+                },
+                "billing_history": {
+                    "title": "Hisob-kitob tarixi",
+                    "invoice_number": "Hisob-faktura №",
+                    "date": "Sana",
+                    "amount": "Summa",
+                    "status": "Holat",
+                    "no_invoices": "Hisob-fakturalar hali yaratilmagan"
+                },
+                "tickets": {
+                    "title": "Bog'langan xizmat chiptalari",
+                    "no_tickets": "Bu shartnoma bilan bog'langan xizmat chiptalari yo'q"
+                },
+                "actions": {
+                    "save": "Shartnomani saqlash",
+                    "cancel": "Bekor qilish",
+                    "confirm_suspend": "Ushbu shartnomani to'xtatishni xohlaysizmi?",
+                    "confirm_renew": "Ushbu shartnomani yangilaysizmi?",
+                    "confirm_cancel": "Ushbu shartnomani bekor qilishni xohlaysizmi? Bu amalni bekor qilib bo'lmaydi.",
+                    "suspend_reason_placeholder": "To'xtatish sababini kiriting...",
+                    "cancel_reason_placeholder": "Bekor qilish sababini kiriting...",
+                    "new_end_date": "Yangi tugash sanasi",
+                    "success_created": "Shartnoma muvaffaqiyatli yaratildi",
+                    "success_updated": "Shartnoma muvaffaqiyatli yangilandi",
+                    "success_suspended": "Shartnoma to'xtatildi",
+                    "success_renewed": "Shartnoma yangilandi",
+                    "success_cancelled": "Shartnoma bekor qilindi",
+                    "error_creating": "Shartnomani yaratishda xatolik",
+                    "error_updating": "Shartnomani yangilashda xatolik",
+                    "error_suspending": "Shartnomani to'xtatishda xatolik",
+                    "error_renewing": "Shartnomani yangilashda xatolik",
+                    "error_cancelling": "Shartnomani bekor qilishda xatolik"
+                }
+            }
         }
     }
 }
