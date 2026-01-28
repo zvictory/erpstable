@@ -8,7 +8,7 @@ import {
     CreditCard, Banknote, Package, Activity, Hammer,
     BoxSelect, PieChart, FileBarChart, Receipt,
     FlaskConical, Snowflake, Building2, Factory,
-    LayoutDashboard, Settings, ChevronRight, BookOpen
+    LayoutDashboard, Settings, ChevronRight, BookOpen, ClipboardCheck, Wallet, Wrench
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { UserRole } from '@/auth.config';
@@ -21,7 +21,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ className, isCollapsed, toggleCollapse, userRole }: SidebarProps) {
-    const t = useTranslations('dashboard');
+    const t = useTranslations('navigation');
     const pathname = usePathname();
 
     const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
@@ -93,15 +93,20 @@ export default function Sidebar({ className, isCollapsed, toggleCollapse, userRo
                     <NavItem href="/purchasing/vendors" icon={Users} label={t('vendors')} active={isActive('/purchasing/vendors')} />
                     <NavItem href="/purchasing/orders" icon={ShoppingCart} label={t('purchase_orders')} active={isActive('/purchasing/orders')} />
                     <NavItem href="/inventory/items" icon={Package} label={t('items_services')} active={isActive('/inventory/items')} />
+                    <NavItem href="/inventory/reconciliation" icon={ClipboardCheck} label={t('reconciliation')} active={isActive('/inventory/reconciliation')} />
                     <NavItem href="/manufacturing/lines" icon={Factory} label={t('production_lines')} active={isActive('/manufacturing/lines')} />
                     <NavItem href="/manufacturing/mixing" icon={FlaskConical} label={t('mixing')} active={isActive('/manufacturing/mixing')} />
                     <NavItem href="/manufacturing/sublimation" icon={Snowflake} label={t('sublimation')} active={isActive('/manufacturing/sublimation')} />
+                    <NavItem href="/maintenance" icon={Wrench} label={t('maintenance')} active={isActive('/maintenance')} />
                 </NavGroup>
 
                 {/* Finance */}
                 <NavGroup title={t('finance')}>
                     <NavItem href="/finance/chart-of-accounts" icon={FileBarChart} label={t('chart_of_accounts')} active={isActive('/finance/chart-of-accounts')} />
                     <NavItem href="/finance/general-ledger" icon={BookOpen} label={t('general_ledger')} active={isActive('/finance/general-ledger')} />
+                    <NavItem href="/finance/cash-accounts" icon={Wallet} label={t('cash_accounts')} active={isActive('/finance/cash-accounts')} />
+                    <NavItem href="/finance/fixed-assets" icon={Building2} label={t('fixed_assets')} active={isActive('/finance/fixed-assets')} />
+                    <NavItem href="/expenses" icon={Wallet} label={t('expenses')} active={isActive('/expenses')} />
                     <NavItem href="/finance/reports" icon={PieChart} label={t('financial_reports')} active={isActive('/finance/reports')} />
                     <NavItem href="/reports" icon={PieChart} label={t('reports_center')} active={isActive('/reports')} />
                     <NavItem href="/settings" icon={Settings} label={t('settings')} active={isActive('/settings')} />

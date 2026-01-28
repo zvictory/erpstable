@@ -127,8 +127,11 @@
         "search": "Search",
         "optional": "Optional",
         "select_placeholder": "Select...",
+        "select": "Select...",
         "search_placeholder": "Search...",
-        "no_results": "No results found"
+        "no_results": "No results found",
+        "error": "Error",
+        "balance": "Balance"
     },
     "purchasing": {
         "purchase_orders_page": {
@@ -904,6 +907,43 @@
                 "net_profit": "Net Profit",
                 "fiscal_year": "Fiscal Year"
             }
+        },
+        "transfer": {
+            "title": "Transfer Funds",
+            "subtitle": "Transfer between cash accounts",
+            "from_account": "From Account",
+            "to_account": "To Account",
+            "amount": "Amount",
+            "date": "Date",
+            "memo": "Memo",
+            "memo_placeholder": "Reason for transfer",
+            "balance_before": "Balance Before",
+            "balance_after": "Balance After",
+            "info_box": "Transfer will be posted immediately. A journal entry will be created in the general ledger.",
+            "submit": "Execute Transfer",
+            "submitting": "Executing...",
+            "validation": {
+                "from_required": "Select source account",
+                "to_required": "Select destination account",
+                "amount_positive": "Amount must be positive",
+                "same_account": "Cannot transfer to the same account",
+                "insufficient_balance": "Insufficient funds in source account",
+                "memo_required": "Enter transfer reason"
+            }
+        },
+        "cash_accounts": {
+            "title": "Cash Accounts",
+            "subtitle": "Manage cash and bank account transfers",
+            "total_balance": "Total Balance",
+            "active_accounts": "Active Accounts",
+            "recent_transfers": "Recent Transfers",
+            "new_transfer": "New Transfer",
+            "transfer_out": "Transfer Out",
+            "transfer_in": "Transfer In",
+            "from_account": "From Account",
+            "to_account": "To Account",
+            "amount": "Amount",
+            "no_transfers": "No transfers found"
         }
     },
     "inventory": {
@@ -1189,6 +1229,731 @@
             "title": "Categories",
             "description": "Inventory Categories Management",
             "back_to_dashboard": "Back to Dashboard"
+        }
+    },
+    "navigation": {
+        "dashboard": "Dashboard",
+        "commercial": "Commercial",
+        "customers": "Customers",
+        "invoices": "Invoices",
+        "estimates": "Estimates",
+        "supply_chain": "Supply Chain",
+        "vendors": "Vendors",
+        "purchase_orders": "Purchase Orders",
+        "items_services": "Items & Services",
+        "reconciliation": "Inventory Reconciliation",
+        "production": "Production",
+        "production_lines": "Production Lines",
+        "mixing": "Mixing",
+        "sublimation": "Sublimation",
+        "maintenance": "Maintenance",
+        "finance": "Finance",
+        "chart_of_accounts": "Chart of Accounts",
+        "general_ledger": "General Ledger",
+        "cash_accounts": "Cash Accounts",
+        "fixed_assets": "Fixed Assets",
+        "expenses": "Expenses",
+        "financial_reports": "Financial Reports",
+        "reports_center": "Reports Center",
+        "settings": "Settings",
+        "collapse_sidebar": "Collapse Sidebar"
+    },
+    "expenses": {
+        "title": "Expense Management",
+        "subtitle": "Track petty cash and reimbursable expenses",
+        "actions": {
+            "quick_spend": "Quick Spend",
+            "new_expense": "New Expense",
+            "approve": "Approve",
+            "reject": "Reject",
+            "pay": "Pay",
+            "view": "View",
+            "close": "Close"
+        },
+        "balance_card": {
+            "title": "Petty Cash Balance",
+            "low_balance_warning": "Balance is low. Consider replenishing.",
+            "not_found": "Account not found"
+        },
+        "stats_cards": {
+            "total_expenses": "Total Expenses",
+            "pending_approval": "Pending Approval",
+            "pending_payment": "Pending Payment",
+            "this_month": "This Month"
+        },
+        "quick_spend": {
+            "title": "Quick Petty Cash Spend",
+            "subtitle": "Create and approve a petty cash expense in one action",
+            "submitting": "Processing...",
+            "submit": "Create and Approve",
+            "info_box": "This expense will be automatically created, submitted, and approved.",
+            "fields": {
+                "category": "Category",
+                "amount": "Amount (UZS)",
+                "payee": "Payee",
+                "payee_placeholder": "Enter payee name",
+                "description": "Description",
+                "description_placeholder": "Enter expense description"
+            },
+            "validation": {
+                "category_required": "Category is required",
+                "amount_required": "Amount is required",
+                "amount_positive": "Amount must be positive",
+                "payee_required": "Payee is required",
+                "description_required": "Description is required"
+            }
+        },
+        "new_expense": {
+            "title": "New Expense",
+            "subtitle": "Create a new expense for approval",
+            "submitting": "Creating...",
+            "submit": "Create Expense",
+            "fields": {
+                "type": "Expense Type",
+                "category": "Category",
+                "amount": "Amount (UZS)",
+                "amount_limit": "Maximum Amount",
+                "payee": "Payee",
+                "payee_placeholder": "Enter payee name",
+                "employee": "Employee",
+                "select_employee": "Select employee",
+                "description": "Description",
+                "description_placeholder": "Enter expense description",
+                "date": "Expense Date",
+                "receipt": "Receipt",
+                "receipt_placeholder": "Receipt URL or document number",
+                "receipt_required_note": "Receipt is required for this category",
+                "notes": "Notes",
+                "notes_placeholder": "Additional notes (optional)"
+            },
+            "type": {
+                "petty_cash": "Petty Cash",
+                "petty_cash_desc": "Paid from petty cash",
+                "reimbursable": "Reimbursable",
+                "reimbursable_desc": "Reimburse to employee"
+            },
+            "validation": {
+                "type_required": "Expense type is required",
+                "category_required": "Category is required",
+                "amount_required": "Amount is required",
+                "amount_positive": "Amount must be positive",
+                "payee_required": "Payee is required",
+                "employee_required": "Employee is required",
+                "description_required": "Description is required",
+                "date_required": "Date is required",
+                "receipt_required": "Receipt is required for this category"
+            }
+        },
+        "data_grid": {
+            "columns": {
+                "date": "Date",
+                "number": "Number",
+                "description": "Description",
+                "category": "Category",
+                "payee": "Payee",
+                "type": "Type",
+                "amount": "Amount",
+                "status": "Status",
+                "actions": "Actions"
+            },
+            "status": {
+                "draft": "Draft",
+                "submitted": "Submitted",
+                "approved": "Approved",
+                "paid": "Paid",
+                "rejected": "Rejected"
+            },
+            "type": {
+                "petty_cash": "Petty Cash",
+                "reimbursable": "Reimbursable"
+            },
+            "empty_state": {
+                "title": "No expenses found",
+                "subtitle": "Get started by creating a new expense",
+                "expenses_loaded": "expenses loaded"
+            },
+            "confirm": {
+                "approve": "Are you sure you want to approve this expense?",
+                "reject_reason": "Enter rejection reason:",
+                "payment_reference": "Enter payment reference (optional):"
+            },
+            "actions": {
+                "approve": "Approve",
+                "reject": "Reject",
+                "pay": "Pay",
+                "view": "View"
+            }
+        },
+        "filters": {
+            "title": "Filters",
+            "search_placeholder": "Search by description or payee...",
+            "all_types": "All Types",
+            "all_statuses": "All Statuses",
+            "all_categories": "All Categories",
+            "date_from": "Date From",
+            "date_to": "Date To",
+            "apply_filters": "Apply Filters",
+            "clear_all": "Clear All",
+            "type": {
+                "petty_cash": "Petty Cash",
+                "reimbursable": "Reimbursable"
+            },
+            "status": {
+                "draft": "Draft",
+                "submitted": "Submitted",
+                "approved": "Approved",
+                "paid": "Paid",
+                "rejected": "Rejected"
+            }
+        },
+        "write_check": {
+            "title": "Write Check",
+            "subtitle": "Record an already-made payment",
+            "fields": {
+                "pay_from": "Pay From",
+                "date": "Date",
+                "payee": "Payee",
+                "select_vendor": "Select Vendor",
+                "vendor_or_custom": "Choose a vendor or enter name manually",
+                "payee_placeholder": "Payee name",
+                "amount": "Amount",
+                "category": "Category",
+                "payment_method": "Payment Method",
+                "check_number": "Check Number",
+                "reference": "Reference Number",
+                "description": "Description",
+                "description_placeholder": "What was paid for",
+                "notes": "Notes",
+                "notes_placeholder": "Additional information"
+            },
+            "payment_method": {
+                "check": "Check",
+                "cash": "Cash",
+                "transfer": "Bank Transfer",
+                "card": "Card"
+            },
+            "validation": {
+                "account_required": "Please select a payment account",
+                "date_required": "Please enter a date",
+                "payee_required": "Please enter a payee",
+                "amount_required": "Please enter an amount",
+                "amount_positive": "Amount must be positive",
+                "category_required": "Please select a category",
+                "payment_method_required": "Please select a payment method",
+                "description_required": "Please enter a description"
+            },
+            "info_box": "This payment will be recorded as completed. A general ledger entry will be created immediately.",
+            "submitting": "Recording...",
+            "submit": "Record Payment"
+        },
+        "common": {
+            "currency": "UZS"
+        }
+    },
+    "production": {
+        "detail": {
+            "title": "Production Run #{id}",
+            "tabs": {
+                "overview": "Overview",
+                "inputs": "Inputs",
+                "outputs": "Outputs",
+                "costs": "Costs",
+                "labor": "Labor"
+            },
+            "overview": {
+                "title": "Overview",
+                "type": "Type",
+                "status": "Status",
+                "date": "Date",
+                "notes": "Notes"
+            },
+            "inputs": {
+                "item": "Item",
+                "quantity": "Quantity",
+                "cost": "Cost"
+            },
+            "outputs": {
+                "item": "Item",
+                "quantity": "Quantity",
+                "unit_cost": "Unit Cost",
+                "batch": "Batch"
+            },
+            "costs": {
+                "type": "Type",
+                "amount": "Amount",
+                "description": "Description"
+            }
+        },
+        "labor": {
+            "total_labor_cost": "Total Labor Cost",
+            "total_labor_hours": "Total Labor Hours",
+            "active_workers": "Active Workers",
+            "clock_in": "Clock In",
+            "clock_out": "Clock Out",
+            "add_manual_log": "Add Manual Log",
+            "active_workers_title": "Active Workers",
+            "time_logs_history": "Time Logs History",
+            "no_completed_logs": "No completed logs yet",
+            "worker": "Worker",
+            "clock_in_time": "Clock In Time",
+            "duration": "Duration",
+            "cost": "Cost",
+            "type": "Type",
+            "manual": "Manual",
+            "auto": "Auto",
+            "hourly_rate": "Hourly Rate"
+        },
+        "manual_labor_modal": {
+            "title": "Add Manual Labor Log",
+            "worker": "Worker",
+            "select_worker": "Select Worker",
+            "clock_in_time": "Clock In Time",
+            "clock_out_time": "Clock Out Time",
+            "notes": "Notes",
+            "notes_placeholder": "Additional information (optional)",
+            "validation": {
+                "user_required": "Please select a worker",
+                "times_required": "Please specify clock in and clock out times"
+            }
+        }
+    },
+    "settings": {
+        "business": {
+            "page_title": "Business Settings",
+            "page_subtitle": "Configure your business type and manage modules",
+            "loading": "Loading settings...",
+            "current_type": {
+                "heading": "Current Business Type",
+                "switch_button": "Switch Business Type"
+            },
+            "module_management": {
+                "heading": "Module Management",
+                "description": "Finance is always enabled. Enable other modules based on your business needs.",
+                "enabled_label": "Enabled Modules",
+                "required_badge": "Required"
+            },
+            "other_types": {
+                "heading": "Other Business Types",
+                "switch_to": "Switch to {label}"
+            },
+            "info_box": {
+                "title": "ℹ️ About Business Types",
+                "description": "Switching business types changes which modules are visible in the application. Your data remains intact when switching.",
+                "point1": "🏭 Manufacturing: Mixing, sublimation, production lines, recipes",
+                "point2": "🛒 Retail: Point of sale, inventory management",
+                "point3": "📦 Distribution: Purchasing, sales, warehouse management",
+                "point4": "🏢 Services: Clients, invoicing, project management"
+            },
+            "switch_modal": {
+                "title": "Switch Business Type?",
+                "description": "Changing your business type will affect which modules are visible in the application.",
+                "warning": "Warning: Data from disabled modules won't be visible, but won't be deleted. You can switch back anytime.",
+                "new_type_label": "New Business Type:",
+                "cancel": "Cancel",
+                "confirm": "Switch Business Type",
+                "confirming": "Switching..."
+            },
+            "messages": {
+                "type_updated": "Business type updated",
+                "type_update_failed": "Failed to switch business type",
+                "modules_updated": "Modules successfully updated",
+                "modules_update_failed": "Failed to update modules"
+            }
+        },
+        "team": {
+            "page_title": "Team Management",
+            "page_subtitle": "Manage user roles and permissions",
+            "back_to_dashboard": "Back to Dashboard",
+            "loading_error": "Failed to load users",
+            "table": {
+                "headers": {
+                    "user": "User",
+                    "email": "Email",
+                    "role": "Role",
+                    "status": "Status",
+                    "last_login": "Last Login"
+                },
+                "empty_state": "No users found",
+                "unnamed_user": "Unnamed User",
+                "never_logged_in": "Never",
+                "invalid_date": "Invalid date"
+            },
+            "roles": {
+                "FACTORY_WORKER": "Factory Worker",
+                "PLANT_MANAGER": "Plant Manager",
+                "ACCOUNTANT": "Accountant",
+                "ADMIN": "Administrator"
+            },
+            "status": {
+                "active": "Active",
+                "inactive": "Inactive"
+            }
+        },
+        "inventory_migration": {
+            "page_title": "Warehouse Migration",
+            "page_subtitle": "Migrate existing inventory to multi-location warehouse system",
+            "what_this_does": {
+                "heading": "What this migration does:",
+                "point1": "Creates a default warehouse record (ID: 1) and location (ID: 1)",
+                "point2": "Links all existing items to the default location",
+                "point3": "Transfers current stock quantities to the new location system",
+                "point4": "Enables warehouse tracking for future transactions",
+                "point5": "Preserves all historical data and FIFO layers"
+            },
+            "button": {
+                "run": "Run Migration",
+                "running": "Migrating...",
+                "complete": "Migration Complete ✓"
+            },
+            "results": {
+                "success_title": "Migration Successful",
+                "failed_title": "Migration Failed",
+                "items_migrated": "Items Migrated:",
+                "total_quantity": "Total Quantity:",
+                "warehouse_id": "Warehouse ID:",
+                "location_id": "Location ID:"
+            },
+            "next_steps": "Next Steps: You can now use warehouse-based inventory tracking and transfers between locations."
+        },
+        "system_reset": {
+            "modal_title": "System Reset - Go-Live Mode",
+            "warning": {
+                "alert_title": "⚠️ This action will permanently delete all test transactional data.",
+                "alert_description": "This operation cannot be undone. Ensure you have a backup before proceeding.",
+                "will_delete": {
+                    "heading": "Will Delete",
+                    "point1": "All invoices and payments",
+                    "point2": "All purchase orders and bills",
+                    "point3": "All production runs",
+                    "point4": "All inventory layers and movements",
+                    "point5": "All general ledger entries",
+                    "point6": "Expense history",
+                    "point7": "Payroll data"
+                },
+                "will_preserve": {
+                    "heading": "Will Preserve",
+                    "point1": "Items (quantities reset to 0)",
+                    "point2": "Vendors and customers",
+                    "point3": "Chart of accounts",
+                    "point4": "Units of measure",
+                    "point5": "Categories",
+                    "point6": "Recipes",
+                    "point7": "System settings"
+                },
+                "use_case": "Typical use case: Transitioning from testing phase to production (go-live)."
+            },
+            "confirmation": {
+                "title": "Final Confirmation Required",
+                "instruction": "Type {code} below to confirm.",
+                "label": "Confirmation Code",
+                "placeholder": "Type exactly: DELETE-TEST-DATA",
+                "match_success": "✓ Code matches",
+                "match_failure": "✗ Code doesn't match",
+                "what_happens": {
+                    "heading": "What will happen next:",
+                    "step1": "All test transactions will be deleted",
+                    "step2": "Inventory quantities will be reset to zero",
+                    "step3": "GL account balances will be reset",
+                    "step4": "Your system will be ready for production use"
+                }
+            },
+            "processing": {
+                "title": "Processing reset...",
+                "description": "This may take a few minutes. Please do not close this window."
+            },
+            "success": {
+                "title": "Reset Successfully Completed",
+                "description": "Your system is now ready for production use.",
+                "records_removed": "transactional records removed",
+                "records_reset": "master records reset",
+                "next_steps": {
+                    "heading": "Next Steps",
+                    "step1": "Enter opening balances for GL accounts",
+                    "step2": "Set initial inventory quantities",
+                    "step3": "Verify your system settings",
+                    "step4": "Start processing real transactions"
+                },
+                "details_toggle": "View detailed counts",
+                "deletion_counts": "Deletion Counts:",
+                "reset_counts": "Reset Counts:"
+            },
+            "buttons": {
+                "cancel": "Cancel",
+                "back": "Back",
+                "continue": "Continue to Confirmation",
+                "execute": "Execute Reset",
+                "processing": "Processing...",
+                "close": "Close"
+            }
+        },
+        "inventory_resync": {
+            "button_label": "Resync Inventory from History",
+            "button_loading": "Resyncing...",
+            "description": "This will delete all existing inventory layers and rebuild them from vendor bills, then apply FIFO deductions for all sales invoices.",
+            "confirm_dialog": "This will rebuild ALL inventory layers from vendor bills and sales history. Continue?",
+            "cancelled": "Operation cancelled by user.",
+            "processing": "Processing... Please wait.",
+            "failed": "Failed to resync inventory.",
+            "error": "An error occurred during resync.",
+            "fields": {
+                "check_button": "Check Sync Status",
+                "check_loading": "Checking...",
+                "resync_button": "Resync Inventory",
+                "resync_loading": "Resyncing...",
+                "all_synced": "All inventory data is in sync",
+                "issues_detected": "Inventory sync issues detected",
+                "items_need_resync": "{count} items need resync",
+                "view_affected": "View affected items",
+                "denormalized": "Denormalized: {value}",
+                "layers": "Layers: {value}",
+                "discrepancy": "Discrepancy: {value}"
+            },
+            "health_check": {
+                "checking": "Checking inventory sync status...",
+                "failed_title": "Health check failed",
+                "success_title": "All inventory data is in sync",
+                "items_verified": "{count} items verified",
+                "issues_title": "Inventory sync issues detected",
+                "items_need_resync": "{needResync} of {total} items need resync",
+                "use_tools": "Use the \"Inventory Tools\" section below to fix"
+            }
+        },
+        "system_reset_button": {
+            "label": "Reset System Data"
+        }
+    },
+    "quality": {
+        "title": "Quality Control",
+        "dashboard": {
+            "title": "QC Dashboard",
+            "subtitle": "Quality inspections and test results",
+            "pending": "Pending Inspections",
+            "awaiting_inspection": "Awaiting inspection",
+            "passed_today": "Passed Today",
+            "approved_today": "Approved today",
+            "failed_today": "Failed Today",
+            "rejected_today": "Rejected today",
+            "inspections_list": "All Inspections",
+            "no_inspections": "No inspections found",
+            "perform_inspection": "Perform Inspection",
+            "view_results": "View Results",
+            "actions": "Actions"
+        },
+        "inspection": {
+            "title": "Inspection #{id}",
+            "batch": "Batch Number",
+            "item": "Item",
+            "quantity": "Quantity",
+            "source": "Source",
+            "created_at": "Created At",
+            "inspector": "Inspector",
+            "status": {
+                "label": "Status",
+                "pending": "Pending",
+                "in_progress": "In Progress",
+                "passed": "Passed",
+                "failed": "Failed",
+                "on_hold": "On Hold"
+            },
+            "source": {
+                "production": "Production Run",
+                "purchase": "Purchase Receipt"
+            }
+        },
+        "tests": {
+            "title": "Quality Tests",
+            "result": "Result",
+            "pass": "Pass",
+            "fail": "Fail",
+            "range": "Acceptable range",
+            "notes": "Notes",
+            "notes_placeholder": "Add notes about this test...",
+            "type": {
+                "pass_fail": "Pass/Fail",
+                "numeric": "Numeric"
+            }
+        },
+        "wizard": {
+            "subtitle": "Perform quality inspection tests",
+            "step_review": "Review Details",
+            "step_tests": "Perform Tests",
+            "step_summary": "Review & Submit",
+            "cancel": "Cancel",
+            "back": "Back",
+            "next": "Next",
+            "submit": "Submit Inspection",
+            "submitting": "Submitting...",
+            "review_instructions": "Review the inspection details before proceeding to perform the tests.",
+            "all_tests_passed": "All Tests Passed",
+            "some_tests_failed": "Some Tests Failed",
+            "failed_warning": "This inventory will be moved to quarantine and will not be available for use.",
+            "test_results_summary": "Test Results Summary",
+            "overall_notes": "Overall Notes",
+            "overall_notes_placeholder": "Add overall inspection notes...",
+            "back_to_dashboard": "Back to Dashboard"
+        },
+        "messages": {
+            "inspection_submitted": "Inspection submitted successfully",
+            "inspection_failed": "Failed to submit inspection",
+            "all_tests_required": "All tests must be completed",
+            "inspection_already_completed": "This inspection has already been completed (Status: {status})"
+        }
+    },
+    "audit": {
+        "page_title": "Audit Logs",
+        "page_subtitle": "System activity and data change tracking",
+        "filters": {
+            "title": "Filters",
+            "entity_placeholder": "Entity (e.g., invoice, user)",
+            "action_placeholder": "Select action",
+            "apply": "Apply Filters",
+            "clear": "Clear"
+        },
+        "action": {
+            "create": "Create",
+            "update": "Update",
+            "delete": "Delete",
+            "approve": "Approve",
+            "reject": "Reject",
+            "login": "Login",
+            "logout": "Logout",
+            "export": "Export"
+        },
+        "table": {
+            "title": "Activity Log",
+            "empty": "No audit logs found",
+            "timestamp": "Timestamp",
+            "user": "User",
+            "action": "Action",
+            "entity": "Entity",
+            "entity_id": "Entity ID",
+            "ip_address": "IP Address",
+            "actions": "Actions",
+            "view_details": "View Details"
+        },
+        "detail": {
+            "title": "Audit Log Details",
+            "metadata": "Metadata",
+            "timestamp": "Timestamp",
+            "user": "User",
+            "role": "Role",
+            "ip_address": "IP Address",
+            "entity": "Entity",
+            "entity_id": "Entity ID",
+            "changes": "Changes",
+            "user_agent": "User Agent"
+        }
+    },
+    "notifications": {
+        "title": "Notifications",
+        "empty": "No notifications",
+        "loading": "Loading...",
+        "mark_all_read": "Mark all as read",
+        "view_all": "View all notifications",
+        "unread_count": "{count, plural, =0 {No unread notifications} =1 {1 unread notification} other {# unread notifications}}",
+        "types": {
+            "bill_pending_approval": "Bill Pending Approval",
+            "bill_approved": "Bill Approved",
+            "bill_rejected": "Bill Rejected",
+            "inventory_low_stock": "Low Stock Alert",
+            "inventory_out_of_stock": "Out of Stock",
+            "qc_inspection_required": "QC Inspection Required",
+            "qc_batch_rejected": "QC Batch Rejected",
+            "payment_due_soon": "Payment Due Soon",
+            "payment_overdue": "Payment Overdue",
+            "production_run_completed": "Production Completed"
+        },
+        "actions": {
+            "view": "View Details",
+            "dismiss": "Dismiss",
+            "approve": "Approve",
+            "review": "Review"
+        }
+    },
+    "maintenance": {
+        "title": "Equipment Maintenance",
+        "dashboard": {
+            "title": "Maintenance Management",
+            "subtitle": "Track and manage equipment maintenance schedules",
+            "cost_summary": "Cost Summary",
+            "total_costs_month": "Total costs this month",
+            "quick_actions": "Quick Actions",
+            "manage_active_work": "Manage active work orders",
+            "manage_schedules": "View and edit schedules",
+            "view_past_maintenance": "View completed maintenance",
+            "work_orders_generated": "Work orders generated",
+            "no_new_work_orders": "No new work orders needed"
+        },
+        "kpis": {
+            "overdue": "Overdue",
+            "upcoming_week": "Due This Week",
+            "in_progress": "In Progress",
+            "completed_month": "Completed (Month)",
+            "requires_attention": "Requires immediate attention",
+            "next_7_days": "Next 7 days",
+            "active_now": "Currently being worked on",
+            "this_month": "Completed this month"
+        },
+        "actions": {
+            "create_schedule": "Create Schedule",
+            "generate_work_orders": "Generate Work Orders",
+            "generating": "Generating...",
+            "view_calendar": "View Calendar",
+            "view_work_orders": "View Work Orders",
+            "view_schedules": "View Schedules",
+            "view_history": "View History",
+            "complete": "Complete"
+        },
+        "calendar": {
+            "title": "Maintenance Calendar",
+            "loading": "Loading calendar...",
+            "status": {
+                "planned": "Planned",
+                "in_progress": "In Progress",
+                "completed": "Completed"
+            }
+        },
+        "work_orders": {
+            "title": "Work Orders",
+            "work_order_number": "Work Order #",
+            "task": "Task",
+            "asset": "Asset",
+            "scheduled": "Scheduled",
+            "status": "Status",
+            "cost": "Cost",
+            "actions": "Actions",
+            "no_work_orders": "No work orders found"
+        },
+        "status": {
+            "planned": "Planned",
+            "in_progress": "In Progress",
+            "completed": "Completed",
+            "pending_approval": "Pending Approval"
+        },
+        "form": {
+            "complete_work_order": "Complete Work Order",
+            "labor_hours": "Labor Hours",
+            "completion_notes": "Completion Notes",
+            "completion_notes_placeholder": "Describe the work performed, any issues encountered, and parts replaced...",
+            "completion_notes_required": "Completion notes must be at least 10 characters",
+            "minimum_10_characters": "Minimum 10 characters required",
+            "external_cost": "External Service Cost",
+            "follow_up_required": "Follow-up maintenance required",
+            "follow_up_notes": "Follow-up Notes",
+            "follow_up_notes_placeholder": "Describe the follow-up work needed...",
+            "estimated_labor_cost": "Estimated labor cost",
+            "approval_warning_title": "Approval Required",
+            "approval_warning_message": "This work order exceeds 5,000 UZS and will require approval before posting to GL",
+            "approval_required_message": "Work order submitted for approval. A plant manager must approve before posting to General Ledger.",
+            "work_order_completed": "Work order completed successfully and posted to General Ledger",
+            "submitting": "Submitting...",
+            "back": "Back",
+            "cancel": "Cancel",
+            "error": "Error"
+        },
+        "common": {
+            "loading": "Loading...",
+            "error": "Error"
         }
     }
 }

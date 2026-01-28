@@ -52,6 +52,9 @@ export const equipmentUnits = sqliteTable('equipment_units', {
     maintenanceIntervalHours: integer('maintenance_interval_hours'), // e.g., 2000
     totalOperatingHours: integer('total_operating_hours').default(0),
 
+    // Fixed asset linkage (CMMS integration)
+    fixedAssetId: integer('fixed_asset_id'),
+
     isActive: integer('is_active', { mode: 'boolean' }).default(true),
 
     ...timestampFields,
@@ -301,7 +304,8 @@ export const downtimeReasonCodes = sqliteTable('downtime_reason_codes', {
 
 export const maintenanceSchedules = sqliteTable('maintenance_schedules', {
     id: integer('id').primaryKey({ autoIncrement: true }),
-    workCenterId: integer('work_center_id').references(() => workCenters.id).notNull(),
+    workCenterId: integer('work_center_id').references(() => workCenters.id),
+    fixedAssetId: integer('fixed_asset_id'), // Polymorphic: either workCenterId OR fixedAssetId
     taskName: text('task_name').notNull(),
     taskNameRu: text('task_name_ru'),
     description: text('description'),
@@ -319,7 +323,8 @@ export const maintenanceSchedules = sqliteTable('maintenance_schedules', {
 
 export const maintenanceEvents = sqliteTable('maintenance_events', {
     id: integer('id').primaryKey({ autoIncrement: true }),
-    workCenterId: integer('work_center_id').references(() => workCenters.id).notNull(),
+    workCenterId: integer('work_center_id').references(() => workCenters.id),
+    fixedAssetId: integer('fixed_asset_id'), // Polymorphic: either workCenterId OR fixedAssetId
     maintenanceScheduleId: integer('maintenance_schedule_id').references(() => maintenanceSchedules.id),
     eventType: text('event_type').notNull(),
     taskPerformed: text('task_performed').notNull(),
@@ -335,6 +340,23 @@ export const maintenanceEvents = sqliteTable('maintenance_events', {
     costEstimate: real('cost_estimate'),
     followUpRequired: integer('follow_up_required', { mode: 'boolean' }).default(false),
     followUpNotes: text('follow_up_notes'),
+
+    // CMMS work order tracking
+    workOrderNumber: text('work_order_number').unique(), // e.g., "MWO-2024-0001"
+
+    // Cost tracking (all in Tiyin)
+    laborCost: integer('labor_cost').default(0),
+    partsCost: integer('parts_cost').default(0),
+    externalCost: integer('external_cost').default(0),
+    totalCost: integer('total_cost').default(0),
+
+    // GL integration
+    journalEntryId: integer('journal_entry_id'),
+
+    // Approval workflow
+    requiresApproval: integer('requires_approval', { mode: 'boolean' }).default(false),
+    approvedAt: integer('approved_at', { mode: 'timestamp' }),
+
     ...timestampFields,
 });
 

@@ -55,6 +55,9 @@ export const fixedAssets = sqliteTable(
         // Traceability
         vendorBillLineId: integer('vendor_bill_line_id').references(() => vendorBillLines.id), // Link to purchase
 
+        // Equipment linkage (CMMS integration)
+        equipmentUnitId: integer('equipment_unit_id'), // Link to production equipment
+
         // Optimistic locking
         version: integer('version').default(1).notNull(),
         isActive: integer('is_active', { mode: 'boolean' }).default(true),

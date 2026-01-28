@@ -1190,5 +1190,663 @@
             "description": "Inventory Categories Management",
             "back_to_dashboard": "Back to Dashboard"
         }
+    },
+    "navigation": {
+        "dashboard": "Kontrol Paneli",
+        "commercial": "Ticaret",
+        "customers": "Müşteriler",
+        "invoices": "Faturalar",
+        "estimates": "Teklifler",
+        "supply_chain": "Tedarik Zinciri",
+        "vendors": "Tedarikçiler",
+        "purchase_orders": "Satın Alma Siparişleri",
+        "items_services": "Ürünler ve Hizmetler",
+        "reconciliation": "Envanter Mutabakatı",
+        "production": "Üretim",
+        "production_lines": "Üretim Hatları",
+        "mixing": "Karıştırma",
+        "sublimation": "Süblimleşme",
+        "maintenance": "Bakım",
+        "finance": "Finans",
+        "chart_of_accounts": "Hesap Planı",
+        "general_ledger": "Genel Defter",
+        "cash_accounts": "Nakit Hesaplar",
+        "fixed_assets": "Duran Varlıklar",
+        "expenses": "Giderler",
+        "financial_reports": "Mali Raporlar",
+        "reports_center": "Rapor Merkezi",
+        "settings": "Ayarlar",
+        "collapse_sidebar": "Kenar Çubuğunu Daralt"
+    },
+    "expenses": {
+        "title": "Gider Yönetimi",
+        "subtitle": "Küçük kasa ve geri ödenebilir giderleri takip edin",
+        "actions": {
+            "quick_spend": "Hızlı Harcama",
+            "new_expense": "Yeni Gider",
+            "approve": "Onayla",
+            "reject": "Reddet",
+            "pay": "Öde",
+            "view": "Görüntüle",
+            "close": "Kapat"
+        },
+        "balance_card": {
+            "title": "Küçük Kasa Bakiyesi",
+            "low_balance_warning": "Bakiye düşük. Yenilemeyi düşünün.",
+            "not_found": "Hesap bulunamadı"
+        },
+        "stats_cards": {
+            "total_expenses": "Toplam Giderler",
+            "pending_approval": "Onay Bekleyen",
+            "pending_payment": "Ödeme Bekleyen",
+            "this_month": "Bu Ay"
+        },
+        "quick_spend": {
+            "title": "Hızlı Küçük Kasa Harcaması",
+            "subtitle": "Tek hamlede küçük kasa gideri oluştur ve onayla",
+            "submitting": "İşleniyor...",
+            "submit": "Oluştur ve Onayla",
+            "info_box": "Bu gider otomatik olarak oluşturulacak, gönderilecek ve onaylanacaktır.",
+            "fields": {
+                "category": "Kategori",
+                "amount": "Tutar (UZS)",
+                "payee": "Alıcı",
+                "payee_placeholder": "Alıcı adını girin",
+                "description": "Açıklama",
+                "description_placeholder": "Gider açıklamasını girin"
+            },
+            "validation": {
+                "category_required": "Kategori gereklidir",
+                "amount_required": "Tutar gereklidir",
+                "amount_positive": "Tutar pozitif olmalıdır",
+                "payee_required": "Alıcı gereklidir",
+                "description_required": "Açıklama gereklidir"
+            }
+        },
+        "new_expense": {
+            "title": "Yeni Gider",
+            "subtitle": "Onay için yeni gider oluştur",
+            "submitting": "Oluşturuluyor...",
+            "submit": "Gider Oluştur",
+            "fields": {
+                "type": "Gider Türü",
+                "category": "Kategori",
+                "amount": "Tutar (UZS)",
+                "amount_limit": "Maksimum Tutar",
+                "payee": "Alıcı",
+                "payee_placeholder": "Alıcı adını girin",
+                "employee": "Çalışan",
+                "select_employee": "Çalışan seçin",
+                "description": "Açıklama",
+                "description_placeholder": "Gider açıklamasını girin",
+                "date": "Gider Tarihi",
+                "receipt": "Makbuz",
+                "receipt_placeholder": "Makbuz URL'si veya belge numarası",
+                "receipt_required_note": "Bu kategori için makbuz gereklidir",
+                "notes": "Notlar",
+                "notes_placeholder": "Ek notlar (isteğe bağlı)"
+            },
+            "type": {
+                "petty_cash": "Küçük Kasa",
+                "petty_cash_desc": "Küçük kasadan ödendi",
+                "reimbursable": "Geri Ödenebilir",
+                "reimbursable_desc": "Çalışana geri öde"
+            },
+            "validation": {
+                "type_required": "Gider türü gereklidir",
+                "category_required": "Kategori gereklidir",
+                "amount_required": "Tutar gereklidir",
+                "amount_positive": "Tutar pozitif olmalıdır",
+                "payee_required": "Alıcı gereklidir",
+                "employee_required": "Çalışan gereklidir",
+                "description_required": "Açıklama gereklidir",
+                "date_required": "Tarih gereklidir",
+                "receipt_required": "Bu kategori için makbuz gereklidir"
+            }
+        },
+        "data_grid": {
+            "columns": {
+                "date": "Tarih",
+                "number": "Numara",
+                "description": "Açıklama",
+                "category": "Kategori",
+                "payee": "Alıcı",
+                "type": "Tür",
+                "amount": "Tutar",
+                "status": "Durum",
+                "actions": "İşlemler"
+            },
+            "status": {
+                "draft": "Taslak",
+                "submitted": "Gönderildi",
+                "approved": "Onaylandı",
+                "paid": "Ödendi",
+                "rejected": "Reddedildi"
+            },
+            "type": {
+                "petty_cash": "Küçük Kasa",
+                "reimbursable": "Geri Ödenebilir"
+            },
+            "empty_state": {
+                "title": "Gider bulunamadı",
+                "subtitle": "Yeni gider oluşturarak başlayın",
+                "expenses_loaded": "gider yüklendi"
+            },
+            "confirm": {
+                "approve": "Bu gideri onaylamak istediğinizden emin misiniz?",
+                "reject_reason": "Reddetme nedenini girin:",
+                "payment_reference": "Ödeme referansını girin (isteğe bağlı):"
+            },
+            "actions": {
+                "approve": "Onayla",
+                "reject": "Reddet",
+                "pay": "Öde",
+                "view": "Görüntüle"
+            }
+        },
+        "filters": {
+            "title": "Filtreler",
+            "search_placeholder": "Açıklama veya alıcıya göre ara...",
+            "all_types": "Tüm Türler",
+            "all_statuses": "Tüm Durumlar",
+            "all_categories": "Tüm Kategoriler",
+            "date_from": "Başlangıç Tarihi",
+            "date_to": "Bitiş Tarihi",
+            "apply_filters": "Filtreleri Uygula",
+            "clear_all": "Tümünü Temizle",
+            "type": {
+                "petty_cash": "Küçük Kasa",
+                "reimbursable": "Geri Ödenebilir"
+            },
+            "status": {
+                "draft": "Taslak",
+                "submitted": "Gönderildi",
+                "approved": "Onaylandı",
+                "paid": "Ödendi",
+                "rejected": "Reddedildi"
+            }
+        },
+        "write_check": {
+            "title": "Çek Yaz",
+            "subtitle": "Yapılmış bir ödemeyi kaydet",
+            "fields": {
+                "pay_from": "Ödeme Hesabı",
+                "date": "Tarih",
+                "payee": "Alıcı",
+                "select_vendor": "Tedarikçi Seç",
+                "vendor_or_custom": "Bir tedarikçi seçin veya manuel olarak isim girin",
+                "payee_placeholder": "Alıcı adı",
+                "amount": "Tutar",
+                "category": "Kategori",
+                "payment_method": "Ödeme Yöntemi",
+                "check_number": "Çek Numarası",
+                "reference": "Referans Numarası",
+                "description": "Açıklama",
+                "description_placeholder": "Ne için ödendi",
+                "notes": "Notlar",
+                "notes_placeholder": "Ek bilgi"
+            },
+            "payment_method": {
+                "check": "Çek",
+                "cash": "Nakit",
+                "transfer": "Banka Transferi",
+                "card": "Kart"
+            },
+            "validation": {
+                "account_required": "Lütfen bir ödeme hesabı seçin",
+                "date_required": "Lütfen bir tarih girin",
+                "payee_required": "Lütfen alıcı girin",
+                "amount_required": "Lütfen tutar girin",
+                "amount_positive": "Tutar pozitif olmalıdır",
+                "category_required": "Lütfen kategori seçin",
+                "payment_method_required": "Lütfen ödeme yöntemi seçin",
+                "description_required": "Lütfen açıklama girin"
+            },
+            "info_box": "Bu ödeme tamamlanmış olarak kaydedilecek. Genel muhasebe kaydı hemen oluşturulacak.",
+            "submitting": "Kaydediliyor...",
+            "submit": "Ödemeyi Kaydet"
+        },
+        "common": {
+            "currency": "UZS"
+        }
+    },
+    "settings": {
+        "business": {
+            "page_title": "İşletme Ayarları",
+            "page_subtitle": "İşletme türünüzü yapılandırın ve modülleri yönetin",
+            "loading": "Ayarlar yükleniyor...",
+            "current_type": {
+                "heading": "Mevcut İşletme Türü",
+                "switch_button": "İşletme Türünü Değiştir"
+            },
+            "module_management": {
+                "heading": "Modül Yönetimi",
+                "description": "Finans her zaman etkindir. İşletme ihtiyaçlarınıza göre diğer modülleri etkinleştirin.",
+                "enabled_label": "Etkin Modüller",
+                "required_badge": "Gerekli"
+            },
+            "other_types": {
+                "heading": "Diğer İşletme Türleri",
+                "switch_to": "{label} türüne geç"
+            },
+            "info_box": {
+                "title": "ℹ️ İşletme Türleri Hakkında",
+                "description": "İşletme türünü değiştirmek, uygulamada hangi modüllerin görünür olduğunu değiştirir. Verileriniz değiştirilirken bozulmadan kalır.",
+                "point1": "🏭 Üretim: Karıştırma, süblimasyon, üretim hatları, tarifler",
+                "point2": "🛒 Perakende: Satış noktası, envanter yönetimi",
+                "point3": "📦 Dağıtım: Satın alma, satış, depo yönetimi",
+                "point4": "🏢 Hizmetler: Müşteriler, faturalandırma, proje yönetimi"
+            },
+            "switch_modal": {
+                "title": "İşletme Türü Değiştirilsin mi?",
+                "description": "İşletme türünüzü değiştirmek, uygulamada hangi modüllerin görünür olduğunu etkileyecektir.",
+                "warning": "Uyarı: Devre dışı bırakılan modüllerden veriler görünmez ancak silinmez. İstediğiniz zaman geri dönebilirsiniz.",
+                "new_type_label": "Yeni İşletme Türü:",
+                "cancel": "İptal",
+                "confirm": "İşletme Türünü Değiştir",
+                "confirming": "Değiştiriliyor..."
+            },
+            "messages": {
+                "type_updated": "İşletme türü güncellendi",
+                "type_update_failed": "İşletme türü değiştirilemedi",
+                "modules_updated": "Modüller başarıyla güncellendi",
+                "modules_update_failed": "Modüller güncellenemedi"
+            }
+        },
+        "team": {
+            "page_title": "Ekip Yönetimi",
+            "page_subtitle": "Kullanıcı rollerini ve izinleri yönetin",
+            "back_to_dashboard": "Kontrol Paneline Dön",
+            "loading_error": "Kullanıcılar yüklenemedi",
+            "table": {
+                "headers": {
+                    "user": "Kullanıcı",
+                    "email": "E-posta",
+                    "role": "Rol",
+                    "status": "Durum",
+                    "last_login": "Son Giriş"
+                },
+                "empty_state": "Kullanıcı bulunamadı",
+                "unnamed_user": "İsimsiz Kullanıcı",
+                "never_logged_in": "Hiç",
+                "invalid_date": "Geçersiz tarih"
+            },
+            "roles": {
+                "FACTORY_WORKER": "Fabrika İşçisi",
+                "PLANT_MANAGER": "Tesis Müdürü",
+                "ACCOUNTANT": "Muhasebeci",
+                "ADMIN": "Yönetici"
+            },
+            "status": {
+                "active": "Aktif",
+                "inactive": "Pasif"
+            }
+        },
+        "inventory_migration": {
+            "page_title": "Depo Geçişi",
+            "page_subtitle": "Mevcut envanteri çok konumlu depo sistemine taşıyın",
+            "what_this_does": {
+                "heading": "Bu geçiş ne yapar:",
+                "point1": "Varsayılan bir depo kaydı (ID: 1) ve konum (ID: 1) oluşturur",
+                "point2": "Tüm mevcut öğeleri varsayılan konuma bağlar",
+                "point3": "Mevcut stok miktarlarını yeni konum sistemine aktarır",
+                "point4": "Gelecekteki işlemler için depo takibini etkinleştirir",
+                "point5": "Tüm geçmiş verileri ve FIFO katmanlarını korur"
+            },
+            "button": {
+                "run": "Geçişi Başlat",
+                "running": "Geçiş yapılıyor...",
+                "complete": "Geçiş Tamamlandı ✓"
+            },
+            "results": {
+                "success_title": "Geçiş Başarılı",
+                "failed_title": "Geçiş Başarısız",
+                "items_migrated": "Taşınan Öğeler:",
+                "total_quantity": "Toplam Miktar:",
+                "warehouse_id": "Depo ID:",
+                "location_id": "Konum ID:"
+            },
+            "next_steps": "Sonraki Adımlar: Artık depoya dayalı envanter takibi ve konumlar arası transferleri kullanabilirsiniz."
+        },
+        "system_reset": {
+            "modal_title": "Sistem Sıfırlama - Canlıya Geçiş Modu",
+            "warning": {
+                "alert_title": "⚠️ Bu işlem tüm test işlem verilerini kalıcı olarak silecektir.",
+                "alert_description": "Bu işlem geri alınamaz. Devam etmeden önce yedeğiniz olduğundan emin olun.",
+                "will_delete": {
+                    "heading": "Silinecekler",
+                    "point1": "Tüm faturalar ve ödemeler",
+                    "point2": "Tüm satın alma siparişleri ve faturalar",
+                    "point3": "Tüm üretim çalışmaları",
+                    "point4": "Tüm envanter katmanları ve hareketleri",
+                    "point5": "Tüm genel muhasebe kayıtları",
+                    "point6": "Gider geçmişi",
+                    "point7": "Bordro verileri"
+                },
+                "will_preserve": {
+                    "heading": "Korunacaklar",
+                    "point1": "Öğeler (miktarlar 0'a sıfırlanır)",
+                    "point2": "Satıcılar ve müşteriler",
+                    "point3": "Hesap planı",
+                    "point4": "Ölçü birimleri",
+                    "point5": "Kategoriler",
+                    "point6": "Tarifler",
+                    "point7": "Sistem ayarları"
+                },
+                "use_case": "Tipik kullanım durumu: Test aşamasından üretime geçiş (canlıya alma)."
+            },
+            "confirmation": {
+                "title": "Nihai Onay Gerekli",
+                "instruction": "Onaylamak için aşağıya {code} yazın.",
+                "label": "Onay Kodu",
+                "placeholder": "Tam olarak yazın: DELETE-TEST-DATA",
+                "match_success": "✓ Kod eşleşiyor",
+                "match_failure": "✗ Kod eşleşmiyor",
+                "what_happens": {
+                    "heading": "Sırada ne olacak:",
+                    "step1": "Tüm test işlemleri silinecek",
+                    "step2": "Envanter miktarları sıfıra sıfırlanacak",
+                    "step3": "Genel muhasebe hesap bakiyeleri sıfırlanacak",
+                    "step4": "Sisteminiz üretim kullanımı için hazır olacak"
+                }
+            },
+            "processing": {
+                "title": "Sıfırlama işleniyor...",
+                "description": "Bu birkaç dakika sürebilir. Lütfen bu pencereyi kapatmayın."
+            },
+            "success": {
+                "title": "Sıfırlama Başarıyla Tamamlandı",
+                "description": "Sisteminiz artık üretim kullanımı için hazır.",
+                "records_removed": "işlem kaydı kaldırıldı",
+                "records_reset": "ana kayıt sıfırlandı",
+                "next_steps": {
+                    "heading": "Sonraki Adımlar",
+                    "step1": "Genel muhasebe hesapları için açılış bakiyelerini girin",
+                    "step2": "Başlangıç envanter miktarlarını ayarlayın",
+                    "step3": "Sistem ayarlarınızı doğrulayın",
+                    "step4": "Gerçek işlemleri işlemeye başlayın"
+                },
+                "details_toggle": "Detaylı sayıları görüntüle",
+                "deletion_counts": "Silme Sayıları:",
+                "reset_counts": "Sıfırlama Sayıları:"
+            },
+            "buttons": {
+                "cancel": "İptal",
+                "back": "Geri",
+                "continue": "Onaya Devam Et",
+                "execute": "Sıfırlamayı Gerçekleştir",
+                "processing": "İşleniyor...",
+                "close": "Kapat"
+            }
+        },
+        "inventory_resync": {
+            "button_label": "Envanteri Geçmişten Yeniden Senkronize Et",
+            "button_loading": "Yeniden senkronize ediliyor...",
+            "description": "Bu, tüm mevcut envanter katmanlarını siler ve satıcı faturalarından yeniden oluşturur, ardından tüm satış faturaları için FIFO kesintilerini uygular.",
+            "confirm_dialog": "Bu TÜM envanter katmanlarını satıcı faturaları ve satış geçmişinden yeniden oluşturacaktır. Devam edilsin mi?",
+            "cancelled": "İşlem kullanıcı tarafından iptal edildi.",
+            "processing": "İşleniyor... Lütfen bekleyin.",
+            "failed": "Envanter yeniden senkronize edilemedi.",
+            "error": "Yeniden senkronizasyon sırasında hata oluştu.",
+            "fields": {
+                "check_button": "Senkronizasyon Durumunu Kontrol Et",
+                "check_loading": "Kontrol ediliyor...",
+                "resync_button": "Envanteri Yeniden Senkronize Et",
+                "resync_loading": "Yeniden senkronize ediliyor...",
+                "all_synced": "Tüm envanter verileri senkronize",
+                "issues_detected": "Envanter senkronizasyon sorunları tespit edildi",
+                "items_need_resync": "{count} öğe yeniden senkronizasyon gerektiriyor",
+                "view_affected": "Etkilenen öğeleri görüntüle",
+                "denormalized": "Normalleştirilmemiş: {value}",
+                "layers": "Katmanlar: {value}",
+                "discrepancy": "Tutarsızlık: {value}"
+            },
+            "health_check": {
+                "checking": "Envanter senkronizasyon durumu kontrol ediliyor...",
+                "failed_title": "Sağlık kontrolü başarısız",
+                "success_title": "Tüm envanter verileri senkronize",
+                "items_verified": "{count} öğe doğrulandı",
+                "issues_title": "Envanter senkronizasyon sorunları tespit edildi",
+                "items_need_resync": "{total} öğeden {needResync} tanesi yeniden senkronizasyon gerektiriyor",
+                "use_tools": "Düzeltmek için aşağıdaki \"Envanter Araçları\" bölümünü kullanın"
+            }
+        },
+        "system_reset_button": {
+            "label": "Sistem Verilerini Sıfırla"
+        }
+    },
+    "quality": {
+        "title": "Kalite Kontrol",
+        "dashboard": {
+            "title": "Kalite Kontrol Paneli",
+            "subtitle": "Kalite kontrolleri ve test sonuçları",
+            "pending": "Bekleyen Kontroller",
+            "awaiting_inspection": "Kontrol bekleniyor",
+            "passed_today": "Bugün Onaylanan",
+            "approved_today": "Bugün onaylandı",
+            "failed_today": "Bugün Reddedilen",
+            "rejected_today": "Bugün reddedildi",
+            "inspections_list": "Tüm Kontroller",
+            "no_inspections": "Kontrol bulunamadı",
+            "perform_inspection": "Kontrol Yap",
+            "view_results": "Sonuçları Görüntüle",
+            "actions": "İşlemler"
+        },
+        "inspection": {
+            "title": "Kontrol #{id}",
+            "batch": "Parti Numarası",
+            "item": "Ürün",
+            "quantity": "Miktar",
+            "source": "Kaynak",
+            "created_at": "Oluşturulma",
+            "inspector": "Kontrolör",
+            "status": {
+                "label": "Durum",
+                "pending": "Beklemede",
+                "in_progress": "Devam Ediyor",
+                "passed": "Geçti",
+                "failed": "Başarısız",
+                "on_hold": "Beklemede"
+            },
+            "source": {
+                "production": "Üretim Çalışması",
+                "purchase": "Satın Alma Girişi"
+            }
+        },
+        "tests": {
+            "title": "Kalite Testleri",
+            "result": "Sonuç",
+            "pass": "Geçti",
+            "fail": "Kusurlu",
+            "range": "Kabul edilebilir aralık",
+            "notes": "Notlar",
+            "notes_placeholder": "Bu test hakkında not ekleyin...",
+            "type": {
+                "pass_fail": "Geçti/Kusurlu",
+                "numeric": "Sayısal"
+            }
+        },
+        "wizard": {
+            "subtitle": "Kalite kontrol testlerini gerçekleştir",
+            "step_review": "Detayları İncele",
+            "step_tests": "Testleri Gerçekleştir",
+            "step_summary": "İncele ve Gönder",
+            "cancel": "İptal",
+            "back": "Geri",
+            "next": "İleri",
+            "submit": "Kontrolü Gönder",
+            "submitting": "Gönderiliyor...",
+            "review_instructions": "Testleri gerçekleştirmeden önce kontrol detaylarını inceleyin.",
+            "all_tests_passed": "Tüm Testler Geçti",
+            "some_tests_failed": "Bazı Testler Başarısız",
+            "failed_warning": "Bu envanter karantinaya taşınacak ve kullanıma uygun olmayacak.",
+            "test_results_summary": "Test Sonuçları Özeti",
+            "overall_notes": "Genel Notlar",
+            "overall_notes_placeholder": "Kontrol hakkında genel not ekleyin...",
+            "back_to_dashboard": "Panele Dön"
+        },
+        "messages": {
+            "inspection_submitted": "Kontrol başarıyla gönderildi",
+            "inspection_failed": "Kontrol gönderilemedi",
+            "all_tests_required": "Tüm testler tamamlanmalıdır",
+            "inspection_already_completed": "Bu kontrol zaten tamamlanmış (Durum: {status})"
+        }
+    },
+    "audit": {
+        "page_title": "Denetim Günlükleri",
+        "page_subtitle": "Sistem aktivitesi ve veri değişikliği takibi",
+        "filters": {
+            "title": "Filtreler",
+            "entity_placeholder": "Varlık (örn. invoice, user)",
+            "action_placeholder": "İşlem seçin",
+            "apply": "Filtreleri Uygula",
+            "clear": "Temizle"
+        },
+        "action": {
+            "create": "Oluştur",
+            "update": "Güncelle",
+            "delete": "Sil",
+            "approve": "Onayla",
+            "reject": "Reddet",
+            "login": "Giriş",
+            "logout": "Çıkış",
+            "export": "Dışa Aktar"
+        },
+        "table": {
+            "title": "Aktivite Günlüğü",
+            "empty": "Denetim günlüğü bulunamadı",
+            "timestamp": "Zaman Damgası",
+            "user": "Kullanıcı",
+            "action": "İşlem",
+            "entity": "Varlık",
+            "entity_id": "Varlık ID",
+            "ip_address": "IP Adresi",
+            "actions": "İşlemler",
+            "view_details": "Detayları Görüntüle"
+        },
+        "detail": {
+            "title": "Denetim Günlüğü Detayları",
+            "metadata": "Metadata",
+            "timestamp": "Zaman Damgası",
+            "user": "Kullanıcı",
+            "role": "Rol",
+            "ip_address": "IP Adresi",
+            "entity": "Varlık",
+            "entity_id": "Varlık ID",
+            "changes": "Değişiklikler",
+            "user_agent": "Kullanıcı Aracısı"
+        }
+    },
+    "notifications": {
+        "title": "Bildirimler",
+        "empty": "Bildirim yok",
+        "loading": "Yükleniyor...",
+        "mark_all_read": "Tümünü okundu olarak işaretle",
+        "view_all": "Tüm bildirimleri görüntüle",
+        "unread_count": "{count, plural, =0 {Okunmamış bildirim yok} =1 {1 okunmamış bildirim} other {# okunmamış bildirim}}",
+        "types": {
+            "bill_pending_approval": "Fatura Onay Bekliyor",
+            "bill_approved": "Fatura Onaylandı",
+            "bill_rejected": "Fatura Reddedildi",
+            "inventory_low_stock": "Düşük Stok Uyarısı",
+            "inventory_out_of_stock": "Stokta Yok",
+            "qc_inspection_required": "Kalite Kontrol Gerekli",
+            "qc_batch_rejected": "Kalite Kontrol Partisi Reddedildi",
+            "payment_due_soon": "Ödeme Tarihi Yaklaşıyor",
+            "payment_overdue": "Ödeme Gecikmiş",
+            "production_run_completed": "Üretim Tamamlandı"
+        },
+        "actions": {
+            "view": "Detayları Görüntüle",
+            "dismiss": "Kapat",
+            "approve": "Onayla",
+            "review": "İncele"
+        }
+    },
+    "maintenance": {
+        "title": "Ekipman Bakımı",
+        "dashboard": {
+            "title": "Bakım Yönetimi",
+            "subtitle": "Ekipman bakım programlarını takip edin ve yönetin",
+            "cost_summary": "Maliyet Özeti",
+            "total_costs_month": "Bu ay toplam maliyetler",
+            "quick_actions": "Hızlı İşlemler",
+            "manage_active_work": "Aktif iş emirlerini yönetin",
+            "manage_schedules": "Programları görüntüleyin ve düzenleyin",
+            "view_past_maintenance": "Tamamlanan bakımı görüntüleyin",
+            "work_orders_generated": "İş emirleri oluşturuldu",
+            "no_new_work_orders": "Yeni iş emirleri gerekmiyor"
+        },
+        "kpis": {
+            "overdue": "Gecikmiş",
+            "upcoming_week": "Bu Hafta",
+            "in_progress": "Devam Ediyor",
+            "completed_month": "Tamamlanan (Ay)",
+            "requires_attention": "Acil dikkat gerektirir",
+            "next_7_days": "Önümüzdeki 7 gün",
+            "active_now": "Şu anda üzerinde çalışılıyor",
+            "this_month": "Bu ay tamamlanan"
+        },
+        "actions": {
+            "create_schedule": "Program Oluştur",
+            "generate_work_orders": "İş Emirleri Oluştur",
+            "generating": "Oluşturuluyor...",
+            "view_calendar": "Takvimi Görüntüle",
+            "view_work_orders": "İş Emirlerini Görüntüle",
+            "view_schedules": "Programları Görüntüle",
+            "view_history": "Geçmişi Görüntüle",
+            "complete": "Tamamla"
+        },
+        "calendar": {
+            "title": "Bakım Takvimi",
+            "loading": "Takvim yükleniyor...",
+            "status": {
+                "planned": "Planlandı",
+                "in_progress": "Devam Ediyor",
+                "completed": "Tamamlandı"
+            }
+        },
+        "work_orders": {
+            "title": "İş Emirleri",
+            "work_order_number": "İş Emri №",
+            "task": "Görev",
+            "asset": "Varlık",
+            "scheduled": "Planlandı",
+            "status": "Durum",
+            "cost": "Maliyet",
+            "actions": "İşlemler",
+            "no_work_orders": "İş emri bulunamadı"
+        },
+        "status": {
+            "planned": "Planlandı",
+            "in_progress": "Devam Ediyor",
+            "completed": "Tamamlandı",
+            "pending_approval": "Onay Bekliyor"
+        },
+        "form": {
+            "complete_work_order": "İş Emrini Tamamla",
+            "labor_hours": "Çalışma Saatleri",
+            "completion_notes": "Tamamlama Notları",
+            "completion_notes_placeholder": "Yapılan işi, karşılaşılan sorunları ve değiştirilen parçaları açıklayın...",
+            "completion_notes_required": "Tamamlama notları en az 10 karakter olmalıdır",
+            "minimum_10_characters": "En az 10 karakter gereklidir",
+            "external_cost": "Dış Hizmet Maliyeti",
+            "follow_up_required": "Takip bakımı gerekli",
+            "follow_up_notes": "Takip Notları",
+            "follow_up_notes_placeholder": "Gerekli takip işini açıklayın...",
+            "estimated_labor_cost": "Tahmini işçilik maliyeti",
+            "approval_warning_title": "Onay Gerekli",
+            "approval_warning_message": "Bu iş emri 5.000 UZS'yi aşıyor ve Genel Deftere kaydedilmeden önce onay gerektirir",
+            "approval_required_message": "İş emri onay için gönderildi. Genel Deftere kaydedilmeden önce bir fabrika müdürü onaylamalıdır.",
+            "work_order_completed": "İş emri başarıyla tamamlandı ve Genel Deftere kaydedildi",
+            "submitting": "Gönderiliyor...",
+            "back": "Geri",
+            "cancel": "İptal",
+            "error": "Hata"
+        },
+        "common": {
+            "loading": "Yükleniyor...",
+            "error": "Hata"
+        }
     }
 }
