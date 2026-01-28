@@ -3,6 +3,7 @@ import { sql, relations } from 'drizzle-orm';
 import { integer, sqliteTable, text, uniqueIndex, index } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
+import { users } from './auth';
 
 // --- Shared Columns ---
 const timestampFields = {
@@ -56,23 +57,40 @@ export const items = sqliteTable('items', {
   name: text('name').notNull(),
   sku: text('sku').unique(),
   description: text('description'),
+  barcode: text('barcode'), // NEW: For scanning
 
-  // High-Density Features
+  // Classification
   type: text('type').default('Inventory').notNull(), // Inventory, Service, Assembly, Non-Inventory
+  itemClass: text('item_class', { enum: ['RAW_MATERIAL', 'WIP', 'FINISHED_GOODS', 'SERVICE'] }).default('RAW_MATERIAL').notNull(), // NEW: Manufacturing classification
   categoryId: integer('category_id').references(() => categories.id).notNull(),
   parentId: integer('parent_id'), // Self-reference for hierarchy
 
   // UOM configurations
   baseUomId: integer('base_uom_id').references(() => uoms.id).notNull(),
   purchaseUomId: integer('purchase_uom_id').references(() => uoms.id),
+  purchaseUomConversionFactor: integer('purchase_uom_conversion_factor').default(100), // NEW: stored as factor * 100 (e.g., 2000 = 20.0)
 
   // Valuation & Pricing
+  valuationMethod: text('valuation_method', { enum: ['FIFO', 'WEIGHTED_AVG', 'STANDARD'] }).default('FIFO').notNull(), // NEW
   standardCost: integer('standard_cost').default(0), // In Tiyin
   salesPrice: integer('sales_price').default(0), // In Tiyin
   reorderPoint: integer('reorder_point').default(0),
+  safetyStock: integer('safety_stock').default(0), // NEW: Minimum stock level
 
-  // Accounting Link
-  incomeAccountCode: text('income_account_code'), // Reference to gl_accounts
+  // Denormalized inventory fields for performance
+  quantityOnHand: integer('quantity_on_hand').default(0).notNull(),
+  averageCost: integer('average_cost').default(0).notNull(), // In Tiyin
+
+  // Accounting Links (GL codes)
+  assetAccountCode: text('asset_account_code'), // NEW: Inventory asset account
+  incomeAccountCode: text('income_account_code'), // Revenue account
+  expenseAccountCode: text('expense_account_code'), // NEW: COGS account
+
+  // Vendor Link
+  preferredVendorId: integer('preferred_vendor_id'), // NEW: FK to vendors.id for auto PO
+
+  // Field Service Integration
+  requiresInstallation: integer('requires_installation', { mode: 'boolean' }).default(false).notNull(),
 
   status: text('status', { enum: ['ACTIVE', 'ARCHIVED'] }).default('ACTIVE').notNull(),
   isActive: integer('is_active', { mode: 'boolean' }).default(true),
@@ -137,6 +155,14 @@ export const inventoryLayers = sqliteTable('inventory_layers', {
   // Status
   isDepleted: integer('is_depleted', { mode: 'boolean' }).default(false),
 
+  // QC Status Fields - NEW FOR QUALITY CONTROL
+  qcStatus: text('qc_status', {
+    enum: ['PENDING', 'APPROVED', 'REJECTED', 'NOT_REQUIRED']
+  }).default('NOT_REQUIRED').notNull(), // Default for existing data
+  qcInspectedBy: integer('qc_inspected_by'), // References users.id
+  qcInspectedAt: integer('qc_inspected_at', { mode: 'timestamp' }),
+  qcNotes: text('qc_notes'),
+
   // Optimistic Locking
   version: integer('version').default(1).notNull(),
 
@@ -148,6 +174,7 @@ export const inventoryLayers = sqliteTable('inventory_layers', {
   warehouseIdx: index('inventory_layers_warehouse_idx').on(t.warehouseId),
   locationIdx: index('inventory_layers_location_idx').on(t.locationId),
   itemLocationIdx: index('inventory_layers_item_location_idx').on(t.itemId, t.warehouseId, t.locationId),
+  qcStatusIdx: index('inventory_layers_qc_status_idx').on(t.qcStatus), // NEW: QC status index
 }));
 
 export const inventoryLocationTransfers = sqliteTable('inventory_location_transfers', {
@@ -177,15 +204,80 @@ export const inventoryLocationTransfers = sqliteTable('inventory_location_transf
   dateIdx: index('transfers_date_idx').on(t.transferDate),
 }));
 
+// Stock Reservations for committed quantities
+export const stockReservations = sqliteTable('stock_reservations', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  itemId: integer('item_id').references(() => items.id).notNull(),
+  sourceType: text('source_type').notNull(), // 'SALES_ORDER', 'WORK_ORDER', 'TRANSFER'
+  sourceId: integer('source_id').notNull(),
+  qtyReserved: integer('qty_reserved').notNull(),
+  status: text('status', { enum: ['ACTIVE', 'RELEASED', 'EXPIRED'] }).default('ACTIVE').notNull(),
+  reservedAt: integer('reserved_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  expiresAt: integer('expires_at', { mode: 'timestamp' }),
+  ...timestampFields,
+}, (t) => ({
+  itemIdx: index('stock_reservations_item_idx').on(t.itemId),
+  sourceIdx: index('stock_reservations_source_idx').on(t.sourceType, t.sourceId),
+  statusIdx: index('stock_reservations_status_idx').on(t.status),
+}));
+
+export const stockReservationsRelations = relations(stockReservations, ({ one }) => ({
+  item: one(items, {
+    fields: [stockReservations.itemId],
+    references: [items.id],
+  }),
+}));
+
 // Audit Logs for forensic history
 export const auditLogs = sqliteTable('audit_logs', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  tableName: text('table_name').notNull(),
-  recordId: integer('record_id').notNull(),
-  action: text('action').notNull(), // CREATE, UPDATE, DELETE
-  userId: text('user_id'), // Optional link to NextAuth user
-  changes: text('changes'), // JSON string of changes
+
+  // Entity identification
+  entity: text('entity').notNull(), // 'invoice', 'vendor', 'user', etc.
+  entityId: text('entity_id').notNull(), // String for flexibility with UUIDs and composite keys
+
+  // Action tracking
+  action: text('action', {
+    enum: ['CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'EXPORT', 'APPROVE', 'REJECT']
+  }).notNull(),
+
+  // User tracking
+  userId: integer('user_id'), // FK to users.id (constraint applied in relations)
+  userName: text('user_name'), // Denormalized for historical accuracy
+  userRole: text('user_role'), // Role at time of action
+
+  // Change tracking
+  changes: text('changes', { mode: 'json' }).$type<{
+    before?: Record<string, any>;
+    after?: Record<string, any>;
+    fields?: string[]; // Changed fields list
+  }>(),
+
+  // Request metadata
+  ipAddress: text('ip_address'), // NEW: IP tracking
+  userAgent: text('user_agent'), // NEW: Browser tracking
+
+  // Timestamps
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+
+  // Legacy fields (for backward compatibility)
+  tableName: text('table_name'), // Deprecated, use 'entity'
+  recordId: integer('record_id'), // Deprecated, use 'entityId'
+}, (t) => ({
+  entityIdx: index('audit_logs_entity_idx').on(t.entity, t.entityId),
+  userIdx: index('audit_logs_user_idx').on(t.userId),
+  actionIdx: index('audit_logs_action_idx').on(t.action),
+  dateIdx: index('audit_logs_date_idx').on(t.createdAt),
+}));
+
+export const inventoryReserves = sqliteTable('inventory_reserves', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  itemId: integer('item_id').references(() => items.id).notNull(),
+  reserveAmount: integer('reserve_amount').notNull(), // In Tiyin (contra-asset)
+  reason: text('reason').notNull(), // 'Lower of Cost or NRV adjustment', 'Obsolescence', etc.
+  effectiveDate: integer('effective_date', { mode: 'timestamp' }).notNull(),
+  status: text('status', { enum: ['ACTIVE', 'REVERSED'] }).default('ACTIVE').notNull(),
+  ...timestampFields,
 });
 
 // --- Relations ---
@@ -299,6 +391,13 @@ export const uomConversionsRelations = relations(uomConversions, ({ one }) => ({
   }),
 }));
 
+export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
+  user: one(users, {
+    fields: [auditLogs.userId],
+    references: [users.id],
+  }),
+}));
+
 // --- Zod Schemas ---
 
 export const insertCategorySchema = createInsertSchema(categories);
@@ -324,3 +423,9 @@ export const selectWarehouseLocationSchema = createSelectSchema(warehouseLocatio
 
 export const insertInventoryLocationTransferSchema = createInsertSchema(inventoryLocationTransfers);
 export const selectInventoryLocationTransferSchema = createSelectSchema(inventoryLocationTransfers);
+
+export const insertStockReservationSchema = createInsertSchema(stockReservations);
+export const selectStockReservationSchema = createSelectSchema(stockReservations);
+
+export const insertInventoryReserveSchema = createInsertSchema(inventoryReserves);
+export const selectInventoryReserveSchema = createSelectSchema(inventoryReserves);
