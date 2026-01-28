@@ -9,3 +9,10 @@ export * from './fixed_assets';
 export * from './purchasing';
 export * from './production';
 export * from './sales';
+export * from './payments';
+export * from './expenses';
+export * from './hr';
+export * from './quality';
+export * from './notifications';
+export * from './service';
+
