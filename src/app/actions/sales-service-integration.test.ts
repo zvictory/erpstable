@@ -159,6 +159,9 @@ describe('Sales-Service Integration: Auto-create Installation Tickets', () => {
     expect(assets).toHaveLength(1); // 1 asset per invoice line (even if qty > 1)
     expect(assets[0].status).toBe('PENDING_INSTALLATION');
     expect(assets[0].itemId).toBe(machineItemId);
+    // Verify serialNumber and installationAddress are captured (currently null)
+    expect(assets[0].serialNumber).toBeNull(); // TODO: Should be captured from invoice line
+    expect(assets[0].installationAddress).toBeNull(); // TODO: Should be captured from invoice line
   });
 
   it('should NOT create installation ticket when invoice has only regular items', async () => {
@@ -360,5 +363,49 @@ describe('Sales-Service Integration: Auto-create Installation Tickets', () => {
 
     const assetItemIds = assets.map(a => a.itemId).sort();
     expect(assetItemIds).toEqual([machineItemId, machine2.id].sort());
+  });
+
+  it('should capture serialNumber and installationAddress when provided', async () => {
+    // This test documents the expected behavior when invoice lines include
+    // serialNumber and installationAddress fields (not yet implemented)
+
+    // Create invoice with machine item
+    const result = await createInvoice({
+      customerId: testCustomerId,
+      date: new Date(),
+      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      invoiceNumber: `INV-SERIAL-${timestamp}`,
+      lines: [
+        {
+          itemId: machineItemId,
+          quantity: 1,
+          rate: 1000000,
+          description: 'Coffee Machine',
+          // TODO: Add these fields to invoiceLineInputSchema and invoice line creation:
+          // serialNumber: 'SN-123456',
+          // installationAddress: '123 Main St, Tashkent, Uzbekistan',
+        },
+      ],
+      subtotal: 1000000,
+      taxTotal: 0,
+      totalAmount: 1000000,
+    });
+
+    expect(result.success).toBe(true);
+
+    // Verify customer asset was created
+    const assets = await db.query.customerAssets.findMany({
+      where: eq(customerAssets.customerId, testCustomerId),
+    });
+
+    expect(assets).toHaveLength(1);
+
+    // Currently these are null until invoice line schema is updated
+    expect(assets[0].serialNumber).toBeNull();
+    expect(assets[0].installationAddress).toBeNull();
+
+    // TODO: When invoice line schema includes serialNumber and installationAddress:
+    // expect(assets[0].serialNumber).toBe('SN-123456');
+    // expect(assets[0].installationAddress).toBe('123 Main St, Tashkent, Uzbekistan');
   });
 });

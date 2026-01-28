@@ -261,10 +261,18 @@ export async function createInvoice(data: z.infer<typeof createInvoiceSchema>) {
                         assetSequence++;
 
                         // Create customer asset
+                        // NOTE: Installation ticket creation is inlined here instead of calling
+                        // createInstallationTicket() to avoid transaction nesting issues.
+                        // All logic from createInstallationTicket() is replicated within this transaction.
+                        // TODO: serialNumber and installationAddress should be captured from invoice
+                        // lines in the future. For now, they are set to null as the invoice line
+                        // schema doesn't currently include these fields.
                         const [asset] = await tx.insert(customerAssets).values({
                             assetNumber,
                             customerId: validated.customerId,
                             itemId: line.itemId,
+                            serialNumber: null, // TODO: Capture from invoice line when available
+                            installationAddress: null, // TODO: Capture from invoice line when available
                             invoiceLineId: line.id,
                             status: 'PENDING_INSTALLATION',
                         }).returning();
