@@ -7,7 +7,7 @@ import VendorListSidebar from './VendorListSidebar';
 import VendorDetailView from './VendorDetailView';
 import VendorHistoryView from './VendorHistoryView';
 import VendorForm from './VendorForm';
-import BillForm from './BillForm';
+import BillEditor from './BillEditor';
 import PurchasingDocumentForm from './PurchasingDocumentForm';
 import DeletePOModal from './DeletePOModal';
 import { saveItemReceipt, getBillById, deleteVendorBill, getPurchaseOrder, deletePurchaseOrder, savePurchaseOrder } from '@/app/actions/purchasing';
@@ -59,10 +59,7 @@ export default function VendorCenterClient({
 
     const handleEditBill = async (bill: any) => {
         // Only allow editing OPEN bills
-        if (bill.status !== 'OPEN') {
-            alert('Only OPEN bills can be edited. This bill is already paid or partially paid.');
-            return;
-        }
+        // Allow viewing all bills. Backend handles edit restrictions.
 
         try {
             // Extract numeric bill ID from transaction ID (format: "bill-{id}")
@@ -104,13 +101,13 @@ export default function VendorCenterClient({
 
             if (result.success) {
                 // Show success message
-                alert(result.message || 'Bill deleted successfully');
+                alert((result as any).message || 'Bill deleted successfully');
 
                 // Refresh the page to get updated data
                 router.refresh();
             } else {
                 // Show error message
-                alert(result.error || 'Failed to delete bill');
+                alert((result as any).error || 'Failed to delete bill');
             }
         } catch (error) {
             console.error('Error deleting bill:', error);
@@ -119,11 +116,7 @@ export default function VendorCenterClient({
     };
 
     const handleEditPO = async (po: any) => {
-        // Only allow editing OPEN POs
-        if (po.status !== 'OPEN') {
-            alert('Only OPEN purchase orders can be edited. This PO is already received or partially received.');
-            return;
-        }
+        // Allow viewing all POs.
 
         try {
             // Extract numeric PO ID from transaction ID (format: "po-{id}")
@@ -354,23 +347,23 @@ export default function VendorCenterClient({
     // Render rightPane content based on mode
     const rightPaneContent = mode !== 'VIEW_DETAILS' ? (
         mode === 'CREATE_BILL' ? (
-            <BillForm
+            <BillEditor
                 mode="create"
                 vendorId={selectedVendorId!}
                 vendors={vendors}
                 items={items}
-                onCancel={handleCancelEdit}
+                onClose={handleCancelEdit}
                 onSuccess={handleSaveSuccess}
             />
         ) : mode === 'EDIT_BILL' && editingBill && billFormData ? (
-            <BillForm
+            <BillEditor
                 mode="edit"
-                billId={editingBill.id}
+                billId={editingBill.id.toString()}
                 vendorId={editingBill.vendorId}
                 vendors={vendors}
                 items={items}
                 initialData={billFormData}
-                onCancel={handleCancelEdit}
+                onClose={handleCancelEdit}
                 onSuccess={handleSaveSuccess}
             />
         ) : mode === 'CREATE_PO' ? (

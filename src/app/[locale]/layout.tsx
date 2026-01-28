@@ -8,6 +8,7 @@ import { SessionProvider } from 'next-auth/react';
 import { BusinessProvider } from '@/contexts/BusinessContext';
 import { getBusinessSettings } from '@/app/actions/business';
 import type { ModuleKey } from '@/config/modules';
+import { Toaster } from 'sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -40,6 +41,7 @@ export default async function RootLayout({
                             initialSetupCompleted={businessSettings !== null}
                         >
                             <GlobalKeyboardHandler />
+                            <Toaster position="top-right" />
                             {children}
                         </BusinessProvider>
                     </NextIntlClientProvider>

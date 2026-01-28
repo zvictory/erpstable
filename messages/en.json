@@ -1234,6 +1234,9 @@
     "navigation": {
         "dashboard": "Dashboard",
         "commercial": "Commercial",
+        "pipeline": "Sales Pipeline",
+        "leads": "Leads",
+        "quotes": "Quotes",
         "customers": "Customers",
         "invoices": "Invoices",
         "estimates": "Estimates",
@@ -1954,6 +1957,261 @@
         "common": {
             "loading": "Loading...",
             "error": "Error"
+        }
+    },
+    "wms": {
+        "menu": {
+            "title": "WMS Scanner",
+            "lookup": "Lookup",
+            "transfer": "Stock Move",
+            "picking": "Pick List",
+            "count": "Blind Count"
+        },
+        "lookup": {
+            "title": "Lookup",
+            "ready": "Ready to Scan",
+            "scanning": "Scanning...",
+            "instruction": "Scan item barcode or location code",
+            "not_found": "Not Found",
+            "not_found_message": "No item or location matches this code",
+            "item_details": "Item Details",
+            "location_details": "Location Details",
+            "stock_locations": "Stock Locations",
+            "items_at_location": "Items at Location",
+            "qoh": "On Hand",
+            "zone": "Zone",
+            "warehouse": "Warehouse"
+        },
+        "transfer": {
+            "title": "Stock Transfer",
+            "step1": {
+                "title": "Step 1: Scan Item",
+                "instruction": "Scan the item barcode to transfer"
+            },
+            "step2": {
+                "title": "Step 2: Scan Destination",
+                "instruction": "Scan destination location code"
+            },
+            "step3": {
+                "title": "Step 3: Enter Quantity",
+                "instruction": "Enter quantity to transfer"
+            },
+            "from": "From",
+            "to": "To",
+            "quantity": "Quantity",
+            "available": "Available",
+            "confirm_transfer": "Confirm Transfer",
+            "success": "Transfer Complete",
+            "success_message": "Stock moved successfully",
+            "transferring": "Transferring...",
+            "item": "Item",
+            "destination": "Destination",
+            "source": "Source"
+        },
+        "picking": {
+            "title": "Pick List",
+            "progress": "Progress",
+            "pick_qty": "Pick Quantity",
+            "pick_from": "Pick From",
+            "next": "Next Item",
+            "complete": "Complete Picking",
+            "completed": "Picking Complete",
+            "completed_message": "All items picked successfully",
+            "empty": "No items to pick",
+            "loading": "Loading pick list..."
+        },
+        "count": {
+            "title": "Blind Count",
+            "step1": {
+                "title": "Step 1: Scan Location",
+                "instruction": "Scan location barcode to count"
+            },
+            "step2": {
+                "title": "Step 2: Scan Items",
+                "instruction": "Scan each item (tap + to adjust)"
+            },
+            "location": "Location",
+            "submit_count": "Submit Count",
+            "success": "Count Submitted",
+            "success_message": "Inventory count recorded",
+            "submitting": "Submitting...",
+            "counted_items": "Counted Items"
+        },
+        "common": {
+            "back_to_menu": "Back to Menu",
+            "error": "Error",
+            "retry": "Retry",
+            "start_over": "Start Over"
+        }
+    },
+    "crm": {
+        "title": "CRM & Sales Pipeline",
+        "leads": {
+            "title": "Leads",
+            "new_lead": "New Lead",
+            "quick_add": "Quick Add Lead",
+            "view_all": "View All Leads",
+            "convert_to_customer": "Convert to Customer",
+            "fields": {
+                "full_name": "Full Name",
+                "company": "Company",
+                "email": "Email",
+                "phone": "Phone",
+                "source": "Source",
+                "status": "Status",
+                "estimated_value": "Estimated Value",
+                "notes": "Notes",
+                "assigned_to": "Assigned To"
+            },
+            "status": {
+                "new": "New",
+                "contacted": "Contacted",
+                "qualified": "Qualified",
+                "unqualified": "Unqualified",
+                "converted": "Converted"
+            },
+            "source": {
+                "website": "Website",
+                "referral": "Referral",
+                "trade_show": "Trade Show",
+                "cold_call": "Cold Call",
+                "partner": "Partner",
+                "other": "Other"
+            },
+            "actions": {
+                "create": "Create Lead",
+                "update": "Update Lead",
+                "convert": "Convert Lead",
+                "delete": "Delete Lead"
+            },
+            "messages": {
+                "create_success": "Lead created successfully",
+                "update_success": "Lead updated successfully",
+                "convert_success": "Lead converted to customer",
+                "delete_success": "Lead deleted successfully"
+            }
+        },
+        "opportunities": {
+            "title": "Opportunities",
+            "new_opportunity": "New Opportunity",
+            "view_all": "View All Opportunities",
+            "fields": {
+                "title": "Title",
+                "customer": "Customer",
+                "estimated_value": "Estimated Value",
+                "probability": "Probability",
+                "expected_close_date": "Expected Close Date",
+                "stage": "Stage",
+                "description": "Description",
+                "next_action": "Next Action",
+                "lost_reason": "Lost Reason",
+                "assigned_to": "Assigned To",
+                "linked_lead": "Linked Lead",
+                "quote": "Quote",
+                "sales_order": "Sales Order"
+            },
+            "actions": {
+                "create": "Create Opportunity",
+                "update": "Update Opportunity",
+                "create_quote": "Create Quote",
+                "mark_won": "Mark as Won",
+                "mark_lost": "Mark as Lost",
+                "delete": "Delete Opportunity"
+            },
+            "messages": {
+                "create_success": "Opportunity created successfully",
+                "update_success": "Opportunity updated successfully",
+                "stage_update_success": "Stage updated successfully",
+                "quote_created": "Quote created successfully",
+                "delete_success": "Opportunity deleted successfully"
+            }
+        },
+        "pipeline": {
+            "title": "Sales Pipeline",
+            "view_kanban": "Kanban View",
+            "view_list": "List View",
+            "stages": {
+                "lead": "Lead",
+                "qualified": "Qualified",
+                "proposal": "Proposal",
+                "negotiation": "Negotiation",
+                "closed_won": "Closed Won",
+                "closed_lost": "Closed Lost"
+            },
+            "stats": {
+                "total_value": "Total Pipeline Value",
+                "weighted_value": "Weighted Value",
+                "opportunity_count": "Active Opportunities",
+                "win_rate": "Win Rate",
+                "won_count": "Won",
+                "lost_count": "Lost"
+            },
+            "card": {
+                "value": "Value",
+                "probability": "Probability",
+                "customer": "Customer",
+                "assigned_to": "Assigned to",
+                "expected_close": "Expected Close"
+            },
+            "column_header": {
+                "count": "{count} opportunities",
+                "total": "Total: {total}"
+            }
+        },
+        "quotes": {
+            "title": "Quotes",
+            "new_quote": "New Quote",
+            "view_all": "View All Quotes",
+            "convert_to_so": "Convert to Sales Order",
+            "fields": {
+                "quote_number": "Quote Number",
+                "customer": "Customer",
+                "opportunity": "Opportunity",
+                "date": "Quote Date",
+                "valid_until": "Valid Until",
+                "total_amount": "Total Amount",
+                "status": "Status"
+            },
+            "status": {
+                "draft": "Draft",
+                "sent": "Sent",
+                "accepted": "Accepted",
+                "expired": "Expired"
+            },
+            "actions": {
+                "create": "Create Quote",
+                "send": "Send Quote",
+                "convert": "Convert to Sales Order",
+                "duplicate": "Duplicate Quote",
+                "delete": "Delete Quote"
+            },
+            "messages": {
+                "create_success": "Quote created successfully",
+                "convert_success": "Quote converted to sales order",
+                "send_success": "Quote sent to customer",
+                "delete_success": "Quote deleted successfully"
+            }
+        },
+        "conversion": {
+            "title": "Convert Lead",
+            "create_customer": "Create Customer",
+            "create_opportunity": "Also Create Opportunity",
+            "customer_info": "Customer Information",
+            "opportunity_info": "Opportunity Information",
+            "actions": {
+                "convert": "Convert Lead",
+                "cancel": "Cancel"
+            }
+        },
+        "common": {
+            "loading": "Loading...",
+            "no_data": "No data available",
+            "search": "Search...",
+            "filter": "Filter",
+            "clear_filters": "Clear Filters",
+            "export": "Export",
+            "import": "Import",
+            "settings": "Settings"
         }
     }
 }

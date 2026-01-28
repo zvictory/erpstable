@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 async function seedAdminUser() {
     console.log('🌱 Seeding admin user...');
 
-    const adminEmail = 'admin@laza.uz';
+    const adminEmail = 'admin@erpstable.com';
 
     // Check if admin already exists
     const existingAdminResult = await db.select().from(users).where(eq(users.email, adminEmail)).limit(1);
@@ -29,7 +29,7 @@ async function seedAdminUser() {
     });
 
     console.log('✅ Admin user created successfully');
-    console.log('📧 Email: admin@laza.uz');
+    console.log('📧 Email: admin@erpstable.com');
     console.log('🔑 Password: Admin123!');
     console.log('⚠️  IMPORTANT: Change this password immediately after first login!');
 }

@@ -4,7 +4,7 @@ import { categories } from '../../db/schema';
 import { vendors } from '../../db/schema/purchasing';
 import { eq } from 'drizzle-orm';
 import fs from 'fs';
-import { saveVendorBill } from '../app/actions/purchasing';
+import { createVendorBill } from '../app/actions/purchasing';
 
 /**
  * CSV Bill Importer
@@ -271,7 +271,7 @@ async function importBill() {
         isVatEnabled: false,
     };
 
-    const result = await saveVendorBill(billData);
+    const result = await createVendorBill(billData);
 
     if (result.success) {
         console.log('\n✅ Bill created successfully!');

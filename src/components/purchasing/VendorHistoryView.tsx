@@ -137,11 +137,16 @@ export default function VendorHistoryView({ transactions, initialTab = 'transact
                                         </tr>
                                     ) : (
                                         filteredTransactions.map((tx) => {
-                                            const isEditableBill = tx.type === 'Bill' && tx.status === 'OPEN';
-                                            const isDeletableBill = tx.type === 'Bill'; // Allow delete for ALL bill statuses
-                                            // Fix: Check strictly for "Purchase Order" string as returned by API
-                                            const isEditablePO = (tx.type === 'Purchase Order' || tx.type === 'PO') && tx.status === 'OPEN';
-                                            const isDeletablePO = tx.type === 'Purchase Order'; // Allow delete for ALL PO statuses
+                                            const txType = tx.type.toLowerCase();
+                                            const isBill = txType === 'bill';
+                                            const isPO = txType === 'purchase order' || txType === 'po' || txType === 'purchase_order';
+
+                                            // Allow editing only OPEN documents
+                                            const isEditableBill = isBill && tx.status === 'OPEN';
+                                            const isEditablePO = isPO && tx.status === 'OPEN';
+
+                                            const isDeletableBill = isBill;
+                                            const isDeletablePO = isPO;
 
                                             const handleDoubleClick = () => {
                                                 if (isEditableBill && onEditBill) {
@@ -154,7 +159,7 @@ export default function VendorHistoryView({ transactions, initialTab = 'transact
                                             return (
                                                 <tr
                                                     key={tx.id}
-                                                    onDoubleClick={handleDoubleClick}
+                                                    onClick={handleDoubleClick}
                                                     className={`transition-colors group ${(isEditableBill || isEditablePO)
                                                         ? 'hover:bg-orange-50/50 cursor-pointer'
                                                         : 'hover:bg-slate-50/50 cursor-default'

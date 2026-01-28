@@ -1116,6 +1116,9 @@
     "navigation": {
         "dashboard": "Boshqaruv Paneli",
         "commercial": "Savdo",
+        "pipeline": "Savdo Voronkasi",
+        "leads": "Lidlar",
+        "quotes": "Taklifnomalar",
         "customers": "Mijozlar",
         "invoices": "Hisob-fakturalar",
         "estimates": "Smeta",
@@ -1769,6 +1772,261 @@
         "common": {
             "loading": "Yuklanmoqda...",
             "error": "Xato"
+        }
+    },
+    "wms": {
+        "menu": {
+            "title": "WMS Skaner",
+            "lookup": "Qidiruv",
+            "transfer": "Ko'chirish",
+            "picking": "Yig'ish",
+            "count": "Inventarizatsiya"
+        },
+        "lookup": {
+            "title": "Qidiruv",
+            "ready": "Skanerlash uchun tayyor",
+            "scanning": "Skanerlash...",
+            "instruction": "Tovar shtrix-kodi yoki lokatsiya kodini skanerlang",
+            "not_found": "Topilmadi",
+            "not_found_message": "Bu kod bo'yicha tovar yoki lokatsiya topilmadi",
+            "item_details": "Tovar ma'lumotlari",
+            "location_details": "Lokatsiya ma'lumotlari",
+            "stock_locations": "Saqlash joylari",
+            "items_at_location": "Lokatsiyadagi tovarlar",
+            "qoh": "Mavjud",
+            "zone": "Zona",
+            "warehouse": "Ombor"
+        },
+        "transfer": {
+            "title": "Tovarni ko'chirish",
+            "step1": {
+                "title": "1-qadam: Tovarni skanerlash",
+                "instruction": "Ko'chirish uchun tovar shtrix-kodini skanerlang"
+            },
+            "step2": {
+                "title": "2-qadam: Manzilni skanerlash",
+                "instruction": "Manzil lokatsiyasi kodini skanerlang"
+            },
+            "step3": {
+                "title": "3-qadam: Miqdorni kiriting",
+                "instruction": "Ko'chirish uchun miqdorni kiriting"
+            },
+            "from": "Qayerdan",
+            "to": "Qayerga",
+            "quantity": "Miqdor",
+            "available": "Mavjud",
+            "confirm_transfer": "Ko'chirishni tasdiqlash",
+            "success": "Ko'chirish yakunlandi",
+            "success_message": "Tovar muvaffaqiyatli ko'chirildi",
+            "transferring": "Ko'chirilmoqda...",
+            "item": "Tovar",
+            "destination": "Manzil",
+            "source": "Manba"
+        },
+        "picking": {
+            "title": "Yig'ish ro'yxati",
+            "progress": "Jarayon",
+            "pick_qty": "Yig'ish miqdori",
+            "pick_from": "Qayerdan olish",
+            "next": "Keyingi tovar",
+            "complete": "Yig'ishni yakunlash",
+            "completed": "Yig'ish yakunlandi",
+            "completed_message": "Barcha tovarlar muvaffaqiyatli yig'ildi",
+            "empty": "Yig'ish uchun tovar yo'q",
+            "loading": "Yig'ish ro'yxati yuklanmoqda..."
+        },
+        "count": {
+            "title": "Inventarizatsiya",
+            "step1": {
+                "title": "1-qadam: Lokatsiyani skanerlash",
+                "instruction": "Inventarizatsiya uchun lokatsiya shtrix-kodini skanerlang"
+            },
+            "step2": {
+                "title": "2-qadam: Tovarlarni skanerlash",
+                "instruction": "Har bir tovarni skanerlang (tuzatish uchun + bosing)"
+            },
+            "location": "Lokatsiya",
+            "submit_count": "Inventarizatsiyani yuborish",
+            "success": "Inventarizatsiya yuborildi",
+            "success_message": "Inventarizatsiya yozib olindi",
+            "submitting": "Yuborilmoqda...",
+            "counted_items": "Hisoblangan tovarlar"
+        },
+        "common": {
+            "back_to_menu": "Menyuga qaytish",
+            "error": "Xato",
+            "retry": "Qayta urinish",
+            "start_over": "Qaytadan boshlash"
+        }
+    },
+    "crm": {
+        "title": "CRM va Savdo Voronkasi",
+        "leads": {
+            "title": "Lidlar",
+            "new_lead": "Yangi lid",
+            "quick_add": "Tez qo'shish",
+            "view_all": "Barcha lidlar",
+            "convert_to_customer": "Mijozga aylantirish",
+            "fields": {
+                "full_name": "To'liq ism",
+                "company": "Kompaniya",
+                "email": "Email",
+                "phone": "Telefon",
+                "source": "Manba",
+                "status": "Status",
+                "estimated_value": "Taxminiy qiymat",
+                "notes": "Izohlar",
+                "assigned_to": "Biriktirilgan"
+            },
+            "status": {
+                "new": "Yangi",
+                "contacted": "Bog'lanilgan",
+                "qualified": "Malakali",
+                "unqualified": "Malakasiz",
+                "converted": "Aylantrilgan"
+            },
+            "source": {
+                "website": "Veb-sayt",
+                "referral": "Tavsiya",
+                "trade_show": "Ko'rgazma",
+                "cold_call": "Sovuq qo'ng'iroq",
+                "partner": "Hamkor",
+                "other": "Boshqa"
+            },
+            "actions": {
+                "create": "Lid yaratish",
+                "update": "Lidni yangilash",
+                "convert": "Lidni aylantirish",
+                "delete": "Lidni o'chirish"
+            },
+            "messages": {
+                "create_success": "Lid muvaffaqiyatli yaratildi",
+                "update_success": "Lid muvaffaqiyatli yangilandi",
+                "convert_success": "Lid mijozga aylantirildi",
+                "delete_success": "Lid muvaffaqiyatli o'chirildi"
+            }
+        },
+        "opportunities": {
+            "title": "Imkoniyatlar",
+            "new_opportunity": "Yangi imkoniyat",
+            "view_all": "Barcha imkoniyatlar",
+            "fields": {
+                "title": "Nomi",
+                "customer": "Mijoz",
+                "estimated_value": "Taxminiy qiymat",
+                "probability": "Ehtimollik",
+                "expected_close_date": "Kutilayotgan yopish sanasi",
+                "stage": "Bosqich",
+                "description": "Tavsif",
+                "next_action": "Keyingi harakat",
+                "lost_reason": "Yo'qotish sababi",
+                "assigned_to": "Biriktirilgan",
+                "linked_lead": "Bog'langan lid",
+                "quote": "Taklifnoma",
+                "sales_order": "Savdo buyurtmasi"
+            },
+            "actions": {
+                "create": "Imkoniyat yaratish",
+                "update": "Imkoniyatni yangilash",
+                "create_quote": "Taklifnoma yaratish",
+                "mark_won": "Yutilgan deb belgilash",
+                "mark_lost": "Yo'qotilgan deb belgilash",
+                "delete": "Imkoniyatni o'chirish"
+            },
+            "messages": {
+                "create_success": "Imkoniyat muvaffaqiyatli yaratildi",
+                "update_success": "Imkoniyat muvaffaqiyatli yangilandi",
+                "stage_update_success": "Bosqich muvaffaqiyatli yangilandi",
+                "quote_created": "Taklifnoma muvaffaqiyatli yaratildi",
+                "delete_success": "Imkoniyat muvaffaqiyatli o'chirildi"
+            }
+        },
+        "pipeline": {
+            "title": "Savdo Voronkasi",
+            "view_kanban": "Kanban ko'rinishi",
+            "view_list": "Ro'yxat ko'rinishi",
+            "stages": {
+                "lead": "Lid",
+                "qualified": "Malakali",
+                "proposal": "Taklif",
+                "negotiation": "Muzokaralar",
+                "closed_won": "Yutilgan",
+                "closed_lost": "Yo'qotilgan"
+            },
+            "stats": {
+                "total_value": "Umumiy voronka qiymati",
+                "weighted_value": "O'rtacha qiymat",
+                "opportunity_count": "Faol imkoniyatlar",
+                "win_rate": "G'alabalar foizi",
+                "won_count": "Yutilgan",
+                "lost_count": "Yo'qotilgan"
+            },
+            "card": {
+                "value": "Qiymat",
+                "probability": "Ehtimollik",
+                "customer": "Mijoz",
+                "assigned_to": "Biriktirilgan",
+                "expected_close": "Kutilayotgan yopish"
+            },
+            "column_header": {
+                "count": "{count} imkoniyat",
+                "total": "Jami: {total}"
+            }
+        },
+        "quotes": {
+            "title": "Taklifnomalar",
+            "new_quote": "Yangi taklifnoma",
+            "view_all": "Barcha taklifnomalar",
+            "convert_to_so": "Buyurtmaga aylantirish",
+            "fields": {
+                "quote_number": "Taklifnoma raqami",
+                "customer": "Mijoz",
+                "opportunity": "Imkoniyat",
+                "date": "Taklifnoma sanasi",
+                "valid_until": "Amal qilish muddati",
+                "total_amount": "Umumiy summa",
+                "status": "Status"
+            },
+            "status": {
+                "draft": "Qoralama",
+                "sent": "Yuborilgan",
+                "accepted": "Qabul qilingan",
+                "expired": "Muddati o'tgan"
+            },
+            "actions": {
+                "create": "Taklifnoma yaratish",
+                "send": "Taklifnomani yuborish",
+                "convert": "Buyurtmaga aylantirish",
+                "duplicate": "Taklifnomani nusxalash",
+                "delete": "Taklifnomani o'chirish"
+            },
+            "messages": {
+                "create_success": "Taklifnoma muvaffaqiyatli yaratildi",
+                "convert_success": "Taklifnoma buyurtmaga aylantirildi",
+                "send_success": "Taklifnoma mijozga yuborildi",
+                "delete_success": "Taklifnoma muvaffaqiyatli o'chirildi"
+            }
+        },
+        "conversion": {
+            "title": "Lidni aylantirish",
+            "create_customer": "Mijoz yaratish",
+            "create_opportunity": "Imkoniyat ham yaratish",
+            "customer_info": "Mijoz ma'lumotlari",
+            "opportunity_info": "Imkoniyat ma'lumotlari",
+            "actions": {
+                "convert": "Lidni aylantirish",
+                "cancel": "Bekor qilish"
+            }
+        },
+        "common": {
+            "loading": "Yuklanmoqda...",
+            "no_data": "Ma'lumot yo'q",
+            "search": "Qidirish...",
+            "filter": "Filtr",
+            "clear_filters": "Filtrlarni tozalash",
+            "export": "Eksport",
+            "import": "Import",
+            "settings": "Sozlamalar"
         }
     }
 }

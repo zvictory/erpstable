@@ -83,7 +83,7 @@ export function SetupWizard({ onSetupComplete }: SetupWizardProps) {
       <div className="container max-w-2xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Welcome to LAZA ERP</h1>
+          <h1 className="text-4xl font-bold mb-4">Welcome to Stable ERP</h1>
           <p className="text-muted-foreground text-lg">
             Let's set up your business configuration
           </p>

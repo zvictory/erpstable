@@ -9,7 +9,7 @@ const authToken = process.env.DATABASE_AUTH_TOKEN;
 
 // Use global object for caching to avoid re-initialization
 declare global {
-  var dbInstance: ReturnType<typeof drizzle> | undefined;
+  var dbInstance: ReturnType<typeof drizzle<typeof schema>> | undefined;
 }
 
 if (!globalThis.dbInstance) {

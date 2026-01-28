@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Filter } from 'lucide-react';
-import { Card } from "@/components/ui/Card";
+import { Card } from "@/components/ui/card";
 import { formatCurrency } from '@/lib/format';
 
 interface Vendor {

@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from '@/lib/format';
 import { Mail, Phone, Clock, FileText, ChevronDown, Plus, Pencil, Trash2, Eye } from 'lucide-react';
+import { ConfirmDelete } from '@/components/ui/ConfirmDelete';
+import { deleteCustomer } from '@/app/actions/common';
+import { DownloadInvoicePdfButton } from '@/components/sales/DownloadInvoicePdfButton';
 
 interface Transaction {
     id: string;
@@ -27,6 +30,7 @@ interface SelectedCustomer {
 interface CustomerProfileProps {
     customer?: SelectedCustomer | null;
     onEdit?: (id: number) => void;
+    onDeleteSuccess?: () => void;
     onNewInvoice?: (id: number) => void;
     onNewPayment?: (id: number) => void;
     onViewTransaction?: (id: string, type: string) => void;
@@ -37,12 +41,33 @@ interface CustomerProfileProps {
 export function CustomerProfile({
     customer,
     onEdit,
+    onDeleteSuccess,
     onNewInvoice,
     onNewPayment,
     onViewTransaction,
     onEditTransaction,
     onDeleteTransaction
 }: CustomerProfileProps) {
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const handleDelete = async () => {
+        try {
+            const result = await deleteCustomer(customer!.id);
+
+            if (result.success) {
+                alert(result.message);
+                onDeleteSuccess?.();
+            } else {
+                alert(result.message || 'Failed to delete customer');
+            }
+        } catch (error) {
+            console.error('Delete customer error:', error);
+            alert('An unexpected error occurred');
+        } finally {
+            setShowDeleteDialog(false);
+        }
+    };
+
     if (!customer) {
         return (
             <div className="flex-1 flex flex-col items-center justify-center p-12 bg-slate-50">
@@ -93,6 +118,12 @@ export function CustomerProfile({
                             className="px-4 py-1.5 border border-slate-300 rounded-full text-[13px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
                         >
                             Edit
+                        </button>
+                        <button
+                            onClick={() => setShowDeleteDialog(true)}
+                            className="px-4 py-1.5 border border-red-300 rounded-full text-[13px] font-semibold text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                        >
+                            <Trash2 className="h-4 w-4" /> Delete
                         </button>
                         <div className="flex">
                             <button
@@ -184,6 +215,12 @@ export function CustomerProfile({
                                                 >
                                                     <Eye className="h-4 w-4 text-slate-500" />
                                                 </button>
+                                                {transaction.type === 'Invoice' && (
+                                                    <DownloadInvoicePdfButton
+                                                        invoiceId={parseInt(transaction.id.replace('invoice-', ''))}
+                                                        variant="icon"
+                                                    />
+                                                )}
                                                 <button
                                                     onClick={() => onEditTransaction?.(transaction.id, transaction.type)}
                                                     className="p-1 hover:bg-slate-100 rounded transition-colors"
@@ -207,6 +244,14 @@ export function CustomerProfile({
                     </div>
                 )}
             </div>
+
+            <ConfirmDelete
+                open={showDeleteDialog}
+                onOpenChange={setShowDeleteDialog}
+                onConfirm={handleDelete}
+                title="Delete Customer?"
+                description={`Are you sure you want to delete ${customer.name}? This action cannot be undone if the customer has no existing invoices.`}
+            />
         </div>
     );
 }

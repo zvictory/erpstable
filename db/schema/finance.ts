@@ -29,7 +29,7 @@ export const journalEntries = sqliteTable('journal_entries', {
     reference: text('reference'), // External ref e.g. "WO-101"
     transactionId: text('transaction_id'), // Link to Invoice ID, Bill ID, etc.
     isPosted: integer('is_posted', { mode: 'boolean' }).default(false),
-    entryType: text('entry_type').default('TRANSACTION').notNull(), // 'TRANSACTION', 'REVERSAL', or 'ADJUSTMENT'
+    entryType: text('entry_type').default('TRANSACTION').notNull(), // 'TRANSACTION', 'REVERSAL', 'ADJUSTMENT', 'TRANSFER'
 
     // Link to other modules?
     // module: text('module'), // Manufacturing, Sales, etc.
@@ -94,3 +94,14 @@ export const selectJournalEntrySchema = createSelectSchema(journalEntries);
 
 export const insertJournalEntryLineSchema = createInsertSchema(journalEntryLines);
 export const selectJournalEntryLineSchema = createSelectSchema(journalEntryLines);
+
+// --- Type Exports ---
+
+export type GlAccount = typeof glAccounts.$inferSelect;
+export type InsertGlAccount = typeof glAccounts.$inferInsert;
+
+export type JournalEntry = typeof journalEntries.$inferSelect;
+export type InsertJournalEntry = typeof journalEntries.$inferInsert;
+
+export type JournalEntryLine = typeof journalEntryLines.$inferSelect;
+export type InsertJournalEntryLine = typeof journalEntryLines.$inferInsert;

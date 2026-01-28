@@ -53,7 +53,7 @@ export default function ItemForm({
             name: initialData?.name || '',
             sku: initialData?.sku || '',
             type: initialData?.type || 'INVENTORY',
-            baseUomId: initialData?.baseUomId || undefined,
+            baseUomId: initialData?.baseUomId || uoms[0]?.id || 1,
             categoryId: initialData?.categoryId || undefined,
             salesPrice: initialData?.salesPrice || 0,
             standardCost: initialData?.standardCost || 0,
@@ -184,7 +184,6 @@ export default function ItemForm({
                                         <div className="grid gap-2">
                                             <label className="text-sm font-medium text-slate-700">Единица Измерения (UOM)</label>
                                             <select {...register('baseUomId')} className="flex h-9 w-full rounded-md border border-slate-200 bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus:ring-1 focus:ring-slate-950">
-                                                <option value="">Выберите ед. изм...</option>
                                                 {uoms.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
                                             </select>
                                             {errors.baseUomId && <p className="text-xs text-red-500">{errors.baseUomId.message}</p>}

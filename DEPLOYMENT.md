@@ -1,4 +1,4 @@
-# LAZA ERP - Deployment Guide
+# Stable ERP - Deployment Guide
 
 ## Server Information
 - **Server**: laza.odoob.uz (173.212.195.32)
@@ -17,7 +17,7 @@ The application has been successfully deployed and is running on the production 
 ### PM2 Status
 ```bash
 pm2 list
-# Shows laza-erp running on port 3002
+# Shows stable-erp running on port 3002
 ```
 
 ## Deployment Scripts
@@ -41,7 +41,7 @@ sshpass -p '2@19Myokyanus' ssh root@laza.odoob.uz
 
 ### View Application Logs
 ```bash
-sshpass -p '2@19Myokyanus' ssh root@laza.odoob.uz "pm2 logs laza-erp"
+sshpass -p '2@19Myokyanus' ssh root@laza.odoob.uz "pm2 logs stable-erp"
 ```
 
 ### View Application Status
@@ -51,17 +51,17 @@ sshpass -p '2@19Myokyanus' ssh root@laza.odoob.uz "pm2 list"
 
 ### Restart Application
 ```bash
-sshpass -p '2@19Myokyanus' ssh root@laza.odoob.uz "pm2 restart laza-erp"
+sshpass -p '2@19Myokyanus' ssh root@laza.odoob.uz "pm2 restart stable-erp"
 ```
 
 ### Stop Application
 ```bash
-sshpass -p '2@19Myokyanus' ssh root@laza.odoob.uz "pm2 stop laza-erp"
+sshpass -p '2@19Myokyanus' ssh root@laza.odoob.uz "pm2 stop stable-erp"
 ```
 
 ### View Real-time Logs
 ```bash
-sshpass -p '2@19Myokyanus' ssh root@laza.odoob.uz "pm2 logs laza-erp --lines 100"
+sshpass -p '2@19Myokyanus' ssh root@laza.odoob.uz "pm2 logs stable-erp --lines 100"
 ```
 
 ## Configuration Files
@@ -72,7 +72,7 @@ Located at: `/var/www/laza/ecosystem.config.js`
 ```javascript
 module.exports = {
   apps: [{
-    name: 'laza-erp',
+    name: 'stable-erp',
     script: 'npm',
     args: 'start',
     cwd: '/var/www/laza',
@@ -149,7 +149,7 @@ ssh root@laza.odoob.uz
 cd /var/www/laza
 # Generate a secure random string
 echo "AUTH_SECRET=\"$(openssl rand -base64 32)\"" >> .env
-pm2 restart laza-erp
+pm2 restart stable-erp
 ```
 
 ## Build Information
@@ -170,7 +170,7 @@ pm2 restart laza-erp
 ## Troubleshooting
 
 ### Application Won't Start
-1. Check PM2 logs: `pm2 logs laza-erp --lines 50`
+1. Check PM2 logs: `pm2 logs stable-erp --lines 50`
 2. Check port availability: `lsof -i :3002`
 3. Check disk space: `df -h`
 4. Check memory: `free -h`
@@ -181,7 +181,7 @@ If port 3002 is occupied, update ecosystem.config.js:
 ssh root@laza.odoob.uz
 cd /var/www/laza
 nano ecosystem.config.js  # Change PORT value
-pm2 restart laza-erp
+pm2 restart stable-erp
 ```
 
 ### Database Issues
@@ -220,6 +220,6 @@ ssh root@laza.odoob.uz "pm2 monit"
 ## Contact & Support
 
 For deployment issues, check:
-1. Application logs: `pm2 logs laza-erp`
+1. Application logs: `pm2 logs stable-erp`
 2. System logs: `/var/log/nginx/error.log`
 3. Process status: `pm2 list`

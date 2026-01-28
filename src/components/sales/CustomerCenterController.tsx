@@ -124,6 +124,7 @@ export default function CustomerCenterController({
                         <InvoiceForm
                             customerId={selectedCustomerId}
                             items={items}
+                            customers={selectedCustomer ? [{ id: selectedCustomer.id, name: selectedCustomer.name }] : []}
                             onSuccess={closeModals}
                             onCancel={closeModals}
                         />

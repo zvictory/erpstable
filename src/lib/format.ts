@@ -3,6 +3,9 @@
  * Avoids hydration mismatches by using manual formatting instead of toLocaleString
  */
 
+import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
+
 /**
  * Format a number with thousands separator and optional currency
  * Uses comma as separator for consistency across server and client
@@ -58,4 +61,43 @@ export function formatCurrency(tiyinAmount: number, currency: string = 'UZS'): s
         separator: ',',
         currency
     });
+}
+
+/**
+ * Format date in Russian locale (dd.MM.yyyy)
+ * @param date - Date to format
+ * @param formatStr - Format string (default: 'dd.MM.yyyy')
+ * @returns Formatted date string
+ */
+export function formatDateRu(
+    date: Date | string | number,
+    formatStr: string = 'dd.MM.yyyy'
+): string {
+    const dateObj = typeof date === 'string' || typeof date === 'number'
+        ? new Date(date)
+        : date;
+
+    if (isNaN(dateObj.getTime())) {
+        return '-';
+    }
+
+    return format(dateObj, formatStr, { locale: ru });
+}
+
+/**
+ * Format datetime in Russian locale
+ * @param date - Date to format
+ * @returns Formatted string like "24.01.2026 15:30"
+ */
+export function formatDateTimeRu(date: Date | string | number): string {
+    return formatDateRu(date, 'dd.MM.yyyy HH:mm');
+}
+
+/**
+ * Format date as Russian month name
+ * @param date - Date to format
+ * @returns Formatted string like "24 января 2026"
+ */
+export function formatDateLongRu(date: Date | string | number): string {
+    return formatDateRu(date, 'd MMMM yyyy');
 }

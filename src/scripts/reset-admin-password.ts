@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 async function resetAdminPassword() {
     console.log('🔄 Resetting admin password...');
 
-    const adminEmail = 'admin@laza.uz';
+    const adminEmail = 'admin@erpstable.com';
     const newPassword = 'Admin123!';
     const hashedPassword = await hashPassword(newPassword);
 

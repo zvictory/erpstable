@@ -14,6 +14,8 @@ import PickingLocationDisplay from './PickingLocationDisplay';
 import { createInvoice, updateInvoice } from '@/app/actions/sales';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { getToday, addDays } from '@/lib/utils/date';
+import EntityCombobox from '@/components/shared/EntityCombobox';
+import { getWarehouses } from '@/app/actions/inventory-locations';
 
 // Validation Schemas
 const invoiceLineSchema = z.object({
@@ -22,6 +24,7 @@ const invoiceLineSchema = z.object({
     quantity: z.coerce.number().min(0.001, "Qty required"),
     unitPrice: z.coerce.number().min(0, "Price required"),
     amount: z.coerce.number(),
+    warehouseId: z.coerce.number().optional(), // NEW - optional warehouse selection
 });
 
 const invoiceSchema = z.object({
@@ -57,6 +60,8 @@ interface Item {
 interface InvoiceFormProps {
     customerId?: number;
     items: Item[];
+    customers: { id: number; name: string }[];
+    isGlobalMode?: boolean;
     onSuccess: () => void;
     onCancel: () => void;
     mode?: 'create' | 'edit';
@@ -67,6 +72,8 @@ interface InvoiceFormProps {
 export default function InvoiceForm({
     customerId = 0,
     items: availableItems,
+    customers,
+    isGlobalMode = false,
     onSuccess,
     onCancel,
     mode = 'create',
@@ -75,6 +82,7 @@ export default function InvoiceForm({
 }: InvoiceFormProps) {
     const t = useTranslations('sales.invoices');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [warehouses, setWarehouses] = useState<{ id: number; name: string; code: string }[]>([]);
 
     const methods = useForm<InvoiceFormValues>({
         resolver: zodResolver(invoiceSchema),
@@ -122,6 +130,19 @@ export default function InvoiceForm({
         });
     }, [watchedItems, availableItems]);
 
+    // Fetch warehouses on mount
+    useEffect(() => {
+        async function loadWarehouses() {
+            try {
+                const wh = await getWarehouses();
+                setWarehouses(wh);
+            } catch (error) {
+                console.error('Error loading warehouses:', error);
+            }
+        }
+        loadWarehouses();
+    }, []);
+
     useEffect(() => {
         if (invoiceDate) {
             let daysToAdd = 30;
@@ -143,7 +164,12 @@ export default function InvoiceForm({
                 dueDate: data.dueDate,
                 terms: data.terms,
                 memo: data.memo,
-                items: data.items.filter(i => i.itemId > 0),
+                items: data.items
+                    .filter(i => i.itemId > 0)
+                    .map(i => ({
+                        ...i,
+                        warehouseId: i.warehouseId || undefined, // Include warehouse if selected
+                    })),
                 subtotal: Math.round(subtotal * 100),
                 total: Math.round(grandTotal * 100),
             };
@@ -185,13 +211,25 @@ export default function InvoiceForm({
                         {/* Invoice Information Card */}
                         <DocumentFormCard title={t('cards.document_info')}>
                             <FormField label={t('fields.customer')} required error={errors.customerId?.message}>
-                                <select
-                                    {...methods.register("customerId")}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-semibold focus:ring-2 focus:ring-green-100 focus:border-green-600 outline-none"
-                                >
-                                    <option value="">{t('fields.select_customer')}</option>
-                                    {/* Customers would be passed from parent or fetched */}
-                                </select>
+                                {isGlobalMode ? (
+                                    <EntityCombobox
+                                        entities={customers}
+                                        value={methods.watch('customerId') || null}
+                                        onChange={(id) => methods.setValue('customerId', id, { shouldValidate: true })}
+                                        placeholder={t('fields.select_customer')}
+                                        error={errors.customerId?.message}
+                                    />
+                                ) : (
+                                    <select
+                                        {...methods.register("customerId", { valueAsNumber: true })}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-semibold focus:ring-2 focus:ring-green-100 focus:border-green-600 outline-none"
+                                    >
+                                        <option value="">{t('fields.select_customer')}</option>
+                                        {customers.map(c => (
+                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                        ))}
+                                    </select>
+                                )}
                             </FormField>
 
                             <FormField label={t('fields.invoice_date')} required error={errors.invoiceDate?.message}>
@@ -261,10 +299,10 @@ export default function InvoiceForm({
                 }
             >
                 <div className="space-y-4">
-                    <SalesGrid items={availableItems} enableStockValidation={true} />
+                    <SalesGrid items={availableItems} warehouses={warehouses} enableStockValidation={true} />
                     <PickingLocationDisplay
-                        items={methods.watch('items')
-                            .filter(item => item.itemId && item.quantity > 0)
+                        items={(methods.watch('items') || [])
+                            .filter(item => item.itemId && Number(item.itemId) > 0 && item.quantity > 0)
                             .map(item => ({
                                 itemId: Number(item.itemId),
                                 quantity: Number(item.quantity)

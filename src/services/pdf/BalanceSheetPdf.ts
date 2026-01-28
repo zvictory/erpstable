@@ -3,7 +3,7 @@ import PDFDocument from 'pdfkit';
 import fs from 'fs';
 import path from 'path';
 import { db } from '../../../db';
-import { glAccounts, journalEntryLines, journalEntries } from '../../../db/schema';
+import { glAccounts, journalEntryLines, journalEntries, businessSettings } from '../../../db/schema';
 import { eq, and, lte, sum, sql, desc } from 'drizzle-orm';
 
 export class BalanceSheetPdf {
@@ -12,7 +12,17 @@ export class BalanceSheetPdf {
      */
     async generate(asOfDate: Date): Promise<Buffer> {
         return new Promise(async (resolve, reject) => {
-            // 1. Fetch Data
+            // 1. Fetch Business Settings for company name
+            const businessConfig = await db
+                .select()
+                .from(businessSettings)
+                .limit(1);
+
+            const companyName = businessConfig[0]?.companyNameLocal
+                || businessConfig[0]?.companyName
+                || 'Stable ERP';
+
+            // 2. Fetch Data
             // Sum balances per account up to asOfDate
             // We need Account Name, Type, and Sum(Dr - Cr) or (Cr - Dr) depending on type.
 
@@ -40,14 +50,14 @@ export class BalanceSheetPdf {
             const totalLiab = liabilities.reduce((s, i) => s + i.value, 0);
             const totalEquity = equity.reduce((s, i) => s + i.value, 0);
 
-            // 2. Initialize PDF
+            // 3. Initialize PDF
             const doc = new PDFDocument({ size: 'A4', margin: 50 });
             const buffers: Buffer[] = [];
             doc.on('data', buffers.push.bind(buffers));
             doc.on('end', () => resolve(Buffer.concat(buffers)));
             doc.on('error', reject);
 
-            // 3. Font Setup for Cyrillic
+            // 4. Font Setup for Cyrillic
             // Assuming font exists in public/fonts. 
             // If not present, this will fail in runtime (fs.readFileSync), so we wrap or point to a system font if specific path fails.
             const fontPath = path.resolve(process.cwd(), 'public/fonts/Roboto-Regular.ttf');
@@ -59,13 +69,13 @@ export class BalanceSheetPdf {
                 doc.font('Helvetica'); // Will likely corrupt Russian text
             }
 
-            // 4. Header
-            doc.fontSize(20).text('LAZA LLC', { align: 'center' });
+            // 5. Header
+            doc.fontSize(20).text(companyName, { align: 'center' });
             doc.fontSize(16).text('Бухгалтерский баланс (Balance Sheet)', { align: 'center' });
             doc.fontSize(12).text(`As of: ${asOfDate.toISOString().split('T')[0]}`, { align: 'center' });
             doc.moveDown(2);
 
-            // 5. Draw Table (2 Columns)
+            // 6. Draw Table (2 Columns)
             // Left: Assets. Right: Liabilities + Equity.
             const startY = doc.y;
             const midX = doc.page.width / 2;

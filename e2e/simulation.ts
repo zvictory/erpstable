@@ -253,7 +253,7 @@ async function runSimulation() {
     // Missing link: Receipt -> Bill. 
     // I will call `saveVendorBill` here to bridge the gap, as is standard ERP flow.
 
-    const billResult = await import('../src/app/actions/purchasing').then(m => m.saveVendorBill({
+    const billResult = await import('../src/app/actions/purchasing').then(m => m.createVendorBill({
         vendorId: vendor.id,
         date: new Date(),
         refNumber: `BILL-${poRef}`,

@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { getChartOfAccounts } from '@/app/actions/finance'; // Action to implement
 import { clsx } from 'clsx';
-import { ArrowRight, Wallet, TrendingUp, TrendingDown, Layers, Building2 } from 'lucide-react';
+import { ArrowRight, Wallet, TrendingUp, TrendingDown, Layers, Building2, Plus } from 'lucide-react';
 import { ModuleGuard } from '@/components/guards/ModuleGuard';
+import { Button } from '@/components/ui/button';
+import OpeningBalanceModal from '@/components/finance/OpeningBalanceModal';
 
 interface GLAccount {
     code: string;
@@ -38,6 +40,7 @@ export default function ChartOfAccountsPage() {
     const tAccounts = useTranslations('finance.chartOfAccounts.accountTypes');
     const [accounts, setAccounts] = useState<GLAccount[]>([]);
     const [loading, setLoading] = useState(true);
+    const [openingBalanceModalOpen, setOpeningBalanceModalOpen] = useState(false);
 
     useEffect(() => {
         getChartOfAccounts()
@@ -69,9 +72,19 @@ export default function ChartOfAccountsPage() {
     return (
         <ModuleGuard module="FINANCE">
             <div className="min-h-screen bg-slate-50 p-8">
-                <header className="mb-8">
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">{t('title')}</h1>
-                    <p className="text-slate-500 font-medium">{t('subtitle')}</p>
+                <header className="mb-8 flex justify-between items-start">
+                    <div>
+                        <h1 className="text-3xl font-black text-slate-900 tracking-tight">{t('title')}</h1>
+                        <p className="text-slate-500 font-medium">{t('subtitle')}</p>
+                    </div>
+                    <Button
+                        onClick={() => setOpeningBalanceModalOpen(true)}
+                        className="gap-2"
+                        variant="outline"
+                    >
+                        <Plus size={16} />
+                        {t('enter_opening_balances')}
+                    </Button>
                 </header>
 
                 {loading ? (
@@ -145,6 +158,17 @@ export default function ChartOfAccountsPage() {
                         })}
                     </div>
                 )}
+
+                {/* Opening Balance Modal */}
+                <OpeningBalanceModal
+                    isOpen={openingBalanceModalOpen}
+                    onClose={() => setOpeningBalanceModalOpen(false)}
+                    onSuccess={() => {
+                        setOpeningBalanceModalOpen(false);
+                        // Refresh accounts
+                        getChartOfAccounts().then(setAccounts);
+                    }}
+                />
             </div>
         </ModuleGuard>
     );

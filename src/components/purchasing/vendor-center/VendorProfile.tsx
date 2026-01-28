@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from '@/lib/format';
-import { Mail, Phone, Clock, FileText, ChevronDown, Plus } from 'lucide-react';
+import { Mail, Phone, Clock, FileText, ChevronDown, Plus, Pencil, Trash2, Eye } from 'lucide-react';
+import { ConfirmDelete } from '@/components/ui/ConfirmDelete';
+import { deleteVendor } from '@/app/actions/common';
 
 interface Transaction {
     id: string;
@@ -26,12 +28,35 @@ interface SelectedVendor {
 interface VendorProfileProps {
     vendor?: SelectedVendor | null;
     onEdit?: (id: number) => void;
+    onDeleteSuccess?: () => void;
     onNewBill?: (id: number) => void;
     onNewPO?: (id: number) => void;
     onViewTransaction?: (id: string, type: string) => void;
+    onEditTransaction?: (id: string, type: string) => void;
+    onDeleteTransaction?: (id: string, type: string, status: string) => void;
 }
 
-export function VendorProfile({ vendor, onEdit, onNewBill, onNewPO, onViewTransaction }: VendorProfileProps) {
+export function VendorProfile({ vendor, onEdit, onDeleteSuccess, onNewBill, onNewPO, onViewTransaction, onEditTransaction, onDeleteTransaction }: VendorProfileProps) {
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const handleDelete = async () => {
+        try {
+            const result = await deleteVendor(vendor!.id);
+
+            if (result.success) {
+                alert(result.message);
+                onDeleteSuccess?.();
+            } else {
+                alert(result.message || 'Failed to delete vendor');
+            }
+        } catch (error) {
+            console.error('Delete vendor error:', error);
+            alert('An unexpected error occurred');
+        } finally {
+            setShowDeleteDialog(false);
+        }
+    };
+
     if (!vendor) {
         return (
             <div className="flex-1 flex flex-col items-center justify-center p-12 bg-slate-50">
@@ -66,6 +91,12 @@ export function VendorProfile({ vendor, onEdit, onNewBill, onNewPO, onViewTransa
                             className="px-4 py-1.5 border border-slate-300 rounded-full text-[13px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
                         >
                             Edit
+                        </button>
+                        <button
+                            onClick={() => setShowDeleteDialog(true)}
+                            className="px-4 py-1.5 border border-red-300 rounded-full text-[13px] font-semibold text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                        >
+                            <Trash2 className="h-4 w-4" /> Delete
                         </button>
                         <div className="flex">
                             <button
@@ -124,7 +155,7 @@ export function VendorProfile({ vendor, onEdit, onNewBill, onNewPO, onViewTransa
                                     <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">No.</th>
                                     <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Amount</th>
                                     <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Status</th>
-                                    <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center w-[80px]">Action</th>
+                                    <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center w-[120px]">Action</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-200">
@@ -140,12 +171,36 @@ export function VendorProfile({ vendor, onEdit, onNewBill, onNewPO, onViewTransa
                                             </Badge>
                                         </td>
                                         <td className="px-4 py-3 text-[13px] text-center">
-                                            <button
-                                                onClick={() => onViewTransaction?.(tx.id, tx.type)}
-                                                className="text-blue-600 font-semibold hover:underline"
-                                            >
-                                                View
-                                            </button>
+                                            <div className="flex items-center justify-center gap-1">
+                                                {/* Edit - hidden for PAID/CLOSED */}
+                                                {tx.status !== 'PAID' && tx.status !== 'CLOSED' && (
+                                                    <button
+                                                        onClick={() => onEditTransaction?.(tx.id, tx.type)}
+                                                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                                        title="Edit"
+                                                    >
+                                                        <Pencil className="h-4 w-4" />
+                                                    </button>
+                                                )}
+                                                {/* Delete - hidden for PAID/CLOSED */}
+                                                {tx.status !== 'PAID' && tx.status !== 'CLOSED' && (
+                                                    <button
+                                                        onClick={() => onDeleteTransaction?.(tx.id, tx.type, tx.status)}
+                                                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                                        title="Delete"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </button>
+                                                )}
+                                                {/* View - always visible */}
+                                                <button
+                                                    onClick={() => onViewTransaction?.(tx.id, tx.type)}
+                                                    className="p-1.5 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                                                    title="View"
+                                                >
+                                                    <Eye className="h-4 w-4" />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 )) || (
@@ -165,6 +220,14 @@ export function VendorProfile({ vendor, onEdit, onNewBill, onNewPO, onViewTransa
                     </div>
                 </div>
             </div>
+
+            <ConfirmDelete
+                open={showDeleteDialog}
+                onOpenChange={setShowDeleteDialog}
+                onConfirm={handleDelete}
+                title="Delete Vendor?"
+                description={`Are you sure you want to delete ${vendor.name}? This action cannot be undone if the vendor has no existing transactions.`}
+            />
         </div>
     );
 }

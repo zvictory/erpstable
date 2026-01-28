@@ -1919,6 +1919,9 @@
     "navigation": {
         "dashboard": "Дашборд",
         "commercial": "Коммерция",
+        "pipeline": "Воронка продаж",
+        "leads": "Лиды",
+        "quotes": "КП",
         "customers": "Клиенты",
         "invoices": "Счета",
         "estimates": "Сметы",
@@ -2480,6 +2483,261 @@
         "common": {
             "loading": "Загрузка...",
             "error": "Ошибка"
+        }
+    },
+    "wms": {
+        "menu": {
+            "title": "WMS Сканер",
+            "lookup": "Поиск",
+            "transfer": "Перемещение",
+            "picking": "Комплектация",
+            "count": "Инвентаризация"
+        },
+        "lookup": {
+            "title": "Поиск",
+            "ready": "Готов к сканированию",
+            "scanning": "Сканирование...",
+            "instruction": "Отсканируйте штрихкод товара или код локации",
+            "not_found": "Не найдено",
+            "not_found_message": "Товар или локация не найдены по этому коду",
+            "item_details": "Информация о товаре",
+            "location_details": "Информация о локации",
+            "stock_locations": "Локации хранения",
+            "items_at_location": "Товары в локации",
+            "qoh": "В наличии",
+            "zone": "Зона",
+            "warehouse": "Склад"
+        },
+        "transfer": {
+            "title": "Перемещение товара",
+            "step1": {
+                "title": "Шаг 1: Сканировать товар",
+                "instruction": "Отсканируйте штрихкод товара для перемещения"
+            },
+            "step2": {
+                "title": "Шаг 2: Сканировать место назначения",
+                "instruction": "Отсканируйте код локации назначения"
+            },
+            "step3": {
+                "title": "Шаг 3: Введите количество",
+                "instruction": "Введите количество для перемещения"
+            },
+            "from": "Откуда",
+            "to": "Куда",
+            "quantity": "Количество",
+            "available": "Доступно",
+            "confirm_transfer": "Подтвердить перемещение",
+            "success": "Перемещение завершено",
+            "success_message": "Товар успешно перемещен",
+            "transferring": "Перемещение...",
+            "item": "Товар",
+            "destination": "Место назначения",
+            "source": "Источник"
+        },
+        "picking": {
+            "title": "Лист комплектации",
+            "progress": "Прогресс",
+            "pick_qty": "Количество для комплектации",
+            "pick_from": "Взять из",
+            "next": "Следующий товар",
+            "complete": "Завершить комплектацию",
+            "completed": "Комплектация завершена",
+            "completed_message": "Все товары скомплектованы успешно",
+            "empty": "Нет товаров для комплектации",
+            "loading": "Загрузка листа комплектации..."
+        },
+        "count": {
+            "title": "Инвентаризация",
+            "step1": {
+                "title": "Шаг 1: Сканировать локацию",
+                "instruction": "Отсканируйте штрихкод локации для инвентаризации"
+            },
+            "step2": {
+                "title": "Шаг 2: Сканировать товары",
+                "instruction": "Отсканируйте каждый товар (нажмите + для корректировки)"
+            },
+            "location": "Локация",
+            "submit_count": "Отправить инвентаризацию",
+            "success": "Инвентаризация отправлена",
+            "success_message": "Инвентаризация записана",
+            "submitting": "Отправка...",
+            "counted_items": "Посчитанные товары"
+        },
+        "common": {
+            "back_to_menu": "Вернуться в меню",
+            "error": "Ошибка",
+            "retry": "Повторить",
+            "start_over": "Начать заново"
+        }
+    },
+    "crm": {
+        "title": "CRM и Воронка продаж",
+        "leads": {
+            "title": "Лиды",
+            "new_lead": "Новый лид",
+            "quick_add": "Быстрое добавление лида",
+            "view_all": "Все лиды",
+            "convert_to_customer": "Конвертировать в клиента",
+            "fields": {
+                "full_name": "ФИО",
+                "company": "Компания",
+                "email": "Email",
+                "phone": "Телефон",
+                "source": "Источник",
+                "status": "Статус",
+                "estimated_value": "Оценочная стоимость",
+                "notes": "Заметки",
+                "assigned_to": "Назначено"
+            },
+            "status": {
+                "new": "Новый",
+                "contacted": "Контактирован",
+                "qualified": "Квалифицирован",
+                "unqualified": "Неквалифицирован",
+                "converted": "Конвертирован"
+            },
+            "source": {
+                "website": "Веб-сайт",
+                "referral": "Рекомендация",
+                "trade_show": "Выставка",
+                "cold_call": "Холодный звонок",
+                "partner": "Партнер",
+                "other": "Другое"
+            },
+            "actions": {
+                "create": "Создать лид",
+                "update": "Обновить лид",
+                "convert": "Конвертировать лид",
+                "delete": "Удалить лид"
+            },
+            "messages": {
+                "create_success": "Лид успешно создан",
+                "update_success": "Лид успешно обновлен",
+                "convert_success": "Лид конвертирован в клиента",
+                "delete_success": "Лид успешно удален"
+            }
+        },
+        "opportunities": {
+            "title": "Возможности",
+            "new_opportunity": "Новая возможность",
+            "view_all": "Все возможности",
+            "fields": {
+                "title": "Название",
+                "customer": "Клиент",
+                "estimated_value": "Оценочная стоимость",
+                "probability": "Вероятность",
+                "expected_close_date": "Ожидаемая дата закрытия",
+                "stage": "Этап",
+                "description": "Описание",
+                "next_action": "Следующее действие",
+                "lost_reason": "Причина проигрыша",
+                "assigned_to": "Назначено",
+                "linked_lead": "Связанный лид",
+                "quote": "Коммерческое предложение",
+                "sales_order": "Заказ на продажу"
+            },
+            "actions": {
+                "create": "Создать возможность",
+                "update": "Обновить возможность",
+                "create_quote": "Создать КП",
+                "mark_won": "Отметить как выигранную",
+                "mark_lost": "Отметить как проигранную",
+                "delete": "Удалить возможность"
+            },
+            "messages": {
+                "create_success": "Возможность успешно создана",
+                "update_success": "Возможность успешно обновлена",
+                "stage_update_success": "Этап успешно обновлен",
+                "quote_created": "КП успешно создано",
+                "delete_success": "Возможность успешно удалена"
+            }
+        },
+        "pipeline": {
+            "title": "Воронка продаж",
+            "view_kanban": "Канбан",
+            "view_list": "Список",
+            "stages": {
+                "lead": "Лид",
+                "qualified": "Квалифицирован",
+                "proposal": "Предложение",
+                "negotiation": "Переговоры",
+                "closed_won": "Выигран",
+                "closed_lost": "Проигран"
+            },
+            "stats": {
+                "total_value": "Общая стоимость воронки",
+                "weighted_value": "Взвешенная стоимость",
+                "opportunity_count": "Активные возможности",
+                "win_rate": "Процент побед",
+                "won_count": "Выиграно",
+                "lost_count": "Проиграно"
+            },
+            "card": {
+                "value": "Стоимость",
+                "probability": "Вероятность",
+                "customer": "Клиент",
+                "assigned_to": "Назначено",
+                "expected_close": "Ожидаемое закрытие"
+            },
+            "column_header": {
+                "count": "{count, plural, =1 {# возможность} few {# возможности} other {# возможностей}}",
+                "total": "Итого: {total}"
+            }
+        },
+        "quotes": {
+            "title": "Коммерческие предложения",
+            "new_quote": "Новое КП",
+            "view_all": "Все КП",
+            "convert_to_so": "Конвертировать в заказ",
+            "fields": {
+                "quote_number": "Номер КП",
+                "customer": "Клиент",
+                "opportunity": "Возможность",
+                "date": "Дата КП",
+                "valid_until": "Действительно до",
+                "total_amount": "Общая сумма",
+                "status": "Статус"
+            },
+            "status": {
+                "draft": "Черновик",
+                "sent": "Отправлено",
+                "accepted": "Принято",
+                "expired": "Истекло"
+            },
+            "actions": {
+                "create": "Создать КП",
+                "send": "Отправить КП",
+                "convert": "Конвертировать в заказ",
+                "duplicate": "Дублировать КП",
+                "delete": "Удалить КП"
+            },
+            "messages": {
+                "create_success": "КП успешно создано",
+                "convert_success": "КП конвертировано в заказ",
+                "send_success": "КП отправлено клиенту",
+                "delete_success": "КП успешно удалено"
+            }
+        },
+        "conversion": {
+            "title": "Конвертация лида",
+            "create_customer": "Создать клиента",
+            "create_opportunity": "Также создать возможность",
+            "customer_info": "Информация о клиенте",
+            "opportunity_info": "Информация о возможности",
+            "actions": {
+                "convert": "Конвертировать лид",
+                "cancel": "Отмена"
+            }
+        },
+        "common": {
+            "loading": "Загрузка...",
+            "no_data": "Данные отсутствуют",
+            "search": "Поиск...",
+            "filter": "Фильтр",
+            "clear_filters": "Очистить фильтры",
+            "export": "Экспорт",
+            "import": "Импорт",
+            "settings": "Настройки"
         }
     }
 }

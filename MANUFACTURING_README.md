@@ -1,4 +1,4 @@
-# LAZA ERP Manufacturing System
+# Stable ERP Manufacturing System
 
 **Project**: Advanced Manufacturing Engine with Multi-Stage Routing
 **Status**: ✅ Implementation Complete

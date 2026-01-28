@@ -1194,6 +1194,9 @@
     "navigation": {
         "dashboard": "Kontrol Paneli",
         "commercial": "Ticaret",
+        "pipeline": "Satış Hattı",
+        "leads": "Potansiyel Müşteriler",
+        "quotes": "Teklifler",
         "customers": "Müşteriler",
         "invoices": "Faturalar",
         "estimates": "Teklifler",
@@ -1847,6 +1850,261 @@
         "common": {
             "loading": "Yükleniyor...",
             "error": "Hata"
+        }
+    },
+    "wms": {
+        "menu": {
+            "title": "WMS Tarayıcı",
+            "lookup": "Arama",
+            "transfer": "Transfer",
+            "picking": "Toplama",
+            "count": "Envanter Sayımı"
+        },
+        "lookup": {
+            "title": "Arama",
+            "ready": "Taramaya Hazır",
+            "scanning": "Taranıyor...",
+            "instruction": "Ürün barkodunu veya konum kodunu tarayın",
+            "not_found": "Bulunamadı",
+            "not_found_message": "Bu koda uygun ürün veya konum bulunamadı",
+            "item_details": "Ürün Detayları",
+            "location_details": "Konum Detayları",
+            "stock_locations": "Stok Konumları",
+            "items_at_location": "Konumdaki Ürünler",
+            "qoh": "Eldeki Miktar",
+            "zone": "Bölge",
+            "warehouse": "Depo"
+        },
+        "transfer": {
+            "title": "Stok Transferi",
+            "step1": {
+                "title": "Adım 1: Ürünü Tarayın",
+                "instruction": "Transfer edilecek ürün barkodunu tarayın"
+            },
+            "step2": {
+                "title": "Adım 2: Hedefi Tarayın",
+                "instruction": "Hedef konum kodunu tarayın"
+            },
+            "step3": {
+                "title": "Adım 3: Miktarı Girin",
+                "instruction": "Transfer edilecek miktarı girin"
+            },
+            "from": "Nereden",
+            "to": "Nereye",
+            "quantity": "Miktar",
+            "available": "Mevcut",
+            "confirm_transfer": "Transferi Onayla",
+            "success": "Transfer Tamamlandı",
+            "success_message": "Stok başarıyla taşındı",
+            "transferring": "Transfer Ediliyor...",
+            "item": "Ürün",
+            "destination": "Hedef",
+            "source": "Kaynak"
+        },
+        "picking": {
+            "title": "Toplama Listesi",
+            "progress": "İlerleme",
+            "pick_qty": "Toplama Miktarı",
+            "pick_from": "Nereden Alınacak",
+            "next": "Sonraki Ürün",
+            "complete": "Toplamayı Tamamla",
+            "completed": "Toplama Tamamlandı",
+            "completed_message": "Tüm ürünler başarıyla toplandı",
+            "empty": "Toplanacak ürün yok",
+            "loading": "Toplama listesi yükleniyor..."
+        },
+        "count": {
+            "title": "Kör Sayım",
+            "step1": {
+                "title": "Adım 1: Konumu Tarayın",
+                "instruction": "Sayım için konum barkodunu tarayın"
+            },
+            "step2": {
+                "title": "Adım 2: Ürünleri Tarayın",
+                "instruction": "Her ürünü tarayın (ayarlamak için + basın)"
+            },
+            "location": "Konum",
+            "submit_count": "Sayımı Gönder",
+            "success": "Sayım Gönderildi",
+            "success_message": "Envanter sayımı kaydedildi",
+            "submitting": "Gönderiliyor...",
+            "counted_items": "Sayılan Ürünler"
+        },
+        "common": {
+            "back_to_menu": "Menüye Dön",
+            "error": "Hata",
+            "retry": "Tekrar Dene",
+            "start_over": "Baştan Başla"
+        }
+    },
+    "crm": {
+        "title": "CRM ve Satış Hattı",
+        "leads": {
+            "title": "Potansiyel Müşteriler",
+            "new_lead": "Yeni Potansiyel Müşteri",
+            "quick_add": "Hızlı Ekle",
+            "view_all": "Tümünü Görüntüle",
+            "convert_to_customer": "Müşteriye Dönüştür",
+            "fields": {
+                "full_name": "Ad Soyad",
+                "company": "Şirket",
+                "email": "E-posta",
+                "phone": "Telefon",
+                "source": "Kaynak",
+                "status": "Durum",
+                "estimated_value": "Tahmini Değer",
+                "notes": "Notlar",
+                "assigned_to": "Atanan"
+            },
+            "status": {
+                "new": "Yeni",
+                "contacted": "İletişime Geçildi",
+                "qualified": "Nitelikli",
+                "unqualified": "Niteliksiz",
+                "converted": "Dönüştürüldü"
+            },
+            "source": {
+                "website": "Web Sitesi",
+                "referral": "Tavsiye",
+                "trade_show": "Fuar",
+                "cold_call": "Soğuk Arama",
+                "partner": "İş Ortağı",
+                "other": "Diğer"
+            },
+            "actions": {
+                "create": "Potansiyel Müşteri Oluştur",
+                "update": "Güncelle",
+                "convert": "Dönüştür",
+                "delete": "Sil"
+            },
+            "messages": {
+                "create_success": "Potansiyel müşteri başarıyla oluşturuldu",
+                "update_success": "Başarıyla güncellendi",
+                "convert_success": "Müşteriye dönüştürüldü",
+                "delete_success": "Başarıyla silindi"
+            }
+        },
+        "opportunities": {
+            "title": "Fırsatlar",
+            "new_opportunity": "Yeni Fırsat",
+            "view_all": "Tüm Fırsatlar",
+            "fields": {
+                "title": "Başlık",
+                "customer": "Müşteri",
+                "estimated_value": "Tahmini Değer",
+                "probability": "Olasılık",
+                "expected_close_date": "Beklenen Kapanış Tarihi",
+                "stage": "Aşama",
+                "description": "Açıklama",
+                "next_action": "Sonraki Eylem",
+                "lost_reason": "Kayıp Nedeni",
+                "assigned_to": "Atanan",
+                "linked_lead": "Bağlı Potansiyel Müşteri",
+                "quote": "Teklif",
+                "sales_order": "Satış Siparişi"
+            },
+            "actions": {
+                "create": "Fırsat Oluştur",
+                "update": "Güncelle",
+                "create_quote": "Teklif Oluştur",
+                "mark_won": "Kazanıldı Olarak İşaretle",
+                "mark_lost": "Kaybedildi Olarak İşaretle",
+                "delete": "Sil"
+            },
+            "messages": {
+                "create_success": "Fırsat başarıyla oluşturuldu",
+                "update_success": "Başarıyla güncellendi",
+                "stage_update_success": "Aşama güncellendi",
+                "quote_created": "Teklif oluşturuldu",
+                "delete_success": "Başarıyla silindi"
+            }
+        },
+        "pipeline": {
+            "title": "Satış Hattı",
+            "view_kanban": "Kanban Görünümü",
+            "view_list": "Liste Görünümü",
+            "stages": {
+                "lead": "Potansiyel",
+                "qualified": "Nitelikli",
+                "proposal": "Teklif",
+                "negotiation": "Müzakere",
+                "closed_won": "Kazanıldı",
+                "closed_lost": "Kaybedildi"
+            },
+            "stats": {
+                "total_value": "Toplam Hat Değeri",
+                "weighted_value": "Ağırlıklı Değer",
+                "opportunity_count": "Aktif Fırsatlar",
+                "win_rate": "Kazanma Oranı",
+                "won_count": "Kazanılan",
+                "lost_count": "Kaybedilen"
+            },
+            "card": {
+                "value": "Değer",
+                "probability": "Olasılık",
+                "customer": "Müşteri",
+                "assigned_to": "Atanan",
+                "expected_close": "Beklenen Kapanış"
+            },
+            "column_header": {
+                "count": "{count} fırsat",
+                "total": "Toplam: {total}"
+            }
+        },
+        "quotes": {
+            "title": "Teklifler",
+            "new_quote": "Yeni Teklif",
+            "view_all": "Tüm Teklifler",
+            "convert_to_so": "Siparişe Dönüştür",
+            "fields": {
+                "quote_number": "Teklif Numarası",
+                "customer": "Müşteri",
+                "opportunity": "Fırsat",
+                "date": "Teklif Tarihi",
+                "valid_until": "Geçerlilik Tarihi",
+                "total_amount": "Toplam Tutar",
+                "status": "Durum"
+            },
+            "status": {
+                "draft": "Taslak",
+                "sent": "Gönderildi",
+                "accepted": "Kabul Edildi",
+                "expired": "Süresi Doldu"
+            },
+            "actions": {
+                "create": "Teklif Oluştur",
+                "send": "Teklifi Gönder",
+                "convert": "Siparişe Dönüştür",
+                "duplicate": "Çoğalt",
+                "delete": "Sil"
+            },
+            "messages": {
+                "create_success": "Teklif başarıyla oluşturuldu",
+                "convert_success": "Siparişe dönüştürüldü",
+                "send_success": "Müşteriye gönderildi",
+                "delete_success": "Başarıyla silindi"
+            }
+        },
+        "conversion": {
+            "title": "Potansiyel Müşteriyi Dönüştür",
+            "create_customer": "Müşteri Oluştur",
+            "create_opportunity": "Fırsat da Oluştur",
+            "customer_info": "Müşteri Bilgileri",
+            "opportunity_info": "Fırsat Bilgileri",
+            "actions": {
+                "convert": "Dönüştür",
+                "cancel": "İptal"
+            }
+        },
+        "common": {
+            "loading": "Yükleniyor...",
+            "no_data": "Veri yok",
+            "search": "Ara...",
+            "filter": "Filtrele",
+            "clear_filters": "Filtreleri Temizle",
+            "export": "Dışa Aktar",
+            "import": "İçe Aktar",
+            "settings": "Ayarlar"
         }
     }
 }

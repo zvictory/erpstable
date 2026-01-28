@@ -1,17 +1,7 @@
-import React from 'react';
-import ItemForm from '@/components/inventory/ItemForm';
-import { getUoms } from '@/app/actions/items';
-import { getActiveCategories } from '@/app/actions/settings';
+import { notFound } from 'next/navigation';
 
 export default async function NewItemPage() {
-    const [uoms, categories] = await Promise.all([
-        getUoms(),
-        getActiveCategories()
-    ]);
-
-    return (
-        <div className="p-8 bg-slate-50 min-h-screen">
-            <ItemForm uoms={uoms} categories={categories} />
-        </div>
-    );
+    // This route is deprecated - item creation is handled through the main items page
+    // with ItemCenterLayout
+    notFound();
 }

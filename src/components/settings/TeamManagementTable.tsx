@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { updateUserRole } from '@/app/actions/settings';
@@ -27,13 +28,6 @@ interface User {
 interface TeamManagementTableProps {
     initialUsers: User[];
 }
-
-const ROLE_OPTIONS = [
-    { value: 'FACTORY_WORKER', label: 'Factory Worker' },
-    { value: 'PLANT_MANAGER', label: 'Plant Manager' },
-    { value: 'ACCOUNTANT', label: 'Accountant' },
-    { value: 'ADMIN', label: 'Admin' },
-];
 
 const AVATAR_COLORS = [
     'bg-blue-500',
@@ -65,21 +59,29 @@ function getInitial(name: string | null): string {
     return name.charAt(0).toUpperCase();
 }
 
-// Format relative time
-function formatRelativeTime(date: Date | null): string {
-    if (!date) return 'Never';
-
-    try {
-        return formatDistanceToNow(new Date(date), { addSuffix: true });
-    } catch (error) {
-        return 'Invalid date';
-    }
-}
-
 export default function TeamManagementTable({ initialUsers }: TeamManagementTableProps) {
+    const t = useTranslations('settings.team');
     const router = useRouter();
     const [error, setError] = useState<string | null>(null);
     const [loadingUserId, setLoadingUserId] = useState<number | null>(null);
+
+    const ROLE_OPTIONS = [
+        { value: 'FACTORY_WORKER', label: t('roles.FACTORY_WORKER') },
+        { value: 'PLANT_MANAGER', label: t('roles.PLANT_MANAGER') },
+        { value: 'ACCOUNTANT', label: t('roles.ACCOUNTANT') },
+        { value: 'ADMIN', label: t('roles.ADMIN') },
+    ];
+
+    // Format relative time
+    const formatRelativeTime = (date: Date | null): string => {
+        if (!date) return t('table.never_logged_in');
+
+        try {
+            return formatDistanceToNow(new Date(date), { addSuffix: true });
+        } catch (error) {
+            return t('table.invalid_date');
+        }
+    };
 
     const handleRoleChange = async (userId: number, newRole: string) => {
         setError(null);
@@ -117,11 +119,11 @@ export default function TeamManagementTable({ initialUsers }: TeamManagementTabl
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>User</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Role</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Last Login</TableHead>
+                            <TableHead>{t('table.headers.user')}</TableHead>
+                            <TableHead>{t('table.headers.email')}</TableHead>
+                            <TableHead>{t('table.headers.role')}</TableHead>
+                            <TableHead>{t('table.headers.status')}</TableHead>
+                            <TableHead>{t('table.headers.last_login')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -141,7 +143,7 @@ export default function TeamManagementTable({ initialUsers }: TeamManagementTabl
                                                 {initial}
                                             </div>
                                             <span className="font-medium text-slate-900">
-                                                {user.name || 'Unnamed User'}
+                                                {user.name || t('table.unnamed_user')}
                                             </span>
                                         </div>
                                     </TableCell>
@@ -182,7 +184,7 @@ export default function TeamManagementTable({ initialUsers }: TeamManagementTabl
                                                     : 'bg-gray-50 text-gray-600 border-gray-200'
                                             }
                                         >
-                                            {user.isActive ? 'Active' : 'Inactive'}
+                                            {user.isActive ? t('status.active') : t('status.inactive')}
                                         </Badge>
                                     </TableCell>
 
@@ -202,7 +204,7 @@ export default function TeamManagementTable({ initialUsers }: TeamManagementTabl
             {/* Empty State */}
             {initialUsers.length === 0 && (
                 <div className="text-center py-12">
-                    <p className="text-slate-500">No users found</p>
+                    <p className="text-slate-500">{t('table.empty_state')}</p>
                 </div>
             )}
         </div>

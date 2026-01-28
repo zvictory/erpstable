@@ -7,7 +7,14 @@ const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 const nextConfig = {
     experimental: {
         serverActions: {
-            allowedOrigins: ["localhost:3000", "127.0.0.1:3000", "192.168.1.110:3000", "0.0.0.0:3000"]
+            allowedOrigins: [
+                "localhost:3000",
+                "127.0.0.1:3000",
+                "192.168.1.110:3000",
+                "0.0.0.0:3000",
+                "erpstable.com",
+                "www.erpstable.com"
+            ]
         }
     }
 };

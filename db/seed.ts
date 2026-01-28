@@ -48,35 +48,35 @@ async function seed() {
 
     await db.insert(schema.users).values([
         {
-            email: 'admin@laza.uz',
+            email: 'admin@erpstable.com',
             name: 'Admin User',
             password: passwordHash,
             role: 'ADMIN',
             isActive: true,
         },
         {
-            email: 'accountant@laza.uz',
+            email: 'accountant@erpstable.com',
             name: 'Chief Accountant',
             password: passwordHash,
             role: 'ACCOUNTANT',
             isActive: true,
         },
         {
-            email: 'manager@laza.uz',
+            email: 'manager@erpstable.com',
             name: 'Plant Manager',
             password: passwordHash,
             role: 'PLANT_MANAGER',
             isActive: true,
         },
         {
-            email: 'worker@laza.uz',
+            email: 'worker@erpstable.com',
             name: 'Factory Worker',
             password: passwordHash,
             role: 'FACTORY_WORKER',
             isActive: true,
         },
         {
-            email: 'warehouse@laza.uz',
+            email: 'warehouse@erpstable.com',
             name: 'Warehouse Keeper',
             password: passwordHash,
             role: 'PLANT_MANAGER', // Giving manager role for access

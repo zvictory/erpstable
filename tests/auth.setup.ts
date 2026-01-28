@@ -14,7 +14,7 @@ setup('authenticate', async ({ page }) => {
     console.log('✓ Email input found');
 
     // Fill in login credentials (from seed-admin-user.ts)
-    await emailInput.fill('admin@laza.uz');
+    await emailInput.fill('admin@erpstable.com');
     console.log('✓ Email filled');
 
     // Fill password

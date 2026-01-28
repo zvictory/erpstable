@@ -1,7 +1,7 @@
 import { SetupWizard } from '@/components/setup/SetupWizard';
 
 export const metadata = {
-  title: 'Setup - LAZA ERP',
+  title: 'Setup - Stable ERP',
   description: 'Initial business configuration setup',
 };
 

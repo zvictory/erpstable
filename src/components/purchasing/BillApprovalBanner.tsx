@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 import { Clock, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { approveBill } from '@/app/actions/purchasing';
 import { formatCurrency, formatDateTimeRu } from '@/lib/format';
@@ -27,6 +28,7 @@ export default function BillApprovalBanner({
     const { data: session } = useSession();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const t = useTranslations('purchasing.bill_approval');
 
     // Determine if current user is admin
     const userRole = (session?.user as any)?.role as UserRole | undefined;
@@ -45,7 +47,7 @@ export default function BillApprovalBanner({
             const result = await approveBill(billId, action);
 
             if (!result.success) {
-                setError(result.error || `Failed to ${action.toLowerCase()} bill`);
+                setError((result as any).error || `Failed to ${action.toLowerCase()} bill`);
                 return;
             }
 
@@ -69,11 +71,11 @@ export default function BillApprovalBanner({
                         <div>
                             <p className="font-medium text-yellow-900">
                                 {isAdmin
-                                    ? 'Pending approval'
-                                    : 'Waiting for admin approval'}
+                                    ? t('pending_approval')
+                                    : t('waiting_approval')}
                             </p>
                             <p className="text-sm text-yellow-700">
-                                Amount: {formatCurrency(totalAmount)}
+                                {t('amount_label')} {formatCurrency(totalAmount)}
                             </p>
                         </div>
                     </div>
@@ -88,10 +90,10 @@ export default function BillApprovalBanner({
                                 {loading ? (
                                     <>
                                         <Loader2 className="h-4 w-4 animate-spin" />
-                                        Processing...
+                                        {t('processing')}
                                     </>
                                 ) : (
-                                    'Approve'
+                                    t('approve')
                                 )}
                             </button>
                             <button
@@ -102,10 +104,10 @@ export default function BillApprovalBanner({
                                 {loading ? (
                                     <>
                                         <Loader2 className="h-4 w-4 animate-spin" />
-                                        Processing...
+                                        {t('processing')}
                                     </>
                                 ) : (
-                                    'Reject'
+                                    t('reject')
                                 )}
                             </button>
                         </div>
@@ -128,7 +130,7 @@ export default function BillApprovalBanner({
                 <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
                     <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
                     <div>
-                        <p className="font-medium text-green-900">Approved</p>
+                        <p className="font-medium text-green-900">{t('approved')}</p>
                         {approvedAt && (
                             <p className="text-sm text-green-700">
                                 {formatDateTimeRu(approvedAt)}
@@ -147,9 +149,9 @@ export default function BillApprovalBanner({
                 <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
                     <XCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
                     <div>
-                        <p className="font-medium text-red-900">Rejected</p>
+                        <p className="font-medium text-red-900">{t('rejected')}</p>
                         <p className="text-sm text-red-700">
-                            This bill has been rejected and will not be processed
+                            {t('rejected_message')}
                         </p>
                     </div>
                 </div>

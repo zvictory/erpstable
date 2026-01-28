@@ -2,9 +2,10 @@
 
 import React from 'react';
 import { usePathname } from '@/navigation';
-import { Search, Bell, Menu } from 'lucide-react';
+import { Search, Menu } from 'lucide-react';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 import UserMenu from '@/components/auth/UserMenu';
+import { NotificationPanel } from '@/components/notifications/NotificationPanel';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 
@@ -17,13 +18,38 @@ export default function Header({ toggleSidebar, setIsPasswordModalOpen }: Header
     const pathname = usePathname();
     const t = useTranslations('dashboard');
 
-    // Simple breadcrumb logic: Home > Section > Page
-    // Example: /purchasing/vendors -> Purchasing > Vendors
+    // Enhanced breadcrumb logic with human-readable labels
     const getBreadcrumbs = () => {
-        if (!pathname || pathname === '/') return ['Home'];
+        if (!pathname || pathname === '/') return [t('breadcrumbs.home')];
 
         const parts = pathname.split('/').filter(Boolean);
-        return ['Home', ...parts.map(p => p.charAt(0).toUpperCase() + p.slice(1))];
+
+        // Map to translated labels
+        const labelMap: Record<string, string> = {
+            'purchasing': t('breadcrumbs.purchasing'),
+            'vendors': t('breadcrumbs.vendors'),
+            'orders': t('breadcrumbs.orders'),
+            'inventory': t('breadcrumbs.inventory'),
+            'items': t('breadcrumbs.items'),
+            'reconciliation': t('breadcrumbs.reconciliation'),
+            'manufacturing': t('breadcrumbs.manufacturing'),
+            'lines': t('breadcrumbs.lines'),
+            'mixing': t('breadcrumbs.mixing'),
+            'sublimation': t('breadcrumbs.sublimation'),
+            'sales': t('breadcrumbs.sales'),
+            'customers': t('breadcrumbs.customers'),
+            'invoices': t('breadcrumbs.invoices'),
+            'estimates': t('breadcrumbs.estimates'),
+            'finance': t('breadcrumbs.finance'),
+            'chart-of-accounts': t('breadcrumbs.chart_of_accounts'),
+            'reports': t('breadcrumbs.reports'),
+            'settings': t('breadcrumbs.settings'),
+            'new': t('breadcrumbs.new'),
+            'edit': t('breadcrumbs.edit')
+        };
+
+        const breadcrumbs = parts.map(part => labelMap[part] || part.charAt(0).toUpperCase() + part.slice(1));
+        return [t('breadcrumbs.home'), ...breadcrumbs];
     };
 
     const breadcrumbs = getBreadcrumbs();
@@ -33,8 +59,8 @@ export default function Header({ toggleSidebar, setIsPasswordModalOpen }: Header
             <div className="flex h-16 items-center px-6 gap-4">
 
                 {/* Mobile / Collapse Trigger */}
-                <button onClick={toggleSidebar} className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-md">
-                    <Menu size={20} />
+                <button onClick={toggleSidebar} className="lg:hidden p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 rounded-md transition-colors">
+                    <Menu size={20} strokeWidth={2} />
                 </button>
 
                 {/* Left: Breadcrumbs */}
@@ -43,7 +69,7 @@ export default function Header({ toggleSidebar, setIsPasswordModalOpen }: Header
                         <React.Fragment key={index}>
                             <span className={cn(
                                 "font-medium transition-colors",
-                                index === breadcrumbs.length - 1 ? "text-slate-900" : "text-slate-500 hover:text-slate-700"
+                                index === breadcrumbs.length - 1 ? "text-slate-900 font-semibold" : "text-slate-500 hover:text-slate-700"
                             )}>
                                 {crumb}
                             </span>
@@ -58,23 +84,20 @@ export default function Header({ toggleSidebar, setIsPasswordModalOpen }: Header
                 <div className="flex items-center gap-3">
                     {/* Search (Visual Placeholder) */}
                     <div className="relative hidden md:block group">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={16} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={16} />
                         <input
                             type="text"
-                            placeholder="Type to search... (Cmd+K)"
-                            className="h-9 w-64 rounded-md border border-slate-200 bg-slate-50 pl-9 pr-4 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all placeholder:text-slate-400"
+                            placeholder={t('search_placeholder')}
+                            className="h-9 w-64 rounded-md border border-slate-200 bg-slate-50 pl-9 pr-20 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all placeholder:text-slate-400"
                         />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-0.5">
-                            <span className="text-[10px] font-medium text-slate-400 bg-slate-200 px-1.5 py-0.5 rounded">⌘</span>
-                            <span className="text-[10px] font-medium text-slate-400 bg-slate-200 px-1.5 py-0.5 rounded">K</span>
+                            <span className="text-[10px] font-semibold text-slate-500 bg-slate-200/80 px-1.5 py-0.5 rounded shadow-sm">⌘</span>
+                            <span className="text-[10px] font-semibold text-slate-500 bg-slate-200/80 px-1.5 py-0.5 rounded shadow-sm">K</span>
                         </div>
                     </div>
 
                     {/* Notifications */}
-                    <button className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
-                        <Bell size={20} />
-                        <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
-                    </button>
+                    <NotificationPanel />
 
                     <div className="h-6 w-px bg-slate-200 mx-1" />
 

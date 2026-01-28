@@ -7,7 +7,7 @@ import { X, Receipt, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import PurchasingGrid from './PurchasingGrid';
 import { purchasingDocumentSchema, PurchasingDocument } from '@/lib/validators/purchasing';
-import { saveVendorBill } from '@/app/actions/purchasing';
+import { createVendorBill } from '@/app/actions/purchasing';
 import { getItems } from '@/app/actions/items';
 
 // Helper to safely stringify objects with circular references
@@ -86,7 +86,7 @@ export default function NewBillModal({ onClose, vendorId, vendorName, vendors = 
                 }))
             };
 
-            const result = await saveVendorBill(actionData);
+            const result = await createVendorBill(actionData);
             if (result.success) {
                 onClose();
             } else {

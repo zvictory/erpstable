@@ -8,7 +8,8 @@ import {
     CreditCard, Banknote, Package, Activity, Hammer,
     BoxSelect, PieChart, FileBarChart, Receipt,
     FlaskConical, Snowflake, Building2, Factory,
-    LayoutDashboard, Settings, ChevronRight, BookOpen, ClipboardCheck, Wallet, Wrench
+    LayoutDashboard, Settings, ChevronRight, BookOpen, ClipboardCheck, Wallet, Wrench,
+    TrendingUp, UserPlus, FileText as FileTextIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { UserRole } from '@/auth.config';
@@ -73,7 +74,7 @@ export default function Sidebar({ className, isCollapsed, toggleCollapse, userRo
                     <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-900/20">
                         L
                     </div>
-                    {!isCollapsed && <span className="font-bold text-slate-100 text-lg tracking-tight">LazaERP</span>}
+                    {!isCollapsed && <span className="font-bold text-slate-100 text-lg tracking-tight">Stable ERP</span>}
                 </div>
             </div>
 
@@ -83,7 +84,10 @@ export default function Sidebar({ className, isCollapsed, toggleCollapse, userRo
                 {/* Commercial */}
                 <NavGroup title={t('commercial')}>
                     <NavItem href="/" icon={LayoutDashboard} label={t('dashboard')} active={pathname === '/'} />
+                    <NavItem href="/sales/pipeline" icon={TrendingUp} label={t('pipeline')} active={isActive('/sales/pipeline')} />
+                    <NavItem href="/sales/leads" icon={UserPlus} label={t('leads')} active={isActive('/sales/leads')} />
                     <NavItem href="/sales/customers" icon={Users} label={t('customers')} active={isActive('/sales/customers')} />
+                    <NavItem href="/sales/quotes" icon={FileTextIcon} label={t('quotes')} active={isActive('/sales/quotes')} />
                     <NavItem href="/sales/invoices" icon={Receipt} label={t('invoices')} active={isActive('/sales/invoices')} />
                     <NavItem href="/sales/estimates" icon={FileText} label={t('estimates')} active={isActive('/sales/estimates')} />
                 </NavGroup>

@@ -1,11 +1,14 @@
 import { getAllUsers } from '@/app/actions/settings';
 import TeamManagementTable from '@/components/settings/TeamManagementTable';
 import { ChevronLeft, Users } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
 export default async function TeamManagementPage() {
+  const t = await getTranslations('settings.team');
   const result = await getAllUsers();
 
   // Handle error case
@@ -15,7 +18,7 @@ export default async function TeamManagementPage() {
         <div className="max-w-6xl mx-auto space-y-6">
           <Link href="/" className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition">
             <ChevronLeft size={14} />
-            Back to Dashboard
+            {t('back_to_dashboard')}
           </Link>
 
           <div className="flex items-center gap-3">
@@ -23,14 +26,14 @@ export default async function TeamManagementPage() {
               <Users size={24} />
             </div>
             <div>
-              <h1 className="text-3xl font-black text-slate-900">Team Management</h1>
-              <p className="text-sm text-slate-500">Manage user roles and permissions</p>
+              <h1 className="text-3xl font-black text-slate-900">{t('page_title')}</h1>
+              <p className="text-sm text-slate-500">{t('page_subtitle')}</p>
             </div>
           </div>
 
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <p className="text-sm text-red-800">
-              <strong>Error:</strong> {result.error || 'Failed to load users'}
+              {result.error || t('loading_error')}
             </p>
           </div>
         </div>
@@ -43,7 +46,7 @@ export default async function TeamManagementPage() {
       <div className="max-w-6xl mx-auto space-y-6">
         <Link href="/" className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-blue-600 transition">
           <ChevronLeft size={14} />
-          Back to Dashboard
+          {t('back_to_dashboard')}
         </Link>
 
         <div className="flex items-center gap-3">
@@ -51,8 +54,8 @@ export default async function TeamManagementPage() {
             <Users size={24} />
           </div>
           <div>
-            <h1 className="text-3xl font-black text-slate-900">Team Management</h1>
-            <p className="text-sm text-slate-500">Manage user roles and permissions</p>
+            <h1 className="text-3xl font-black text-slate-900">{t('page_title')}</h1>
+            <p className="text-sm text-slate-500">{t('page_subtitle')}</p>
           </div>
         </div>
 

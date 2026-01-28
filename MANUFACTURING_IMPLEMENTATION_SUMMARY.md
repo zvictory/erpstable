@@ -1,6 +1,6 @@
 # Manufacturing System Implementation Summary
 
-**Project**: LAZA ERP Manufacturing Module
+**Project**: Stable ERP Manufacturing Module
 **Completion Date**: January 9, 2026
 **Scope**: Multi-stage production routing with full GL integration and WIP tracking
 
@@ -476,7 +476,7 @@ Unit Cost:  4,511,538 Tiyin/kg
 
 ## Integration Checklist
 
-To integrate this manufacturing system into your LAZA ERP:
+To integrate this manufacturing system into your Stable ERP:
 
 - [ ] **Database Migration**
   - [ ] Run schema updates for workOrderSteps and workOrderStepCosts tables

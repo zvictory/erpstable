@@ -20,6 +20,7 @@ export const users = sqliteTable('users', {
         enum: ['FACTORY_WORKER', 'PLANT_MANAGER', 'ACCOUNTANT', 'ADMIN']
     }).notNull().default('FACTORY_WORKER'),
     isActive: integer('is_active', { mode: 'boolean' }).default(true).notNull(),
+    hourlyRate: integer('hourly_rate').default(0).notNull(), // In Tiyin
     lastLoginAt: integer('last_login_at', { mode: 'timestamp' }),
     ...timestampFields,
 }, (table) => ({

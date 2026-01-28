@@ -2,7 +2,7 @@
 
 import { db } from '../../../db';
 import { vendorBills, journalEntries, journalEntryLines } from '../../../db/schema';
-import { eq, notInArray } from 'drizzle-orm';
+import { eq, notInArray, sql } from 'drizzle-orm';
 import { ACCOUNTS } from '../../lib/accounting-config';
 import { revalidatePath } from 'next/cache';
 
@@ -65,8 +65,9 @@ export async function repostMissingGL() {
                         // But per prompt, "For each ghost bill, call the GL creation logic".
                         // I will update balances too to be safe, assuming the integrity verify meant *nothing* happened.
 
-                        await tx.run(`UPDATE gl_accounts SET balance = balance + ${bill.totalAmount} WHERE code = '${ACCOUNTS.INVENTORY_RAW}'`);
-                        await tx.run(`UPDATE gl_accounts SET balance = balance - ${bill.totalAmount} WHERE code = '${ACCOUNTS.AP_LOCAL}'`);
+                        // Note: Using sql template for raw SQL execution
+                        await tx.run(sql.raw(`UPDATE gl_accounts SET balance = balance + ${bill.totalAmount} WHERE code = '${ACCOUNTS.INVENTORY_RAW}'`));
+                        await tx.run(sql.raw(`UPDATE gl_accounts SET balance = balance - ${bill.totalAmount} WHERE code = '${ACCOUNTS.AP_LOCAL}'`));
                     });
 
                     fixedCount++;

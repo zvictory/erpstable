@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 import DocumentShell from '@/components/ui/DocumentShell';
 import PurchasingGrid from './PurchasingGrid';
 import { purchasingDocumentSchema, PurchasingDocument } from '@/lib/validators/purchasing';
-import { saveVendorBill, updateVendorBill } from '@/app/actions/purchasing';
+import { createVendorBill, updateVendorBill } from '@/app/actions/purchasing';
 import { getItems } from '@/app/actions/items';
 import { generateNextBillNumber } from '@/lib/auto-numbering';
 import { getWarehouses, getWarehouseLocations } from '@/app/actions/inventory-locations';
@@ -173,7 +173,7 @@ export default function BillForm({
 
             const result = mode === 'edit' && billId
                 ? await updateVendorBill(billId, actionData)
-                : await saveVendorBill(actionData);
+                : await createVendorBill(actionData);
 
             if (result.success) {
                 onSuccess();

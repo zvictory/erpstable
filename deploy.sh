@@ -5,7 +5,7 @@
 
 set -e  # Exit on any error
 
-SERVER="laza.odoob.uz"
+SERVER="laza.erpstable.com"
 USER="root"
 REMOTE_DIR="/var/www/laza"
 APP_NAME="laza-erp"

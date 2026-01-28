@@ -7,6 +7,9 @@ import { journalEntries, journalEntryLines } from '../../../db/schema/finance';
 import { eq, sql, inArray, and, asc, gt, desc } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { ACCOUNTS } from '@/lib/accounting-config';
+import { checkPeriodLock } from './finance';
+import { logAuditEvent, getChangedFields } from '@/lib/audit';
 
 // --- Zod Schemas for Actions ---
 
@@ -16,6 +19,7 @@ const invoiceLineInputSchema = z.object({
     rate: z.number().min(0), // Subunit (Tiyin)
     description: z.string().optional(),
     revenueAccountId: z.number().optional(), // For overriding default sales account
+    warehouseId: z.number().optional(), // NEW - optional for warehouse-specific picking
 });
 
 const createInvoiceSchema = z.object({
@@ -152,6 +156,17 @@ export async function createInvoice(data: z.infer<typeof createInvoiceSchema>) {
     try {
         const validated = createInvoiceSchema.parse(data);
 
+        // Validate tax amounts match (GAAP/IFRS compliance)
+        const expectedTotal = validated.subtotal + validated.taxTotal;
+        if (validated.totalAmount !== expectedTotal) {
+            throw new Error(
+                `Tax calculation mismatch: Total (${validated.totalAmount}) must equal Subtotal (${validated.subtotal}) + Tax (${validated.taxTotal})`
+            );
+        }
+
+        // Check period lock (GAAP/IFRS compliance - prevent posting to closed periods)
+        await checkPeriodLock(validated.date);
+
         return await db.transaction(async (tx) => {
             // 1. Create Invoice Header
             const [newInvoice] = await tx.insert(invoices).values({
@@ -192,7 +207,7 @@ export async function createInvoice(data: z.infer<typeof createInvoiceSchema>) {
             // Debit AR (1200)
             await tx.insert(journalEntryLines).values({
                 journalEntryId: je.id,
-                accountCode: '1200', // Accounts Receivable
+                accountCode: ACCOUNTS.AR, // Accounts Receivable
                 debit: validated.totalAmount,
                 credit: 0,
                 description: `Invoice #${validated.invoiceNumber} - Customer #${validated.customerId}`,
@@ -201,12 +216,22 @@ export async function createInvoice(data: z.infer<typeof createInvoiceSchema>) {
             // Credit Sales Income (4100)
             await tx.insert(journalEntryLines).values({
                 journalEntryId: je.id,
-                accountCode: '4100', // Sales Income - Default
+                accountCode: ACCOUNTS.SALES_INCOME, // Sales Income - Default
                 debit: 0,
                 credit: validated.subtotal,
                 description: `Revenue - Invoice #${validated.invoiceNumber}`,
             });
 
+            // Credit Sales Tax Payable (2200) - GAAP/IFRS Compliance
+            if (validated.taxTotal > 0) {
+                await tx.insert(journalEntryLines).values({
+                    journalEntryId: je.id,
+                    accountCode: ACCOUNTS.SALES_TAX, // Sales Tax Payable
+                    debit: 0,
+                    credit: validated.taxTotal,
+                    description: `Sales Tax - Invoice #${validated.invoiceNumber}`,
+                });
+            }
 
             // 4. Financial Event B: Cost of Goods Sold (COGS) & Inventory Deduction (FIFO)
             // Also track picking locations and create transfer records
@@ -218,20 +243,30 @@ export async function createInvoice(data: z.infer<typeof createInvoiceSchema>) {
                 let totalLineCost = 0;
                 const pickingLocations: Array<{ layerId: number; batchNumber: string; pickQty: number; warehouseId: number | null; locationId: number | null }> = [];
 
-                // Fetch FIFO Layers
+                // Fetch FIFO Layers - Filter by warehouse if specified
+                const whereConditions = [
+                    eq(inventoryLayers.itemId, line.itemId),
+                    eq(inventoryLayers.isDepleted, false),
+                    gt(inventoryLayers.remainingQty, 0)
+                ];
+
+                // Add warehouse filter if specified
+                if (line.warehouseId) {
+                    whereConditions.push(eq(inventoryLayers.warehouseId, line.warehouseId));
+                }
+
                 const layers = await tx.select().from(inventoryLayers)
-                    .where(and(
-                        eq(inventoryLayers.itemId, line.itemId),
-                        eq(inventoryLayers.isDepleted, false),
-                        gt(inventoryLayers.remainingQty, 0)
-                    ))
+                    .where(and(...whereConditions))
                     .orderBy(asc(inventoryLayers.receiveDate), asc(inventoryLayers.id)); // FIFO
 
                 // Calculate total available
                 const totalAvailable = layers.reduce((sum, l) => sum + l.remainingQty, 0);
 
                 if (totalAvailable < qtyRemainingToDeduct) {
-                    throw new Error(`Insufficient stock for item #${line.itemId}. Required: ${qtyRemainingToDeduct}, Available: ${totalAvailable}`);
+                    const warehouseContext = line.warehouseId
+                        ? ` in warehouse ${line.warehouseId}`
+                        : '';
+                    throw new Error(`Insufficient stock for item #${line.itemId}${warehouseContext}. Required: ${qtyRemainingToDeduct}, Available: ${totalAvailable}`);
                 }
 
                 for (const layer of layers) {
@@ -368,6 +403,17 @@ export async function updateInvoice(invoiceId: number, data: z.infer<typeof crea
     'use server';
 
     try {
+        // Validate tax amounts match (GAAP/IFRS compliance)
+        const expectedTotal = data.subtotal + data.taxTotal;
+        if (data.totalAmount !== expectedTotal) {
+            throw new Error(
+                `Tax calculation mismatch: Total (${data.totalAmount}) must equal Subtotal (${data.subtotal}) + Tax (${data.taxTotal})`
+            );
+        }
+
+        // Check period lock for the new date (GAAP/IFRS compliance)
+        await checkPeriodLock(data.date);
+
         return await db.transaction(async (tx) => {
             // 1. Verify invoice exists and is editable
             const existingInvoiceResults = await tx.select().from(invoices).where(eq(invoices.id, invoiceId)).limit(1);
@@ -495,7 +541,7 @@ export async function updateInvoice(invoiceId: number, data: z.infer<typeof crea
 
             await tx.insert(journalEntryLines).values({
                 journalEntryId: je.id,
-                accountCode: '1200',
+                accountCode: ACCOUNTS.AR,
                 debit: data.totalAmount,
                 credit: 0,
                 description: `Invoice #${data.invoiceNumber} - Customer #${data.customerId}`,
@@ -503,10 +549,56 @@ export async function updateInvoice(invoiceId: number, data: z.infer<typeof crea
 
             await tx.insert(journalEntryLines).values({
                 journalEntryId: je.id,
-                accountCode: '4100',
+                accountCode: ACCOUNTS.SALES_INCOME,
                 debit: 0,
                 credit: data.subtotal,
                 description: `Revenue - Invoice #${data.invoiceNumber}`,
+            });
+
+            // Credit Sales Tax Payable (2200) - GAAP/IFRS Compliance
+            if (data.taxTotal > 0) {
+                await tx.insert(journalEntryLines).values({
+                    journalEntryId: je.id,
+                    accountCode: ACCOUNTS.SALES_TAX,
+                    debit: 0,
+                    credit: data.taxTotal,
+                    description: `Sales Tax - Invoice #${data.invoiceNumber}`,
+                });
+            }
+
+            // Audit log after successful transaction
+            await logAuditEvent({
+                entity: 'invoice',
+                entityId: invoiceId.toString(),
+                action: 'UPDATE',
+                changes: {
+                    before: {
+                        invoiceNumber: existingInvoice.invoiceNumber,
+                        customerId: existingInvoice.customerId,
+                        totalAmount: existingInvoice.totalAmount,
+                        date: existingInvoice.date
+                    },
+                    after: {
+                        invoiceNumber: data.invoiceNumber,
+                        customerId: data.customerId,
+                        totalAmount: data.totalAmount,
+                        date: data.date
+                    },
+                    fields: getChangedFields(
+                        {
+                            invoiceNumber: existingInvoice.invoiceNumber,
+                            customerId: existingInvoice.customerId,
+                            totalAmount: existingInvoice.totalAmount,
+                            date: existingInvoice.date.toString()
+                        },
+                        {
+                            invoiceNumber: data.invoiceNumber,
+                            customerId: data.customerId,
+                            totalAmount: data.totalAmount,
+                            date: data.date.toString()
+                        }
+                    )
+                }
             });
 
             try { revalidatePath('/sales/customers'); } catch (e) { }
@@ -537,6 +629,9 @@ export async function deleteInvoice(invoiceId: number) {
             if (!invoice) {
                 return { success: false, error: 'Invoice not found' };
             }
+
+            // Check period lock - cannot delete invoices in closed periods (GAAP/IFRS compliance)
+            await checkPeriodLock(invoice.date);
 
             // 2. Reverse inventory consumption (restore to layers)
             const lines = await tx.select().from(invoiceLines).where(eq(invoiceLines.invoiceId, invoiceId));
@@ -660,6 +755,21 @@ export async function receivePayment(data: z.infer<typeof createPaymentSchema>) 
                 debit: 0,
                 credit: validated.amount,
                 description: `Payment Appl - Customer #${validated.customerId}`,
+            });
+
+            // Audit log after successful payment
+            await logAuditEvent({
+                entity: 'payment',
+                entityId: newPayment.id.toString(),
+                action: 'CREATE',
+                changes: {
+                    after: {
+                        customerId: validated.customerId,
+                        amount: validated.amount,
+                        paymentMethod: validated.paymentMethod,
+                        reference: validated.reference
+                    }
+                }
             });
 
             try { revalidatePath('/sales/customers'); } catch (e) { }

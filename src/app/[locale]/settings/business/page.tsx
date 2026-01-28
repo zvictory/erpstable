@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useBusinessType } from '@/contexts/BusinessContext';
 import { BUSINESS_TYPES, MODULES, ModuleKey } from '@/config/modules';
 import { switchBusinessType, updateEnabledModules } from '@/app/actions/business';
@@ -22,6 +23,8 @@ function WarningModal({
   onCancel,
   isLoading,
 }: WarningModalProps) {
+  const t = useTranslations('settings.business.switch_modal');
+
   if (!isOpen) return null;
 
   return (
@@ -32,23 +35,22 @@ function WarningModal({
             <AlertTriangle className="w-6 h-6 text-destructive" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Switch Business Type?</h2>
+            <h2 className="text-lg font-semibold">{t('title')}</h2>
             <p className="text-muted-foreground text-sm mt-1">
-              Changing your business type will affect which modules are visible in the application.
+              {t('description')}
             </p>
           </div>
         </div>
 
         <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded p-4 mb-6">
           <p className="text-sm text-amber-900 dark:text-amber-100">
-            <strong>Warning:</strong> Data from disabled modules won't be visible, but won't be deleted.
-            You can switch back anytime.
+            {t('warning')}
           </p>
         </div>
 
         <div className="mb-6 p-4 rounded bg-secondary/30">
           <p className="text-sm">
-            <strong>New business type:</strong> {businessTypeName}
+            <strong>{t('new_type_label')}</strong> {businessTypeName}
           </p>
           <p className="text-sm text-muted-foreground mt-2">
             {BUSINESS_TYPES[businessTypeName as keyof typeof BUSINESS_TYPES]?.description}
@@ -61,7 +63,7 @@ function WarningModal({
             disabled={isLoading}
             className="px-4 py-2 border border-muted rounded-lg hover:bg-accent transition-colors disabled:opacity-50"
           >
-            Cancel
+            {t('cancel')}
           </button>
           <button
             onClick={onConfirm}
@@ -71,10 +73,10 @@ function WarningModal({
             {isLoading ? (
               <>
                 <Loader2 size={18} className="animate-spin" />
-                Switching...
+                {t('confirming')}
               </>
             ) : (
-              'Switch Business Type'
+              t('confirm')
             )}
           </button>
         </div>
@@ -84,6 +86,11 @@ function WarningModal({
 }
 
 export default function BusinessSettingsPage() {
+  const t = useTranslations('settings.business');
+  const tMessages = useTranslations('settings.business.messages');
+  const tModules = useTranslations('settings.business.module_management');
+  const tOther = useTranslations('settings.business.other_types');
+  const tInfo = useTranslations('settings.business.info_box');
   const router = useRouter();
   const { businessType, enabledModules, isLoading, setBusinessType, setEnabledModules } =
     useBusinessType();
@@ -119,11 +126,11 @@ export default function BusinessSettingsPage() {
 
       if (result.success) {
         setBusinessType(selectedBusinessType as any);
-        setMessage({ type: 'success', text: result.message || 'Business type updated' });
+        setMessage({ type: 'success', text: result.message || tMessages('type_updated') });
         setShowWarningModal(false);
         router.refresh();
       } else {
-        setMessage({ type: 'error', text: result.error || 'Failed to switch business type' });
+        setMessage({ type: 'error', text: result.error || tMessages('type_update_failed') });
       }
     } catch (error) {
       setMessage({
@@ -149,9 +156,9 @@ export default function BusinessSettingsPage() {
 
       if (result.success) {
         setEnabledModules(enabledModulesList);
-        setMessage({ type: 'success', text: 'Modules updated successfully' });
+        setMessage({ type: 'success', text: tMessages('modules_updated') });
       } else {
-        setMessage({ type: 'error', text: result.error || 'Failed to update modules' });
+        setMessage({ type: 'error', text: result.error || tMessages('modules_update_failed') });
         // Revert toggle
         setModuleToggles({ ...moduleToggles });
       }
@@ -172,7 +179,7 @@ export default function BusinessSettingsPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
-          <p className="text-muted-foreground">Loading settings...</p>
+          <p className="text-muted-foreground">{t('loading')}</p>
         </div>
       </div>
     );
@@ -184,9 +191,9 @@ export default function BusinessSettingsPage() {
     <div className="max-w-4xl mx-auto space-y-8 py-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold mb-2">Business Settings</h1>
+        <h1 className="text-3xl font-bold mb-2">{t('page_title')}</h1>
         <p className="text-muted-foreground">
-          Configure your business type and manage which modules are enabled
+          {t('page_subtitle')}
         </p>
       </div>
 
@@ -206,7 +213,7 @@ export default function BusinessSettingsPage() {
       {/* Current Business Type */}
       {currentConfig && (
         <div className="rounded-lg border p-8 bg-card">
-          <h2 className="text-xl font-semibold mb-6">Current Business Type</h2>
+          <h2 className="text-xl font-semibold mb-6">{t('current_type.heading')}</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -220,7 +227,7 @@ export default function BusinessSettingsPage() {
             </div>
 
             <div className="bg-secondary/30 rounded-lg p-4">
-              <p className="text-sm font-medium mb-3 uppercase tracking-wide">Enabled Modules</p>
+              <p className="text-sm font-medium mb-3 uppercase tracking-wide">{tModules('enabled_label')}</p>
               <div className="space-y-2">
                 {enabledModules.map((module) => (
                   <div key={module} className="flex items-center gap-2 text-sm">
@@ -237,17 +244,17 @@ export default function BusinessSettingsPage() {
             className="mt-6 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-amber-50 rounded-lg transition-colors font-medium flex items-center gap-2"
           >
             <AlertTriangle size={18} />
-            Switch Business Type
+            {t('current_type.switch_button')}
           </button>
         </div>
       )}
 
       {/* Module Management */}
       <div className="rounded-lg border p-8 bg-card">
-        <h2 className="text-xl font-semibold mb-6">Module Management</h2>
+        <h2 className="text-xl font-semibold mb-6">{tModules('heading')}</h2>
 
         <p className="text-muted-foreground text-sm mb-6">
-          Finance is always enabled. Toggle other modules based on your business needs.
+          {tModules('description')}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -264,7 +271,7 @@ export default function BusinessSettingsPage() {
                       <h3 className="font-medium">{module.label}</h3>
                       {isFinance && (
                         <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
-                          Required
+                          {tModules('required_badge')}
                         </span>
                       )}
                     </div>
@@ -290,7 +297,7 @@ export default function BusinessSettingsPage() {
 
       {/* Other Business Types */}
       <div className="rounded-lg border p-8 bg-card">
-        <h2 className="text-xl font-semibold mb-6">Other Business Types</h2>
+        <h2 className="text-xl font-semibold mb-6">{tOther('heading')}</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.entries(BUSINESS_TYPES)
@@ -311,7 +318,7 @@ export default function BusinessSettingsPage() {
                   disabled={isUpdating}
                   className="w-full px-4 py-2 border border-primary text-primary hover:bg-primary/10 rounded-lg transition-colors disabled:opacity-50 text-sm font-medium"
                 >
-                  Switch to {config.label}
+                  {tOther('switch_to', { label: config.label })}
                 </button>
               </div>
             ))}
@@ -320,12 +327,13 @@ export default function BusinessSettingsPage() {
 
       {/* Info Box */}
       <div className="rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 p-6">
-        <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">ℹ️ About Business Types</h3>
-        <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-2">
-          <li>• Switching business types changes which modules are visible in the application</li>
-          <li>• Your data is never deleted when you disable modules or switch business types</li>
-          <li>• Finance module is always enabled regardless of business type</li>
-          <li>• You can switch back to a previous business type anytime</li>
+        <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">{tInfo('title')}</h3>
+        <p className="text-sm text-blue-800 dark:text-blue-200 mb-2">{tInfo('description')}</p>
+        <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1 ml-4">
+          <li>{tInfo('point1')}</li>
+          <li>{tInfo('point2')}</li>
+          <li>{tInfo('point3')}</li>
+          <li>{tInfo('point4')}</li>
         </ul>
       </div>
 

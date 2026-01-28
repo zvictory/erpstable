@@ -5,12 +5,11 @@ import { getAccountBalances } from '@/app/actions/ledger';
 import { formatNumber } from '@/lib/format';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, ShieldCheck } from 'lucide-react';
 import AccountLedger from './AccountLedger';
 import { repostMissingGL } from '@/app/actions/integrity';
-import { useToast } from '@/hooks/use-toast'; // Assuming hook exists, or alert
 
 interface AccountSummary {
     code: string;

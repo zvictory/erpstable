@@ -11,7 +11,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
     return (
-        <div className="flex min-h-screen bg-slate-50/50">
+        <div className="flex min-h-screen bg-slate-50">
             {/* Sidebar */}
             <Sidebar
                 isCollapsed={isSidebarCollapsed}
@@ -25,7 +25,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                     setIsPasswordModalOpen={setIsPasswordModalOpen}
                 />
 
-                <main className="flex-1 p-6 md:p-8 overflow-x-hidden">
+                <main className="flex-1 p-6 md:p-8 overflow-x-hidden bg-slate-50">
                     <div className="max-w-[1600px] mx-auto w-full">
                         {children}
                     </div>

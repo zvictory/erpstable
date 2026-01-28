@@ -90,7 +90,7 @@ export function DialogContent({
             {/* Content */}
             <div
                 className={cn(
-                    "relative z-50 grid w-full max-w-lg gap-4 border bg-background p-6 shadow-lg duration-200 sm:rounded-lg md:w-full",
+                    "relative z-50 grid w-full max-w-lg gap-4 border bg-white p-6 shadow-lg duration-200 sm:rounded-lg md:w-full",
                     className
                 )}
             >
@@ -134,5 +134,35 @@ export function DialogTitle({
         >
             {children}
         </h3>
+    );
+}
+
+export function DialogDescription({
+    className,
+    children,
+    ...props
+}: React.HTMLAttributes<HTMLParagraphElement>) {
+    return (
+        <p
+            className={cn("text-sm text-slate-500", className)}
+            {...props}
+        >
+            {children}
+        </p>
+    );
+}
+
+export function DialogFooter({
+    className,
+    children,
+    ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+    return (
+        <div
+            className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)}
+            {...props}
+        >
+            {children}
+        </div>
     );
 }

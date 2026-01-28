@@ -54,7 +54,7 @@ export function SheetContent({
     if (!ctx || !ctx.isOpen) return null;
 
     const sideClasses = {
-        right: "inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-2xl translate-x-0",
+        right: "inset-y-0 right-0 h-full w-[90%] border-l sm:max-w-6xl translate-x-0",
         left: "inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm -translate-x-full",
         top: "inset-x-0 top-0 h-1/3 border-b -translate-y-full",
         bottom: "inset-x-0 bottom-0 h-1/3 border-t translate-y-full",

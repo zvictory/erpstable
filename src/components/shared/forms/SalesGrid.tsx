@@ -1,10 +1,13 @@
 'use client';
 
-import React, { useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { useFormContext, useFieldArray, useWatch, Control } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 import { Trash2, Plus } from 'lucide-react';
 import { formatNumber } from '@/lib/format';
 import { StockValidationBadge } from '@/components/sales/StockValidationBadge';
+import { InlineStockWarning } from '@/components/sales/InlineStockWarning';
+import { ConfirmDelete } from '@/components/ui/ConfirmDelete';
 
 /**
  * Type for form data with items
@@ -17,6 +20,7 @@ interface FormDataWithItems {
     uom?: string;
     unitPrice: number;
     amount: number;
+    warehouseId?: number; // NEW - optional for backward compatibility
   }>;
 }
 
@@ -56,10 +60,16 @@ interface SalesGridProps {
         qtyOnHand?: number;
         itemClass?: string;
     }[];
+    warehouses?: { id: number; name: string; code: string }[]; // NEW
     enableStockValidation?: boolean;
 }
 
-export default function SalesGrid({ items: availableItems, enableStockValidation = false }: SalesGridProps) {
+export default function SalesGrid({ items: availableItems, warehouses = [], enableStockValidation = false }: SalesGridProps) {
+    const t = useTranslations('sales.grid');
+    const tHeaders = useTranslations('sales.grid.headers');
+    const tPlaceholders = useTranslations('sales.grid.placeholders');
+    const tCommon = useTranslations('common');
+
     const { register, control, setValue, setFocus, getValues, formState: { errors } } = useFormContext<any>();
 
     const { fields, append, remove } = useFieldArray({
@@ -68,6 +78,9 @@ export default function SalesGrid({ items: availableItems, enableStockValidation
     });
 
     const { subtotal, taxAmount, grandTotal, items: watchedItems } = useSalesGridMath(control);
+
+    // State for delete confirmation
+    const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
     // Row Update: Use useEffect to update the 'amount' field for each row whenever Qty/Rate changes
     useEffect(() => {
@@ -138,11 +151,14 @@ export default function SalesGrid({ items: availableItems, enableStockValidation
                     <thead className="bg-slate-50">
                         <tr>
                             <th className="w-12 px-4 py-3 border-b border-slate-200 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">#</th>
-                            <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">Item</th>
-                            <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">Description</th>
-                            <th className="w-28 px-4 py-3 text-right text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">Quantity</th>
-                            <th className="w-36 px-4 py-3 text-right text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">Unit Price</th>
-                            <th className="w-36 px-4 py-3 text-right text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">Amount</th>
+                            <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">{tHeaders('item')}</th>
+                            <th className="px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">{tHeaders('description')}</th>
+                            {warehouses.length > 0 && (
+                                <th className="w-32 px-4 py-3 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">{tHeaders('warehouse')}</th>
+                            )}
+                            <th className="w-28 px-4 py-3 text-right text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">{tHeaders('quantity')}</th>
+                            <th className="w-36 px-4 py-3 text-right text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">{tHeaders('unit_price')}</th>
+                            <th className="w-36 px-4 py-3 text-right text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">{tHeaders('amount')}</th>
                             <th className="w-12 px-4 py-3 border-b border-slate-200"></th>
                         </tr>
                     </thead>
@@ -167,9 +183,9 @@ export default function SalesGrid({ items: availableItems, enableStockValidation
                                         <select
                                             {...register(`items.${index}.itemId`)}
                                             onChange={(e) => handleItemChange(index, e.target.value)}
-                                            className="w-full bg-transparent border-none focus:ring-0 text-sm font-semibold text-slate-900 outline-none p-0 appearance-none cursor-pointer"
+                                            className="w-full bg-transparent border-0 border-b border-transparent group-hover:border-slate-200 focus:border-green-600 py-1 text-[13px] font-semibold outline-none transition-all appearance-none cursor-pointer"
                                         >
-                                            <option value="">Select Item...</option>
+                                            <option value="">{tPlaceholders('select_item')}</option>
                                             {availableItems
                                                 .filter(i => i.status === 'ACTIVE' || String(i.id) === String(watchedItems[index]?.itemId))
                                                 .map(i => (
@@ -183,11 +199,26 @@ export default function SalesGrid({ items: availableItems, enableStockValidation
                                         <input
                                             type="text"
                                             {...register(`items.${index}.description`)}
-                                            placeholder="Description..."
-                                            className="w-full bg-transparent border-none focus:ring-0 text-sm text-slate-600 outline-none p-0 placeholder-slate-300"
+                                            placeholder={tPlaceholders('description')}
+                                            className="w-full bg-transparent border-0 border-b border-transparent group-hover:border-slate-200 focus:border-green-600 py-1 text-[13px] text-slate-600 outline-none transition-all placeholder-slate-300"
                                         />
                                     </td>
-                                    <td className="px-4 py-3">
+                                    {/* Warehouse Column */}
+                                    {warehouses.length > 0 && (
+                                        <td className="px-4 py-3">
+                                            <select
+                                                {...register(`items.${index}.warehouseId`, { valueAsNumber: true })}
+                                                className="w-full bg-transparent border-0 border-b border-transparent group-hover:border-slate-200 focus:border-green-600 py-1 text-[13px] outline-none transition-all appearance-none cursor-pointer"
+                                                defaultValue={warehouses.find(w => w.code === 'MAIN')?.id || warehouses[0]?.id}
+                                            >
+                                                <option value="">{tPlaceholders('select_warehouse')}</option>
+                                                {warehouses.map(wh => (
+                                                    <option key={wh.id} value={wh.id}>{wh.code}</option>
+                                                ))}
+                                            </select>
+                                        </td>
+                                    )}
+                                    <td className="px-4 py-3 relative">
                                         <input
                                             type="number"
                                             step="any"
@@ -199,9 +230,19 @@ export default function SalesGrid({ items: availableItems, enableStockValidation
                                                 }
                                             })}
                                             onKeyDown={(e) => handleKeyDown(e, index, 'quantity')}
-                                            className="w-full bg-transparent border-none focus:ring-0 text-sm text-right font-bold text-slate-900 outline-none p-0"
+                                            className="w-full bg-transparent border-0 border-b border-transparent group-hover:border-slate-200 focus:border-green-600 py-1 text-[13px] text-right font-numbers outline-none transition-all"
                                             placeholder="0.00"
                                         />
+                                        {/* Inline Stock Warning */}
+                                        {enableStockValidation && selectedItem && qty > 0 && (
+                                            <InlineStockWarning
+                                                itemId={selectedItem.id}
+                                                requestedQty={qty}
+                                                availableQty={selectedItem.quantityOnHand || selectedItem.qtyOnHand || 0}
+                                                itemClass={selectedItem.itemClass || 'PRODUCT'}
+                                                warehouseId={item?.warehouseId}
+                                            />
+                                        )}
                                     </td>
                                     <td className="px-4 py-3">
                                         <input
@@ -228,7 +269,7 @@ export default function SalesGrid({ items: availableItems, enableStockValidation
                                                 e.target.select();
                                             }}
                                             onKeyDown={(e) => handleKeyDown(e, index, 'unitPrice')}
-                                            className="w-full bg-transparent border-none focus:ring-0 text-sm text-right font-bold text-slate-900 outline-none p-0"
+                                            className="w-full bg-transparent border-0 border-b border-transparent group-hover:border-slate-200 focus:border-green-600 py-1 text-[13px] text-right font-numbers outline-none transition-all"
                                             placeholder="0.00"
                                         />
                                     </td>
@@ -240,7 +281,7 @@ export default function SalesGrid({ items: availableItems, enableStockValidation
                                     <td className="px-4 py-3 text-right">
                                         <button
                                             type="button"
-                                            onClick={() => remove(index)}
+                                            onClick={() => setDeleteIndex(index)}
                                             className="p-1.5 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition"
                                         >
                                             <Trash2 size={14} />
@@ -251,7 +292,7 @@ export default function SalesGrid({ items: availableItems, enableStockValidation
                                 {/* Stock Validation Row */}
                                 {shouldShowValidation && (
                                     <tr className="border-t-0">
-                                        <td colSpan={7} className="px-4 pb-3 pt-1 bg-slate-50/30">
+                                        <td colSpan={warehouses.length > 0 ? 8 : 7} className="px-4 pb-3 pt-1 bg-slate-50/30">
                                             <StockValidationBadge
                                                 itemId={selectedItem.id}
                                                 requestedQty={qty}
@@ -277,7 +318,7 @@ export default function SalesGrid({ items: availableItems, enableStockValidation
                         <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
                             <Plus size={14} />
                         </div>
-                        Add line
+                        {t('add_line')}
                     </button>
                 </div>
             </div>
@@ -286,7 +327,7 @@ export default function SalesGrid({ items: availableItems, enableStockValidation
             <div className="flex justify-end pr-4">
                 <div className="w-80">
                     <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Total</span>
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{tCommon('total')}</span>
                         <div className="text-right">
                             <span className="text-xl font-black text-slate-900 tracking-tighter">
                                 {formatNumber(grandTotal)} <span className="text-xs text-slate-400 ml-1">UZS</span>
@@ -295,6 +336,20 @@ export default function SalesGrid({ items: availableItems, enableStockValidation
                     </div>
                 </div>
             </div>
+
+            {/* Delete Confirmation Dialog */}
+            <ConfirmDelete
+                open={deleteIndex !== null}
+                onOpenChange={() => setDeleteIndex(null)}
+                onConfirm={() => {
+                    if (deleteIndex !== null) {
+                        remove(deleteIndex);
+                        setDeleteIndex(null);
+                    }
+                }}
+                title={t('delete_confirmation.title')}
+                description={t('delete_confirmation.description')}
+            />
         </div>
     );
 }

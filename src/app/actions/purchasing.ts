@@ -17,6 +17,8 @@ import { auth } from '@/auth';
 import { UserRole } from '@/auth.config';
 import { getPreferences } from './preferences';
 import { getPreferenceBoolean, getPreferenceInteger } from '@/lib/preferences';
+import { generateInspection } from './quality';
+import { logAuditEvent } from '@/lib/audit';
 
 // --- Validation Schemas ---
 const vendorSchema = z.object({
@@ -521,6 +523,10 @@ export async function createVendorBill(data: any) {
             if (!itemData) throw new Error(`Item ${item.itemId} not found`);
         }
 
+        // Variables to capture for post-transaction QC inspection generation
+        let billId = 0;
+        const inspectionsToGenerate: Array<{itemId: number; batchNumber: string; quantity: number}> = [];
+
         await db.transaction(async (tx) => {
             // 1. Create Bill
             const [bill] = await tx.insert(vendorBills).values({
@@ -532,6 +538,8 @@ export async function createVendorBill(data: any) {
                 status: 'OPEN',
                 approvalStatus: requiresApproval ? 'PENDING' : 'NOT_REQUIRED',
             }).returning();
+
+            billId = bill.id;
 
             // 2. Insert Bill Lines
             for (let i = 0; i < val.items.length; i++) {
@@ -577,15 +585,24 @@ export async function createVendorBill(data: any) {
                     const qty = parseFloat(item.quantity as any) || 0;
                     const price = parseFloat(item.unitPrice as any) || 0;
                     const unitCostTiyin = Math.round(price * 100);
+                    const batchNumber = `BILL-${bill.id}-${item.itemId}`;
 
                     await tx.insert(inventoryLayers).values({
                         itemId: Number(item.itemId),
-                        batchNumber: `BILL-${bill.id}-${item.itemId}`,
+                        batchNumber: batchNumber,
                         initialQty: qty,
                         remainingQty: qty,
                         unitCost: unitCostTiyin,
                         receiveDate: val.transactionDate,
                         isDepleted: false,
+                        qcStatus: 'PENDING', // Hold until QC approval
+                    });
+
+                    // Capture for QC inspection generation
+                    inspectionsToGenerate.push({
+                        itemId: Number(item.itemId),
+                        batchNumber: batchNumber,
+                        quantity: qty,
                     });
                 }
 
@@ -687,6 +704,19 @@ export async function createVendorBill(data: any) {
                 console.log('⏸️  GL posting skipped - Bill requires approval');
             }
         });
+
+        // Generate QC inspections after transaction completes (only if layers were created)
+        if (inspectionsToGenerate.length > 0) {
+            for (const inspection of inspectionsToGenerate) {
+                await generateInspection({
+                    sourceType: 'PURCHASE_RECEIPT',
+                    sourceId: billId,
+                    batchNumber: inspection.batchNumber,
+                    itemId: inspection.itemId,
+                    quantity: inspection.quantity,
+                });
+            }
+        }
 
         revalidatePath('/purchasing/vendors');
         return { success: true };
@@ -862,6 +892,7 @@ export async function updateVendorBill(billId: number, data: any) {
                     unitCost: unitCostTiyin,
                     receiveDate: val.transactionDate,
                     isDepleted: false,
+                    qcStatus: 'PENDING', // Hold until QC approval
                 });
             }
             console.log('✅ New inventory layers created');
@@ -1539,6 +1570,9 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
     try {
         console.log(`📋 Processing bill ${action.toLowerCase()}: ${billId}`);
 
+        // Variables to capture for post-transaction QC inspection generation
+        const inspectionsToGenerate: Array<{itemId: number; batchNumber: string; quantity: number}> = [];
+
         // 1. Require ADMIN role
         const session = await auth();
         if (!session?.user) {
@@ -1592,14 +1626,24 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
                 const billLines = await tx.select().from(vendorBillLines).where(eq(vendorBillLines.billId, billId));
 
                 for (const line of billLines) {
+                    const batchNumber = `BILL-${billId}-${line.itemId}`;
+
                     await tx.insert(inventoryLayers).values({
                         itemId: line.itemId,
-                        batchNumber: `BILL-${billId}-${line.itemId}`,
+                        batchNumber: batchNumber,
                         initialQty: line.quantity,
                         remainingQty: line.quantity,
                         unitCost: line.unitPrice,
                         receiveDate: bill.billDate,
                         isDepleted: false,
+                        qcStatus: 'PENDING', // Hold until QC approval
+                    });
+
+                    // Capture for QC inspection generation
+                    inspectionsToGenerate.push({
+                        itemId: line.itemId,
+                        batchNumber: batchNumber,
+                        quantity: line.quantity,
                     });
                 }
 
@@ -1730,6 +1774,33 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
 
             throw new Error(`Invalid action: ${action}`);
         });
+
+        // Generate QC inspections after transaction completes (only for approved bills)
+        if (result.success && action === 'APPROVE' && inspectionsToGenerate.length > 0) {
+            for (const inspection of inspectionsToGenerate) {
+                await generateInspection({
+                    sourceType: 'PURCHASE_RECEIPT',
+                    sourceId: billId,
+                    batchNumber: inspection.batchNumber,
+                    itemId: inspection.itemId,
+                    quantity: inspection.quantity,
+                });
+            }
+        }
+
+        // Audit log after successful approval/rejection
+        if (result.success) {
+            await logAuditEvent({
+                entity: 'vendor_bill',
+                entityId: billId.toString(),
+                action: action === 'APPROVE' ? 'APPROVE' : 'REJECT',
+                changes: {
+                    before: { approvalStatus: 'PENDING' },
+                    after: { approvalStatus: action === 'APPROVE' ? 'APPROVED' : 'REJECTED' },
+                    fields: ['approvalStatus', 'approvedBy', 'approvedAt']
+                }
+            });
+        }
 
         // 8. Revalidate paths
         revalidatePath('/purchasing/vendors');

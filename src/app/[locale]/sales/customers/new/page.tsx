@@ -1,10 +1,14 @@
 import { redirect } from 'next/navigation';
 import CustomerForm from '@/components/sales/CustomerForm';
 import { createCustomer } from '@/app/actions/sales';
+import { getTranslations } from 'next-intl/server';
 
-export const metadata = {
-    title: 'New Customer',
-};
+export async function generateMetadata() {
+    const t = await getTranslations('sales.customers');
+    return {
+        title: t('new_customer_title'),
+    };
+}
 
 export default async function NewCustomerPage({
     params: { locale }

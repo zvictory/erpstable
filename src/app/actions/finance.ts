@@ -3,16 +3,21 @@
 
 import { db } from '../../../db';
 import { journalEntries, journalEntryLines, systemSettings, auditLogs, glAccounts, vendorBills, vendors } from '../../../db/schema';
-import { eq, sql, sum, or, like, and, ne, inArray } from 'drizzle-orm';
+import { eq, sql, sum, or, like, and, ne, inArray, gte, lte, desc } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+import { applyLowerOfCostOrNRV } from './inventory-valuation';
+import { auth } from '../../../src/auth';
+import { UserRole } from '../../../src/auth.config';
+import { z } from 'zod';
 
 // Mock function for getting user - in real app use auth()
 const getCurrentUser = () => "admin-user";
 
 /**
  * Ensures the transaction date is not in a closed period.
+ * Exported for use in sales, purchasing, and other modules.
  */
-async function checkPeriodLock(date: Date) {
+export async function checkPeriodLock(date: Date) {
     const results = await db.select().from(systemSettings).where(eq(systemSettings.key, 'financials')).limit(1);
     const settings = results[0];
 
@@ -72,8 +77,21 @@ export async function createJournalEntry(
 /**
  * Closes the Fiscal Period up to the given date.
  * CRITICAL: Checks Trial Balance (Sum Debits = Sum Credits) before locking.
+ * GAAP/IFRS: Applies Lower of Cost or NRV before closing.
  */
 export async function closeFiscalPeriod(closingDate: Date) {
+    // 0. Apply Lower of Cost or NRV (GAAP/IFRS Compliance)
+    console.log('📊 Applying Lower of Cost or NRV adjustments...');
+    const nrvResult = await applyLowerOfCostOrNRV();
+    if (!nrvResult.success) {
+        throw new Error(`Failed to apply NRV adjustments: ${nrvResult.message}`);
+    }
+    if (nrvResult.writeDowns.length > 0) {
+        console.log(`✅ Applied ${nrvResult.writeDowns.length} NRV write-down(s): ${nrvResult.message}`);
+    } else {
+        console.log('✅ No NRV adjustments needed');
+    }
+
     return await db.transaction(async (tx) => {
         // 1. Trial Balance Check (Global Level)
         // In a pristine Double-Entry system, Sum(Debit) should ALWAYS equal Sum(Credit) across all lines.
@@ -109,11 +127,18 @@ export async function closeFiscalPeriod(closingDate: Date) {
 
         // 3. Log Action
         await tx.insert(auditLogs).values({
+            entity: 'period_lock',
+            entityId: closingDate.toISOString().split('T')[0],
+            action: 'CREATE',
+            userId: null,
+            userName: 'System',
+            userRole: 'SYSTEM',
+            changes: {
+                after: { event: 'Period Closed', date: closingDate }
+            },
+            // Legacy fields
             tableName: 'system_settings',
-            recordId: 1, // Singleton
-            action: 'CLOSE_PERIOD',
-            userId: getCurrentUser(),
-            changes: JSON.stringify({ event: 'Period Closed', date: closingDate }),
+            recordId: 1,
         });
 
         try { revalidatePath('/finance/settings'); } catch (e) { }
@@ -123,6 +148,363 @@ export async function closeFiscalPeriod(closingDate: Date) {
 
 export async function getGlAccounts() {
     return await db.select().from(glAccounts).orderBy(glAccounts.code);
+}
+
+// --- Internal Transfer Actions ---
+
+/**
+ * Generate sequential transfer reference number
+ * Format: TRF-YYYY-NNN
+ */
+async function generateTransferReference(): Promise<string> {
+    const currentYear = new Date().getFullYear();
+    const prefix = `TRF-${currentYear}-`;
+
+    const lastTransfer = await db
+        .select()
+        .from(journalEntries)
+        .where(
+            and(
+                like(journalEntries.reference, `${prefix}%`),
+                eq(journalEntries.entryType, 'TRANSFER')
+            )
+        )
+        .orderBy(desc(journalEntries.reference))
+        .limit(1);
+
+    if (lastTransfer.length === 0) {
+        return `${prefix}001`;
+    }
+
+    const lastNumber = parseInt(
+        lastTransfer[0].reference!.substring(prefix.length),
+        10
+    );
+    return `${prefix}${String(lastNumber + 1).padStart(3, '0')}`;
+}
+
+/**
+ * Create internal transfer between cash/bank accounts
+ * Records as journal entry with entryType = 'TRANSFER'
+ */
+const createInternalTransferSchema = z.object({
+    fromAccountCode: z.string().min(1),
+    toAccountCode: z.string().min(1),
+    amount: z.number().positive(),
+    date: z.date(),
+    memo: z.string().min(1),
+}).refine(
+    (data) => data.fromAccountCode !== data.toAccountCode,
+    { message: "Cannot transfer to the same account" }
+);
+
+export async function createInternalTransfer(input: unknown): Promise<{
+    success: boolean;
+    error?: string;
+    journalEntryId?: number;
+}> {
+    // 1. Auth check
+    const session = await auth();
+    if (!session?.user) {
+        return { success: false, error: 'Not authenticated' };
+    }
+
+    const userRole = (session.user as any)?.role as UserRole;
+    if (userRole !== UserRole.ADMIN && userRole !== UserRole.ACCOUNTANT) {
+        return { success: false, error: 'Insufficient permissions' };
+    }
+
+    // 2. Validate input
+    const validated = createInternalTransferSchema.parse(input);
+
+    try {
+        // 3. Check both accounts exist and are assets
+        const accounts = await db
+            .select()
+            .from(glAccounts)
+            .where(
+                and(
+                    inArray(glAccounts.code, [
+                        validated.fromAccountCode,
+                        validated.toAccountCode,
+                    ]),
+                    eq(glAccounts.type, 'Asset'),
+                    eq(glAccounts.isActive, true)
+                )
+            );
+
+        if (accounts.length !== 2) {
+            return {
+                success: false,
+                error: 'One or both accounts not found or not active',
+            };
+        }
+
+        const fromAccount = accounts.find(
+            (a) => a.code === validated.fromAccountCode
+        );
+        const toAccount = accounts.find(
+            (a) => a.code === validated.toAccountCode
+        );
+
+        // 4. Check sufficient balance
+        if (fromAccount!.balance < validated.amount) {
+            return {
+                success: false,
+                error: `Insufficient balance. Current: ${(fromAccount!.balance / 100).toLocaleString()} UZS, Required: ${(validated.amount / 100).toLocaleString()} UZS`,
+            };
+        }
+
+        // 5. Check period lock
+        try {
+            await checkPeriodLock(validated.date);
+        } catch (lockError: any) {
+            return { success: false, error: lockError.message };
+        }
+
+        // 6. Generate transfer reference
+        const reference = await generateTransferReference();
+
+        // 7. Create journal entry
+        const journalEntry = await createJournalEntry(
+            validated.date,
+            validated.memo,
+            [
+                {
+                    accountCode: validated.toAccountCode,
+                    debit: validated.amount,
+                    credit: 0,
+                    description: `Transfer from ${fromAccount!.name}`,
+                },
+                {
+                    accountCode: validated.fromAccountCode,
+                    debit: 0,
+                    credit: validated.amount,
+                    description: `Transfer to ${toAccount!.name}`,
+                },
+            ],
+            reference
+        );
+
+        // 8. Update entryType to TRANSFER
+        await db
+            .update(journalEntries)
+            .set({ entryType: 'TRANSFER', transactionId: `transfer-${journalEntry.id}` })
+            .where(eq(journalEntries.id, journalEntry.id));
+
+        revalidatePath('/finance');
+        return { success: true, journalEntryId: journalEntry.id };
+    } catch (error: any) {
+        console.error('Transfer error:', error);
+        return { success: false, error: error.message || 'Failed to create transfer' };
+    }
+}
+
+/**
+ * Get transfer history with optional filters
+ */
+export async function getTransferHistory(filters?: {
+    accountCode?: string;
+    dateFrom?: Date;
+    dateTo?: Date;
+    limit?: number;
+}) {
+    const session = await auth();
+    if (!session?.user) {
+        throw new Error('Not authenticated');
+    }
+
+    const conditions: any[] = [eq(journalEntries.entryType, 'TRANSFER')];
+
+    if (filters?.dateFrom) {
+        conditions.push(gte(journalEntries.date, filters.dateFrom));
+    }
+    if (filters?.dateTo) {
+        conditions.push(lte(journalEntries.date, filters.dateTo));
+    }
+
+    const transfers = await db
+        .select({
+            id: journalEntries.id,
+            date: journalEntries.date,
+            reference: journalEntries.reference,
+            description: journalEntries.description,
+        })
+        .from(journalEntries)
+        .where(and(...conditions))
+        .orderBy(desc(journalEntries.date))
+        .limit(filters?.limit || 50);
+
+    // For each transfer, get the two lines to determine from/to accounts
+    const transfersWithDetails = await Promise.all(
+        transfers.map(async (transfer) => {
+            const lines = await db
+                .select({
+                    accountCode: journalEntryLines.accountCode,
+                    debit: journalEntryLines.debit,
+                    credit: journalEntryLines.credit,
+                })
+                .from(journalEntryLines)
+                .where(eq(journalEntryLines.journalEntryId, transfer.id));
+
+            const fromLine = lines.find((l) => l.credit > 0);
+            const toLine = lines.find((l) => l.debit > 0);
+
+            return {
+                ...transfer,
+                fromAccountCode: fromLine?.accountCode,
+                toAccountCode: toLine?.accountCode,
+                amount: toLine?.debit || 0,
+            };
+        })
+    );
+
+    // Filter by account code if provided
+    if (filters?.accountCode) {
+        return transfersWithDetails.filter(
+            (t) =>
+                t.fromAccountCode === filters.accountCode ||
+                t.toAccountCode === filters.accountCode
+        );
+    }
+
+    return transfersWithDetails;
+}
+
+/**
+ * General Ledger Filters
+ */
+export interface GLFilters {
+    dateFrom?: Date;
+    dateTo?: Date;
+    accountCode?: string;
+    transactionType?: 'ALL' | 'BILL' | 'INVOICE' | 'PAYMENT' | 'MANUAL';
+    searchTerm?: string;
+    limit?: number;
+    offset?: number;
+    showReversals?: boolean;
+}
+
+/**
+ * Fetches General Ledger entries with filters for the GL Explorer page.
+ * Returns all journal entry lines with related entry and account data.
+ */
+export async function getGeneralLedger(filters: GLFilters = {}) {
+    try {
+        const {
+            dateFrom,
+            dateTo,
+            accountCode,
+            transactionType = 'ALL',
+            searchTerm,
+            limit = 100,
+            offset = 0,
+            showReversals = false
+        } = filters;
+
+        // Build WHERE conditions
+        const conditions = [];
+
+        // Date range filter
+        if (dateFrom) {
+            conditions.push(gte(journalEntries.date, dateFrom));
+        }
+        if (dateTo) {
+            conditions.push(lte(journalEntries.date, dateTo));
+        }
+
+        // Account filter
+        if (accountCode) {
+            conditions.push(eq(journalEntryLines.accountCode, accountCode));
+        }
+
+        // Hide reversals by default
+        if (!showReversals) {
+            conditions.push(ne(journalEntries.entryType, 'REVERSAL'));
+        }
+
+        // Transaction type filter (via pattern matching)
+        if (transactionType !== 'ALL') {
+            if (transactionType === 'BILL') {
+                conditions.push(like(journalEntries.transactionId, 'bill-%'));
+            } else if (transactionType === 'INVOICE') {
+                conditions.push(like(journalEntries.reference, 'INV-%'));
+            } else if (transactionType === 'PAYMENT') {
+                conditions.push(like(journalEntries.transactionId, 'pay-%'));
+            } else if (transactionType === 'MANUAL') {
+                conditions.push(
+                    or(
+                        eq(journalEntries.transactionId, ''),
+                        sql`${journalEntries.transactionId} IS NULL`
+                    )
+                );
+            }
+        }
+
+        // Search filter (description or reference)
+        if (searchTerm && searchTerm.trim()) {
+            conditions.push(
+                or(
+                    like(journalEntries.description, `%${searchTerm}%`),
+                    like(journalEntries.reference, `%${searchTerm}%`)
+                )
+            );
+        }
+
+        // Build WHERE clause
+        const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+        // Fetch total count for pagination
+        const countResult = await db.select({
+            count: sql<number>`COUNT(DISTINCT ${journalEntryLines.id})`
+        })
+            .from(journalEntryLines)
+            .innerJoin(journalEntries, eq(journalEntryLines.journalEntryId, journalEntries.id))
+            .where(whereClause);
+
+        const total = Number(countResult[0]?.count || 0);
+
+        // Fetch paginated entries with account details
+        const lineData = await db.select({
+            line: journalEntryLines,
+            entry: journalEntries,
+            account: glAccounts
+        })
+            .from(journalEntryLines)
+            .innerJoin(journalEntries, eq(journalEntryLines.journalEntryId, journalEntries.id))
+            .innerJoin(glAccounts, eq(journalEntryLines.accountCode, glAccounts.code))
+            .where(whereClause)
+            .orderBy(desc(journalEntries.date), desc(journalEntryLines.id))
+            .limit(limit)
+            .offset(offset);
+
+        // Format response
+        const entries = lineData.map(({ line, entry, account }) => ({
+            lineId: line.id,
+            journalEntryId: entry.id,
+            date: entry.date,
+            description: line.description || entry.description,
+            reference: entry.reference,
+            transactionId: entry.transactionId,
+            entryType: entry.entryType,
+            accountCode: account.code,
+            accountName: account.name,
+            accountType: account.type,
+            debit: line.debit,
+            credit: line.credit
+        }));
+
+        return {
+            entries,
+            total,
+            limit,
+            offset
+        };
+
+    } catch (error) {
+        console.error('General Ledger Error:', error);
+        throw new Error('Failed to fetch general ledger');
+    }
 }
 
 /**
@@ -688,5 +1070,79 @@ export async function deleteJournalEntry(jeId: number) {
     } catch (error: any) {
         console.error('❌ Delete Journal Entry Error:', error);
         return { success: false, error: error.message || 'Failed to delete journal entry' };
+    }
+}
+
+/**
+ * Creates an Opening Balance journal entry
+ * This is a special type of entry used to record starting balances when setting up the system
+ */
+export async function createOpeningBalanceEntry(data: {
+    date: Date;
+    lines: { accountCode: string; debit: number; credit: number }[];
+}) {
+    try {
+        const { date, lines } = data;
+
+        // Validate
+        if (!date || !(date instanceof Date)) {
+            throw new Error('Invalid date provided');
+        }
+
+        if (!lines || lines.length === 0) {
+            throw new Error('At least one line is required');
+        }
+
+        // Validate all lines have an account code
+        if (lines.some(line => !line.accountCode)) {
+            throw new Error('All lines must have an account code');
+        }
+
+        // Validate no line has both debit and credit
+        if (lines.some(line => line.debit > 0 && line.credit > 0)) {
+            throw new Error('A line cannot have both debit and credit amounts');
+        }
+
+        // Validate balanced entry
+        const totalDebit = lines.reduce((sum, line) => sum + line.debit, 0);
+        const totalCredit = lines.reduce((sum, line) => sum + line.credit, 0);
+
+        if (totalDebit !== totalCredit) {
+            throw new Error(`Entry is not balanced. Debit: ${totalDebit}, Credit: ${totalCredit}`);
+        }
+
+        if (totalDebit === 0) {
+            throw new Error('Entry must have at least one non-zero amount');
+        }
+
+        // Check period lock
+        await checkPeriodLock(date);
+
+        // Create journal entry
+        const reference = `OB-${Date.now()}`;
+        const description = `Opening Balance as of ${date.toISOString().split('T')[0]}`;
+
+        const jlInput: JournalLineInput[] = lines.map(line => ({
+            accountCode: line.accountCode,
+            debit: line.debit,
+            credit: line.credit,
+            description: description
+        }));
+
+        // Use the existing createJournalEntry function to create the entry
+        const result = await createJournalEntry(date, description, jlInput, reference);
+
+        // Revalidate paths
+        try {
+            revalidatePath('/finance/chart-of-accounts');
+            revalidatePath('/finance/accounts');
+        } catch (e) {
+            console.error('Revalidate failed:', e);
+        }
+
+        return { success: true, journalEntryId: result };
+    } catch (error: any) {
+        console.error('❌ Create Opening Balance Error:', error);
+        throw new Error(error.message || 'Failed to create opening balance entry');
     }
 }

@@ -20,15 +20,16 @@ export default async function VendorsPage({ searchParams }: PageProps) {
         getInventorySummary()
     ]);
 
-    const { vendors, selectedVendor } = vendorData;
+    const { vendors, selectedVendor, stats } = vendorData;
 
     return (
         <div className="h-full bg-white animate-in fade-in duration-500">
             <VendorCenterLayout
-                vendors={vendors}
+                vendors={vendors as any}
                 selectedVendor={selectedVendor}
                 initialSelectedId={selectedId}
                 items={items as any}
+                stats={stats}
             />
         </div>
     );

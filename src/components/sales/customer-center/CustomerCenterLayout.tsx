@@ -53,6 +53,11 @@ export function CustomerCenterLayout({
     const paymentAction = searchParams.get('paymentId'); // 'new' or id
     const customerAction = searchParams.get('action'); // 'new' or 'edit'
 
+    // Global mode detection (from dashboard quick actions)
+    // invoiceId=new without customerId = global invoice mode (select customer in form)
+    // invoiceId=new with customerId = context mode (customer pre-selected)
+    const isGlobalInvoiceMode = invoiceAction === 'new' && !selectedId;
+
     // Delete modal state
     const [deleteTarget, setDeleteTarget] = useState<{
         id: string;
@@ -112,8 +117,8 @@ export function CustomerCenterLayout({
         //     result = await deletePayment(numericId);
         // }
 
-        if (!result.success) {
-            throw new Error(result.error || 'Failed to delete');
+        if (!result || !result.success) {
+            throw new Error((result as any)?.error || 'Failed to delete');
         }
 
         setDeleteTarget(null);
@@ -181,6 +186,10 @@ export function CustomerCenterLayout({
                 <CustomerProfile
                     customer={selectedCustomer}
                     onEdit={() => updateUrl({ action: 'edit' })}
+                    onDeleteSuccess={() => {
+                        updateUrl({ customerId: null });
+                        router.refresh();
+                    }}
                     onNewInvoice={() => updateUrl({ invoiceId: 'new' })}
                     onNewPayment={() => updateUrl({ paymentId: 'new' })}
                     onViewTransaction={(id, type) => {
@@ -195,15 +204,19 @@ export function CustomerCenterLayout({
 
             {/* Slide-Over Drawers */}
 
-            {/* Invoice Drawer */}
-            <Sheet open={!!invoiceAction} onOpenChange={() => handleCloseDrawer('invoice')}>
+            {/* Invoice Drawer - Context Mode OR Global Mode */}
+            <Sheet
+                open={!!invoiceAction}
+                onOpenChange={() => handleCloseDrawer('invoice')}
+            >
                 <SheetContent className="p-0 border-none bg-slate-50 overflow-y-auto">
                     <div className="p-8 h-full">
                         <InvoiceForm
-                            customerId={selectedId}
+                            customerId={isGlobalInvoiceMode ? 0 : selectedId}
                             invoiceId={invoiceAction && invoiceAction !== 'new' ? parseInt(invoiceAction) : undefined}
                             customers={customers as any}
                             items={items as any}
+                            isGlobalMode={isGlobalInvoiceMode}
                             onSuccess={() => {
                                 handleCloseDrawer('invoice');
                                 router.refresh();
@@ -239,7 +252,7 @@ export function CustomerCenterLayout({
                 <SheetContent className="p-0 border-none bg-white overflow-y-auto border-l border-slate-200">
                     <div className="p-8">
                         <CustomerForm
-                            isEdit={customerAction === 'edit'}
+                            mode={customerAction === 'edit' ? 'edit' : 'create'}
                             customerId={selectedId}
                             initialData={selectedCustomer}
                             onCancel={() => handleCloseDrawer('customer')}
@@ -257,9 +270,12 @@ export function CustomerCenterLayout({
                 <DeleteInvoiceModal
                     isOpen={true}
                     onClose={() => setDeleteTarget(null)}
-                    onConfirm={handleConfirmDelete}
+                    onSuccess={() => {
+                        setDeleteTarget(null);
+                        router.refresh();
+                    }}
                     invoice={{
-                        id: deleteTarget.id,
+                        id: parseInt(deleteTarget.id),
                         invoiceNumber: selectedCustomer?.transactions?.find((t: any) => t.id === `invoice-${deleteTarget.id}`)?.ref || `INV-${deleteTarget.id}`,
                         totalAmount: selectedCustomer?.transactions?.find((t: any) => t.id === `invoice-${deleteTarget.id}`)?.amount || 0,
                         status: deleteTarget.status

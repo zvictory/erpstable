@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import { clsx } from 'clsx';
 import {
   ArrowLeft,
@@ -66,9 +67,9 @@ interface AccountRegisterClientProps {
 }
 
 const formatMoney = (amount: number) =>
-  (amount / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  (amount / 100).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-const formatDateShort = (date: Date | string) => format(new Date(date), 'MMM dd, yyyy');
+const formatDateShort = (date: Date | string) => format(new Date(date), 'dd.MM.yyyy', { locale: ru });
 
 function StatCard({
   title,
@@ -159,16 +160,25 @@ export default function AccountRegisterClient({ data, accountCode }: AccountRegi
     return filteredTransactions
       .filter((_, idx) => idx % step === 0)
       .map(txn => ({
-        date: format(new Date(txn.date), 'MMM dd'),
+        date: format(new Date(txn.date), 'dd MMM', { locale: ru }),
         balance: txn.balance / 100
       }));
   }, [filteredTransactions]);
 
   const handleExportCSV = () => {
-    const headers = ['Date', 'Reference', 'Description', 'Debit', 'Credit', 'Balance'];
+    const headers = [
+      t('transactionTable.headers.date'),
+      t('transactionTable.headers.reference'),
+      'Поставщик',
+      t('transactionTable.headers.description'),
+      t('transactionTable.headers.debit'),
+      t('transactionTable.headers.credit'),
+      t('transactionTable.headers.balance')
+    ];
     const rows = filteredTransactions.map(txn => [
-      format(new Date(txn.date), 'yyyy-MM-dd'),
+      format(new Date(txn.date), 'dd.MM.yyyy', { locale: ru }),
       txn.reference || '',
+      txn.vendorName || '',
       txn.description,
       (txn.debit / 100).toFixed(2),
       (txn.credit / 100).toFixed(2),
@@ -199,7 +209,7 @@ export default function AccountRegisterClient({ data, accountCode }: AccountRegi
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => router.push(`/${locale}`)}
+            onClick={() => router.push(`/${locale}/finance/chart-of-accounts`)}
             className="p-2 hover:bg-slate-200 rounded-lg transition-colors"
             title={tCommon('back')}
           >
@@ -378,7 +388,7 @@ export default function AccountRegisterClient({ data, accountCode }: AccountRegi
             htmlFor="showReversals"
             className="text-sm text-slate-600 cursor-pointer hover:text-slate-900 select-none"
           >
-            Show reversal entries (audit view)
+            {t('filters.showReversals')}
           </label>
         </div>
       </div>
@@ -474,7 +484,7 @@ export default function AccountRegisterClient({ data, accountCode }: AccountRegi
                               setEditJEModalOpen(true);
                             }}
                             className="p-1 text-slate-300 hover:text-blue-600 hover:bg-blue-50 rounded transition-all"
-                            title="Edit Journal Entry"
+                            title={t('buttons.editJournalEntry')}
                           >
                             <Edit2 size={16} />
                           </button>
@@ -484,24 +494,24 @@ export default function AccountRegisterClient({ data, accountCode }: AccountRegi
                             onClick={async (e) => {
                               e.stopPropagation();
                               if (confirm(
-                                `Delete journal entry #${txn.journalEntryId}?\n\n` +
-                                `This will create a reversal entry and mark this as deleted.\n\n` +
-                                `This action cannot be undone.`
+                                t('deleteConfirm.title', { id: txn.journalEntryId }) + '\n\n' +
+                                t('deleteConfirm.message') + '\n\n' +
+                                t('deleteConfirm.warning')
                               )) {
                                 try {
                                   const result = await deleteJournalEntry(txn.journalEntryId);
                                   if (result.success) {
                                     window.location.reload();
                                   } else {
-                                    alert(`Error: ${(result as any).error}`);
+                                    alert(`${t('deleteConfirm.error')}: ${(result as any).error}`);
                                   }
                                 } catch (err) {
-                                  alert(`Error: ${err instanceof Error ? err.message : 'Failed to delete'}`);
+                                  alert(`${t('deleteConfirm.error')}: ${err instanceof Error ? err.message : t('deleteConfirm.failedToDelete')}`);
                                 }
                               }
                             }}
                             className="p-1 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded transition-all"
-                            title="Delete Journal Entry"
+                            title={t('buttons.deleteJournalEntry')}
                           >
                             <Trash2 size={16} />
                           </button>

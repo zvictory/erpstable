@@ -1,0 +1,452 @@
+/**
+ * REFACTORING DEMO: English Logic / Russian UI Pattern
+ *
+ * This file demonstrates the CORRECT way to implement the Laza Stack standards:
+ * - Next.js 14 Server Components
+ * - Server Actions for data fetching
+ * - Drizzle ORM for database queries
+ * - next-intl for localization (English code, Russian UI)
+ * - "Industrial Clean" design system
+ *
+ * Copy this pattern for ALL new pages and components.
+ */
+
+// ========================================
+// PART 1: SERVER ACTION (Data Layer)
+// File: src/app/actions/dashboard.ts
+// ========================================
+
+'use server';
+
+import { db } from '../../../db';
+import { glAccounts, invoices, vendorBills, items } from '../../../db/schema';
+import { sql, eq, and, desc, lt } from 'drizzle-orm';
+import { formatCurrency } from '@/lib/format';
+
+/**
+ * ✅ CORRECT: Type definitions in English
+ * These describe the data structure for business logic
+ */
+export type DashboardMetric = {
+  labelKey: string;      // Translation key, e.g., 'dashboard.metrics.cash'
+  value: string;         // Formatted display value: "145.2 M UZS"
+  rawValue: number;      // Raw value in base units (Tiyin)
+  trend?: 'up' | 'down'; // Optional trend indicator
+};
+
+export type Alert = {
+  id: string;
+  type: 'low_stock' | 'overdue_invoice' | 'pending_approval';
+  severity: 'high' | 'medium' | 'low';
+  titleKey: string;      // Translation key for alert title
+  descriptionKey: string; // Translation key for description
+  count?: number;
+  href: string;
+};
+
+export type DashboardData = {
+  metrics: {
+    cash: DashboardMetric;
+    accountsReceivable: DashboardMetric;
+    accountsPayable: DashboardMetric;
+    netWorkingCapital: DashboardMetric;
+  };
+  alerts: Alert[];
+};
+
+/**
+ * ✅ CORRECT: Server Action with English identifiers
+ * All variable names, function names, and logic in English
+ */
+export async function getDashboardData(): Promise<DashboardData> {
+  // Query 1: Cash account balance (English column names)
+  const cashAccount = await db.query.glAccounts.findFirst({
+    where: eq(glAccounts.code, '1000'),
+    columns: { balance: true }
+  });
+  const cashBalance = cashAccount?.balance ?? 0;
+
+  // Query 2: Accounts Receivable (sum of unpaid invoices)
+  const arResult = await db
+    .select({
+      total: sql<number>`COALESCE(SUM(${invoices.totalAmount} - ${invoices.paidAmount}), 0)`
+    })
+    .from(invoices)
+    .where(eq(invoices.paymentStatus, 'unpaid'));
+  const accountsReceivable = arResult[0]?.total ?? 0;
+
+  // Query 3: Accounts Payable (sum of unpaid bills)
+  const apResult = await db
+    .select({
+      total: sql<number>`COALESCE(SUM(${vendorBills.totalAmount} - ${vendorBills.paidAmount}), 0)`
+    })
+    .from(vendorBills)
+    .where(eq(vendorBills.paymentStatus, 'unpaid'));
+  const accountsPayable = apResult[0]?.total ?? 0;
+
+  // Calculate Net Working Capital
+  const netWorkingCapital = cashBalance + accountsReceivable - accountsPayable;
+
+  // Query 4: Alerts (low stock items)
+  const lowStockItems = await db.query.items.findMany({
+    where: and(
+      lt(items.quantityOnHand, 10),
+      eq(items.isActive, true)
+    ),
+    columns: { id: true, name: true, quantityOnHand: true },
+    limit: 5
+  });
+
+  // ✅ Return data with translation keys (NOT hardcoded Russian text)
+  return {
+    metrics: {
+      cash: {
+        labelKey: 'dashboard.metrics.cash',
+        value: formatCurrency(cashBalance),
+        rawValue: cashBalance,
+        trend: cashBalance > 0 ? 'up' : 'down'
+      },
+      accountsReceivable: {
+        labelKey: 'dashboard.metrics.accounts_receivable',
+        value: formatCurrency(accountsReceivable),
+        rawValue: accountsReceivable
+      },
+      accountsPayable: {
+        labelKey: 'dashboard.metrics.accounts_payable',
+        value: formatCurrency(accountsPayable),
+        rawValue: accountsPayable
+      },
+      netWorkingCapital: {
+        labelKey: 'dashboard.metrics.net_working_capital',
+        value: formatCurrency(netWorkingCapital),
+        rawValue: netWorkingCapital,
+        trend: netWorkingCapital > 0 ? 'up' : 'down'
+      }
+    },
+    alerts: lowStockItems.map(item => ({
+      id: item.id,
+      type: 'low_stock' as const,
+      severity: 'high' as const,
+      titleKey: 'dashboard.alerts.low_stock_title',
+      descriptionKey: 'dashboard.alerts.low_stock_description',
+      count: item.quantityOnHand,
+      href: `/inventory/items/${item.id}`
+    }))
+  };
+}
+
+// ========================================
+// PART 2: SERVER COMPONENT (Page)
+// File: app/[locale]/page.tsx
+// ========================================
+
+import React from 'react';
+import { getDashboardData } from '@/app/actions/dashboard';
+import { DashboardMetrics } from '@/components/dashboard/DashboardMetrics';
+import { AlertsList } from '@/components/dashboard/AlertsList';
+import { useTranslations } from 'next-intl';
+import Shell from '@/components/layout/Shell';
+
+/**
+ * ✅ CORRECT: Server Component (NO 'use client' directive)
+ * Data fetching happens here via Server Actions
+ */
+export default async function DashboardPage() {
+  // ✅ Direct async call in Server Component (no useEffect)
+  const dashboardData = await getDashboardData();
+
+  return (
+    <Shell>
+      <div className="bg-slate-50 min-h-screen">
+        <div className="max-w-7xl mx-auto p-6 space-y-6">
+          {/* ✅ Pass data to client components */}
+          <DashboardHeader />
+
+          <DashboardMetrics metrics={dashboardData.metrics} />
+
+          <AlertsList alerts={dashboardData.alerts} />
+        </div>
+      </div>
+    </Shell>
+  );
+}
+
+// ========================================
+// PART 3: CLIENT COMPONENTS (Presentation)
+// File: src/components/dashboard/DashboardMetrics.tsx
+// ========================================
+
+'use client';
+
+import { useTranslations } from 'next-intl';
+import { TrendingUp, TrendingDown } from 'lucide-react';
+import type { DashboardMetric } from '@/app/actions/dashboard';
+
+/**
+ * ✅ CORRECT: Client component with 'use client' directive
+ * Uses next-intl for ALL UI text (NO hardcoded strings)
+ */
+interface DashboardMetricsProps {
+  metrics: {
+    cash: DashboardMetric;
+    accountsReceivable: DashboardMetric;
+    accountsPayable: DashboardMetric;
+    netWorkingCapital: DashboardMetric;
+  };
+}
+
+export function DashboardMetrics({ metrics }: DashboardMetricsProps) {
+  // ✅ Hook for translations (Russian UI text from messages/ru.json)
+  const t = useTranslations('dashboard');
+
+  const metricsArray = [
+    metrics.cash,
+    metrics.accountsReceivable,
+    metrics.accountsPayable,
+    metrics.netWorkingCapital
+  ];
+
+  return (
+    <section>
+      {/* ✅ ALL UI text via t() function */}
+      <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-3">
+        {t('metrics.section_title')}
+      </h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {metricsArray.map((metric) => (
+          <MetricCard key={metric.labelKey} metric={metric} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * ✅ CORRECT: Sub-component with translated labels
+ */
+function MetricCard({ metric }: { metric: DashboardMetric }) {
+  const t = useTranslations();
+
+  return (
+    <div className="bg-white rounded-lg border border-slate-200 p-4">
+      <div className="flex items-center justify-between">
+        {/* ✅ Label from translation key */}
+        <span className="text-sm text-slate-500">
+          {t(metric.labelKey)}
+        </span>
+
+        {/* Trend indicator (if present) */}
+        {metric.trend && (
+          <TrendIndicator trend={metric.trend} />
+        )}
+      </div>
+
+      {/* Value display */}
+      <p className="text-2xl font-semibold text-slate-900 mt-2">
+        {metric.value}
+      </p>
+    </div>
+  );
+}
+
+function TrendIndicator({ trend }: { trend: 'up' | 'down' }) {
+  const isPositive = trend === 'up';
+
+  return (
+    <div className={`flex items-center gap-1 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+      {isPositive ? (
+        <TrendingUp className="w-4 h-4" />
+      ) : (
+        <TrendingDown className="w-4 h-4" />
+      )}
+    </div>
+  );
+}
+
+// ========================================
+// PART 4: HEADER COMPONENT
+// File: src/components/dashboard/DashboardHeader.tsx
+// ========================================
+
+'use client';
+
+import { useTranslations } from 'next-intl';
+
+/**
+ * ✅ CORRECT: Simple header with translations
+ */
+export function DashboardHeader() {
+  const t = useTranslations('dashboard');
+
+  return (
+    <div className="mb-6">
+      {/* ✅ NO hardcoded "Dashboard" or "Панель управления" */}
+      <h1 className="text-2xl font-bold text-slate-900">
+        {t('page_title')}
+      </h1>
+      <p className="text-sm text-slate-500 mt-1">
+        {t('page_subtitle')}
+      </p>
+    </div>
+  );
+}
+
+// ========================================
+// PART 5: ALERTS LIST COMPONENT
+// File: src/components/dashboard/AlertsList.tsx
+// ========================================
+
+'use client';
+
+import { useTranslations } from 'next-intl';
+import { AlertCircle, Clock, CheckCircle } from 'lucide-react';
+import type { Alert } from '@/app/actions/dashboard';
+import Link from 'next/link';
+
+interface AlertsListProps {
+  alerts: Alert[];
+}
+
+/**
+ * ✅ CORRECT: Dynamic content with translations
+ */
+export function AlertsList({ alerts }: AlertsListProps) {
+  const t = useTranslations('dashboard.alerts');
+
+  if (alerts.length === 0) {
+    return (
+      <div className="bg-white rounded-lg border border-slate-200 p-6 text-center">
+        <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-2" />
+        <p className="text-sm text-slate-500">
+          {t('no_alerts')}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <section>
+      <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-3">
+        {t('section_title')}
+      </h2>
+
+      <div className="space-y-2">
+        {alerts.map((alert) => (
+          <AlertCard key={alert.id} alert={alert} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function AlertCard({ alert }: { alert: Alert }) {
+  const t = useTranslations();
+
+  // ✅ Severity styling (logic in English)
+  const severityConfig = {
+    high: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', icon: AlertCircle },
+    medium: { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-700', icon: Clock },
+    low: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', icon: AlertCircle }
+  };
+
+  const config = severityConfig[alert.severity];
+  const Icon = config.icon;
+
+  return (
+    <Link href={alert.href}>
+      <div className={`${config.bg} ${config.border} border rounded-lg p-4 hover:shadow-sm transition-shadow cursor-pointer`}>
+        <div className="flex items-start gap-3">
+          <Icon className={`w-5 h-5 ${config.text} flex-shrink-0 mt-0.5`} />
+
+          <div className="flex-1">
+            {/* ✅ Title and description from translation keys */}
+            <h3 className={`text-sm font-medium ${config.text}`}>
+              {t(alert.titleKey)}
+            </h3>
+            <p className="text-sm text-slate-600 mt-1">
+              {t(alert.descriptionKey, { count: alert.count })}
+            </p>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+// ========================================
+// PART 6: TRANSLATION FILE
+// File: messages/ru.json
+// ========================================
+
+/*
+{
+  "dashboard": {
+    "page_title": "Панель управления",
+    "page_subtitle": "Финансовый обзор и текущая активность",
+
+    "metrics": {
+      "section_title": "Финансовые показатели",
+      "cash": "Денежные средства",
+      "accounts_receivable": "Дебиторская задолженность",
+      "accounts_payable": "Кредиторская задолженность",
+      "net_working_capital": "Чистый оборотный капитал"
+    },
+
+    "alerts": {
+      "section_title": "Оповещения",
+      "no_alerts": "Нет активных оповещений",
+      "low_stock_title": "Низкий уровень запасов",
+      "low_stock_description": "Осталось только {count} единиц",
+      "overdue_invoice_title": "Просроченный счет",
+      "pending_approval_title": "Ожидает утверждения"
+    }
+  }
+}
+*/
+
+// ========================================
+// KEY TAKEAWAYS
+// ========================================
+
+/**
+ * ✅ ENGLISH LOGIC:
+ * - Variable names: dashboardData, accountsReceivable, lowStockItems
+ * - Function names: getDashboardData, formatCurrency
+ * - Type names: DashboardMetric, Alert
+ * - Database columns: totalAmount, paymentStatus
+ * - Enum values: 'unpaid', 'low_stock', 'high'
+ * - Comments: All in English
+ *
+ * ✅ RUSSIAN CONTENT:
+ * - UI text: t('dashboard.page_title') → "Панель управления"
+ * - Labels: t('dashboard.metrics.cash') → "Денежные средства"
+ * - Descriptions: t('dashboard.alerts.no_alerts') → "Нет активных оповещений"
+ * - All user-facing strings from messages/ru.json
+ *
+ * ✅ PATTERN COMPLIANCE:
+ * - ✅ Server Action for data fetching (NO API routes)
+ * - ✅ Server Component as page (NO useEffect)
+ * - ✅ Client Components marked with 'use client'
+ * - ✅ Drizzle ORM queries (NO raw SQL)
+ * - ✅ Type safety (NO any types)
+ * - ✅ Industrial Clean design (slate-50, tight spacing)
+ * - ✅ next-intl for ALL UI text
+ *
+ * ❌ VIOLATIONS TO AVOID:
+ * - ❌ <h1>Dashboard</h1> or <h1>Панель</h1>
+ * - ❌ const товары = await db.query.items
+ * - ❌ useEffect(() => fetch('/api/data'), [])
+ * - ❌ db.execute("SELECT * FROM invoices")
+ * - ❌ function getData(): any { ... }
+ */
+
+/**
+ * COPY THIS PATTERN FOR:
+ * - All new pages (app/[locale]/*/page.tsx)
+ * - All Server Actions (src/app/actions/*.ts)
+ * - All client components (src/components/*)
+ * - All translation files (messages/*.json)
+ *
+ * This is the GOLD STANDARD for Laza ERP.
+ */

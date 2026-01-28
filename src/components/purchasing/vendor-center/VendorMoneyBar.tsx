@@ -1,6 +1,6 @@
 import React from 'react';
 import { formatCurrency } from '@/lib/format';
-import { Card } from "@/components/ui/Card";
+import { Card } from "@/components/ui/card";
 
 interface MoneyBarProps {
     openPOs: { count: number; total: number };

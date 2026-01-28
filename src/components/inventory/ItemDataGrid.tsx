@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import {
     Pencil, Box, Wrench, Puzzle, AlertTriangle,
     MoreVertical, List, LayoutGrid, Scan,
-    History, Hammer, MoveHorizontal, AlertCircle, Trash2, Eye, EyeOff
+    History, Hammer, MoveHorizontal, AlertCircle, Trash2, Eye, EyeOff,
+    ArrowUpDown, ChevronDown
 } from 'lucide-react';
 import { deleteItem } from '@/app/actions/common';
 import { useTranslations } from 'next-intl';
@@ -27,13 +28,30 @@ interface Item {
     status?: string | null;
 }
 
+type SortBy = 'name' | 'qtyOnHand' | 'salesPrice' | 'createdAt';
+type SortOrder = 'asc' | 'desc';
+
 interface ItemDataGridProps {
     items: Item[];
     uoms: { id: number; name: string }[];
     incomeAccounts: { code: string, name: string }[];
+    sortBy?: SortBy;
+    sortOrder?: SortOrder;
+    onSortChange?: (sortBy: SortBy, sortOrder: SortOrder) => void;
+    selectedItemId?: number | null;
+    onItemSelect?: (itemId: number | null) => void;
 }
 
-export default function ItemDataGrid({ items, uoms, incomeAccounts }: ItemDataGridProps) {
+export default function ItemDataGrid({
+    items,
+    uoms,
+    incomeAccounts,
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
+    onSortChange,
+    selectedItemId,
+    onItemSelect
+}: ItemDataGridProps) {
     const t = useTranslations('inventory');
     const tc = useTranslations('common');
     const router = useRouter();
@@ -42,8 +60,34 @@ export default function ItemDataGrid({ items, uoms, incomeAccounts }: ItemDataGr
     const [deletingId, setDeletingId] = useState<number | null>(null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
+    const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
 
     const filteredItems = items.filter(i => showArchived || i.status !== 'ARCHIVED');
+
+    const sortOptions: { value: SortBy; label: string }[] = [
+        { value: 'name', label: t('data_grid.sort.name') },
+        { value: 'qtyOnHand', label: t('data_grid.sort.qty_on_hand') },
+        { value: 'salesPrice', label: t('data_grid.sort.price') },
+        { value: 'createdAt', label: t('data_grid.sort.date_added') },
+    ];
+
+    const currentSortLabel = sortOptions.find(o => o.value === sortBy)?.label || t('data_grid.sort.label');
+
+    const handleSortChange = (newSortBy: SortBy) => {
+        if (onSortChange) {
+            const newOrder = newSortBy === sortBy && sortOrder === 'desc' ? 'asc' : 'desc';
+            onSortChange(newSortBy, newOrder);
+        }
+        setSortDropdownOpen(false);
+    };
+
+    const handleItemClick = (itemId: number) => {
+        if (onItemSelect) {
+            onItemSelect(selectedItemId === itemId ? null : itemId);
+        } else {
+            router.push(`/inventory/items/${itemId}`);
+        }
+    };
 
     const handleDelete = (e: React.MouseEvent, item: Item) => {
         e.stopPropagation();
@@ -74,6 +118,35 @@ export default function ItemDataGrid({ items, uoms, incomeAccounts }: ItemDataGr
                 </div>
 
                 <div className="flex gap-4 items-center">
+                    {/* Sort Dropdown */}
+                    <div className="relative">
+                        <button
+                            onClick={() => setSortDropdownOpen(!sortDropdownOpen)}
+                            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 font-medium transition shadow-sm"
+                        >
+                            <ArrowUpDown size={14} />
+                            {currentSortLabel}
+                            {sortOrder === 'asc' ? ' ↑' : ' ↓'}
+                            <ChevronDown size={14} className={`transition-transform ${sortDropdownOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        {sortDropdownOpen && (
+                            <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-20 min-w-[180px]">
+                                {sortOptions.map(option => (
+                                    <button
+                                        key={option.value}
+                                        onClick={() => handleSortChange(option.value)}
+                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 transition flex items-center justify-between ${sortBy === option.value ? 'text-blue-600 font-medium' : 'text-slate-700'}`}
+                                    >
+                                        {option.label}
+                                        {sortBy === option.value && (
+                                            <span className="text-xs">{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
                     <button
                         onClick={() => setShowArchived(!showArchived)}
                         className="flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-slate-800 transition"
@@ -81,7 +154,6 @@ export default function ItemDataGrid({ items, uoms, incomeAccounts }: ItemDataGr
                         {showArchived ? <EyeOff size={14} /> : <Eye size={14} />}
                         {showArchived ? t('actions.hide_archived') : t('actions.show_archived')}
                     </button>
-                    {/* View Mode Toggle was here */}
                 </div>
 
                 <div className="flex gap-2">
@@ -114,14 +186,28 @@ export default function ItemDataGrid({ items, uoms, incomeAccounts }: ItemDataGr
                         </thead>
                         <tbody className="divide-y divide-slate-50">
                             {filteredItems.map((item) => (
-                                <ItemRow key={item.id} item={item} onDelete={(e) => handleDelete(e, item)} isDeleting={deletingId === item.id} />
+                                <ItemRow
+                                    key={item.id}
+                                    item={item}
+                                    onDelete={(e) => handleDelete(e, item)}
+                                    isDeleting={deletingId === item.id}
+                                    isSelected={selectedItemId === item.id}
+                                    onClick={() => handleItemClick(item.id)}
+                                />
                             ))}
                         </tbody>
                     </table>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-8">
                         {filteredItems.map((item) => (
-                            <ItemCard key={item.id} item={item} onDelete={(e) => handleDelete(e, item)} isDeleting={deletingId === item.id} />
+                            <ItemCard
+                                key={item.id}
+                                item={item}
+                                onDelete={(e) => handleDelete(e, item)}
+                                isDeleting={deletingId === item.id}
+                                isSelected={selectedItemId === item.id}
+                                onClick={() => handleItemClick(item.id)}
+                            />
                         ))}
                     </div>
                 )}
@@ -152,10 +238,16 @@ export default function ItemDataGrid({ items, uoms, incomeAccounts }: ItemDataGr
     );
 }
 
-function ItemRow({ item, onDelete, isDeleting }: { item: Item; onDelete: (e: React.MouseEvent) => void; isDeleting: boolean }) {
+function ItemRow({ item, onDelete, isDeleting, isSelected, onClick }: {
+    item: Item;
+    onDelete: (e: React.MouseEvent) => void;
+    isDeleting: boolean;
+    isSelected?: boolean;
+    onClick?: () => void;
+}) {
     const t = useTranslations('inventory');
     const tc = useTranslations('common');
-    const router = useRouter(); // Added router
+    const router = useRouter();
     const reorderPoint = item.reorderPoint || 0;
     const isLowStock = item.qtyOnHand < reorderPoint;
 
@@ -175,10 +267,18 @@ function ItemRow({ item, onDelete, isDeleting }: { item: Item; onDelete: (e: Rea
         }
     }
 
+    const handleClick = () => {
+        if (onClick) {
+            onClick();
+        } else {
+            router.push(`/inventory/items/${item.id}`);
+        }
+    };
+
     return (
         <tr
-            onClick={() => router.push(`/inventory/items/${item.id}`)}
-            className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
+            onClick={handleClick}
+            className={`hover:bg-slate-50/50 transition-colors group cursor-pointer ${isSelected ? 'bg-blue-50 ring-1 ring-inset ring-blue-200' : ''}`}
         >
             <td className="px-6 py-4">
                 <div className="flex items-center gap-3">
@@ -256,18 +356,32 @@ function ItemRow({ item, onDelete, isDeleting }: { item: Item; onDelete: (e: Rea
     );
 }
 
-function ItemCard({ item, onDelete, isDeleting }: { item: Item; onDelete: (e: React.MouseEvent) => void; isDeleting: boolean }) {
+function ItemCard({ item, onDelete, isDeleting, isSelected, onClick }: {
+    item: Item;
+    onDelete: (e: React.MouseEvent) => void;
+    isDeleting: boolean;
+    isSelected?: boolean;
+    onClick?: () => void;
+}) {
     const t = useTranslations('inventory');
     const tc = useTranslations('common');
-    const router = useRouter(); // Added router
+    const router = useRouter();
     const reorderPoint = item.reorderPoint || 0;
     const isLowStock = item.qtyOnHand < reorderPoint;
     const stockPercent = Math.min(100, (item.qtyOnHand / Math.max(1, reorderPoint * 2)) * 100);
 
+    const handleClick = () => {
+        if (onClick) {
+            onClick();
+        } else {
+            router.push(`/inventory/items/${item.id}`);
+        }
+    };
+
     return (
         <div
-            onClick={() => router.push(`/inventory/items/${item.id}`)}
-            className="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-xl transition-all group relative overflow-hidden cursor-pointer"
+            onClick={handleClick}
+            className={`bg-white border rounded-2xl p-5 hover:shadow-xl transition-all group relative overflow-hidden cursor-pointer ${isSelected ? 'border-blue-400 ring-2 ring-blue-100' : 'border-slate-200'}`}
         >
             <div className="flex justify-between items-start mb-4">
                 <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">

@@ -309,16 +309,23 @@ export async function runMonthlyDepreciation(
 
                 // Audit log
                 await tx.insert(auditLogs).values({
+                    entity: 'depreciation_entries',
+                    entityId: je.id.toString(),
+                    action: 'CREATE',
+                    userId: null,
+                    userName: 'System',
+                    userRole: 'SYSTEM',
+                    changes: {
+                        after: {
+                            period: `${year}-${month}`,
+                            assetsProcessed: processedCount,
+                            totalAmount,
+                            journalEntryId: je.id,
+                        }
+                    },
+                    // Legacy fields for backward compatibility
                     tableName: 'depreciation_entries',
                     recordId: je.id,
-                    action: 'MONTHLY_DEPRECIATION',
-                    userId: getCurrentUser(),
-                    changes: JSON.stringify({
-                        period: `${year}-${month}`,
-                        assetsProcessed: processedCount,
-                        totalAmount,
-                        journalEntryId: je.id,
-                    }),
                 });
 
                 console.log(

@@ -5,7 +5,7 @@ import createMiddleware from 'next-intl/middleware';
 export const runtime = 'nodejs';
 
 const intlMiddleware = createMiddleware({
-    locales: ['ru', 'uz', 'en'],
+    locales: ['ru', 'en', 'uz', 'tr'],
     defaultLocale: 'ru',
     localePrefix: 'always', // or 'as-needed'
     localeDetection: false
@@ -28,7 +28,7 @@ export default auth((req) => {
     }
 
     // Extract locale and path
-    const pathnameWithoutLocale = nextUrl.pathname.replace(/^\/(ru|uz|en)/, '');
+    const pathnameWithoutLocale = nextUrl.pathname.replace(/^\/(ru|en|uz|tr)/, '');
     const isLoginPage = pathnameWithoutLocale === '/login';
     const locale = nextUrl.pathname.split('/')[1] || 'ru';
 

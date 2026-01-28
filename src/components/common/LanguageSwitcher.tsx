@@ -10,7 +10,8 @@ import { twMerge } from 'tailwind-merge';
 const FLAG_EMOJIS = {
     ru: '🇷🇺',
     uz: '🇺🇿',
-    en: '🇺🇸'
+    en: '🇺🇸',
+    tr: '🇹🇷'
 } as const;
 
 export default function LanguageSwitcher() {
@@ -27,7 +28,8 @@ export default function LanguageSwitcher() {
     const languages = {
         ru: 'Русский',
         uz: 'O\'zbekcha',
-        en: 'English'
+        en: 'English',
+        tr: 'Türkçe'
     };
 
     const handleLanguageChange = (nextLocale: string) => {
