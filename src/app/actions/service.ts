@@ -275,11 +275,14 @@ export async function createInstallationTicket(input: unknown) {
 /**
  * 2. generateRecurringRefills()
  * Generate refill sales orders for due service contracts
+ * @param skipAuth - Set to true when called from cron jobs (no user session available)
  */
-export async function generateRecurringRefills() {
-  const session = await auth();
-  if (!session?.user) {
-    throw new Error('Unauthorized');
+export async function generateRecurringRefills(skipAuth = false) {
+  if (!skipAuth) {
+    const session = await auth();
+    if (!session?.user) {
+      throw new Error('Unauthorized');
+    }
   }
 
   const currentDate = new Date();
