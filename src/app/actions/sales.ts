@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { ACCOUNTS } from '@/lib/accounting-config';
 import { checkPeriodLock } from './finance';
 import { logAuditEvent, getChangedFields } from '@/lib/audit';
+import { serviceTickets, serviceTicketAssets, customerAssets } from '../../../db/schema/service';
 
 // --- Zod Schemas for Actions ---
 
@@ -182,8 +183,9 @@ export async function createInvoice(data: z.infer<typeof createInvoiceSchema>) {
             }).returning();
 
             // 2. Create Invoice Lines
+            let createdLines: (typeof invoiceLines.$inferSelect)[] = [];
             if (validated.lines.length > 0) {
-                await tx.insert(invoiceLines).values(
+                createdLines = await tx.insert(invoiceLines).values(
                     validated.lines.map(line => ({
                         invoiceId: newInvoice.id,
                         itemId: line.itemId,
@@ -193,7 +195,88 @@ export async function createInvoice(data: z.infer<typeof createInvoiceSchema>) {
                         description: line.description,
                         revenueAccountId: line.revenueAccountId,
                     }))
-                );
+                ).returning();
+            }
+
+            // 2a. Check for machine items requiring installation and auto-create service ticket
+            if (createdLines.length > 0) {
+                const machineItems = await tx.select()
+                    .from(items)
+                    .where(and(
+                        inArray(items.id, validated.lines.map(l => l.itemId)),
+                        eq(items.requiresInstallation, true)
+                    ));
+
+                if (machineItems.length > 0) {
+                    // Generate ticket number in format TKT-YYYY-#####
+                    const year = new Date().getFullYear();
+                    const existingTickets = await tx
+                        .select({ ticketNumber: serviceTickets.ticketNumber })
+                        .from(serviceTickets)
+                        .where(sql`${serviceTickets.ticketNumber} LIKE ${`TKT-${year}-%`}`)
+                        .orderBy(desc(serviceTickets.ticketNumber))
+                        .limit(1);
+
+                    const lastNumber = existingTickets[0]?.ticketNumber;
+                    let sequence = 1;
+
+                    if (lastNumber) {
+                        const match = lastNumber.match(/TKT-\d{4}-(\d{5})/);
+                        if (match) {
+                            sequence = parseInt(match[1]) + 1;
+                        }
+                    }
+
+                    const ticketNumber = `TKT-${year}-${String(sequence).padStart(5, '0')}`;
+
+                    // Create service ticket
+                    const [ticket] = await tx.insert(serviceTickets).values({
+                        ticketNumber,
+                        customerId: validated.customerId,
+                        ticketType: 'INSTALLATION',
+                        priority: 'MEDIUM',
+                        title: `Installation for Invoice ${validated.invoiceNumber}`,
+                        description: `Auto-generated installation ticket for equipment sale`,
+                        status: 'OPEN',
+                        isBillable: false,
+                        laborHoursDecimal: 0,
+                        sourceInvoiceId: newInvoice.id,
+                    }).returning();
+
+                    // Get starting sequence for asset numbers
+                    const assetResult = await tx
+                        .select({ count: sql<number>`COUNT(*)` })
+                        .from(customerAssets)
+                        .where(sql`${customerAssets.assetNumber} LIKE ${`CA-${year}-%`}`);
+                    let assetSequence = (assetResult[0]?.count || 0) + 1;
+
+                    // Create customer assets and link to ticket
+                    const machineLines = createdLines.filter(line =>
+                        machineItems.some(item => item.id === line.itemId)
+                    );
+
+                    for (const line of machineLines) {
+                        // Generate asset number with incrementing sequence
+                        const assetNumber = `CA-${year}-${String(assetSequence).padStart(5, '0')}`;
+                        assetSequence++;
+
+                        // Create customer asset
+                        const [asset] = await tx.insert(customerAssets).values({
+                            assetNumber,
+                            customerId: validated.customerId,
+                            itemId: line.itemId,
+                            invoiceLineId: line.id,
+                            status: 'PENDING_INSTALLATION',
+                        }).returning();
+
+                        // Create junction record (ticket -> asset)
+                        await tx.insert(serviceTicketAssets).values({
+                            ticketId: ticket.id,
+                            assetId: asset.id,
+                            notes: `Installation pending for ${assetNumber}`,
+                        });
+                    }
+                }
             }
 
             // 3. Create GL Entries (Double Entry)
@@ -299,14 +382,16 @@ export async function createInvoice(data: z.infer<typeof createInvoiceSchema>) {
                 }
 
                 // Create inventory location transfer records for each picked location
+                // Note: toWarehouseId/toLocationId are set to the same as fromWarehouseId/fromLocationId
+                // to satisfy NOT NULL constraints. In a real system, you'd want a virtual "SHIPPED" location.
                 for (const picking of pickingLocations) {
                     await tx.insert(inventoryLocationTransfers).values({
                         itemId: line.itemId,
                         batchNumber: picking.batchNumber,
                         fromWarehouseId: picking.warehouseId,
                         fromLocationId: picking.locationId,
-                        toWarehouseId: null, // Shipping location
-                        toLocationId: null,
+                        toWarehouseId: picking.warehouseId, // Using same warehouse to satisfy NOT NULL constraint
+                        toLocationId: picking.locationId,   // Using same location to satisfy NOT NULL constraint
                         quantity: picking.pickQty,
                         transferReason: 'picking',
                         status: 'completed',
