@@ -6,7 +6,7 @@ import {
     purchaseOrders, purchaseOrderLines, vendorBills, vendorBillLines,
     invoices, invoiceLines, customers
 } from '../../../db/schema';
-import { eq, desc, asc, like, and, sql, inArray } from 'drizzle-orm';
+import { eq, desc, asc, like, and, or, sql, inArray } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { insertItemSchema } from '../../../db/schema';
@@ -23,6 +23,7 @@ export async function getItems({
     limit = 50,
     search = '',
     category = '',
+    itemClass,
     sortBy = 'createdAt',
     sortOrder = 'desc'
 }: {
@@ -30,6 +31,7 @@ export async function getItems({
     limit?: number;
     search?: string;
     category?: string;
+    itemClass?: 'RAW_MATERIAL' | 'WIP' | 'FINISHED_GOODS' | 'SERVICE';
     sortBy?: 'name' | 'qtyOnHand' | 'salesPrice' | 'createdAt';
     sortOrder?: 'asc' | 'desc';
 } = {}) {
@@ -38,7 +40,12 @@ export async function getItems({
     // Build where clause
     let conditions = [];
     if (search) {
-        conditions.push(like(items.name, `%${search}%`));
+        conditions.push(
+            or(
+                like(items.name, `%${search}%`),
+                like(items.sku, `%${search}%`)
+            )
+        );
     }
     if (category && category !== 'All') {
         // Find the category ID by name and filter by categoryId
@@ -50,6 +57,9 @@ export async function getItems({
         if (categoryRecord.length > 0) {
             conditions.push(eq(items.categoryId, categoryRecord[0].id));
         }
+    }
+    if (itemClass) {
+        conditions.push(eq(items.itemClass, itemClass));
     }
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
