@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import Shell from '@/components/layout/Shell';
+import ShellClient from '@/components/layout/ShellClient';
 import { AlertCircle } from 'lucide-react';
 
 export default function Error({
@@ -17,7 +17,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <Shell>
+    <ShellClient userRole={undefined}>
       <div className="bg-slate-50 min-h-screen">
         <div className="max-w-7xl mx-auto p-6">
           <div className="bg-white rounded-lg border border-red-200 p-8 text-center">
@@ -44,6 +44,6 @@ export default function Error({
           </div>
         </div>
       </div>
-    </Shell>
+    </ShellClient>
   );
 }
