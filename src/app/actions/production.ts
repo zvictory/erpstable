@@ -259,7 +259,7 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
                 remainingQty: val.outputQty,
                 unitCost: unitCost,
                 receiveDate: new Date(),
-                qcStatus: 'PENDING', // Hold until QC approval
+                qcStatus: 'NOT_REQUIRED', // Approval disabled for now
                 sourceType: 'production_run', // Track that this came from production
                 sourceId: run.id, // Link back to this production run
                 locationId: destinationLocationId, // Set warehouse location from production run destination
@@ -565,7 +565,7 @@ export async function executeRecipe(data: z.infer<typeof recipeProductionSchema>
                 remainingQty: productionData.outputQty,
                 unitCost: unitCost,
                 receiveDate: new Date(),
-                qcStatus: 'PENDING', // Hold until QC approval
+                qcStatus: 'NOT_REQUIRED', // Approval disabled for now
                 sourceType: 'production_run', // Track that this came from production
                 sourceId: run.id, // Link back to this production run
             });
