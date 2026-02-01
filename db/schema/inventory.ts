@@ -7,8 +7,8 @@ import { users } from './auth';
 
 // --- Shared Columns ---
 const timestampFields = {
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 };
 
 // --- Tables ---
@@ -148,6 +148,11 @@ export const inventoryLayers = sqliteTable('inventory_layers', {
 
   unitCost: integer('unit_cost').notNull(), // Actual cost per unit in Tiyin
 
+  // Landed Costs (Valuation Adjustment)
+  landedCostAdjustment: integer('landed_cost_adjustment').default(0), // Extra value added per unit in Tiyin
+  totalUnitCost: integer('total_unit_cost').notNull().default(0), // Base unitCost + landedCostAdjustment
+
+
   // Location Tracking - NEW FIELDS
   warehouseId: integer('warehouse_id').references(() => warehouses.id),
   locationId: integer('location_id').references(() => warehouseLocations.id),
@@ -163,10 +168,14 @@ export const inventoryLayers = sqliteTable('inventory_layers', {
   qcInspectedAt: integer('qc_inspected_at', { mode: 'timestamp' }),
   qcNotes: text('qc_notes'),
 
+  // Source Tracking - Links inventory back to production runs or purchases
+  sourceType: text('source_type'), // 'production_run', 'purchase', etc.
+  sourceId: integer('source_id'), // ID of the production run or purchase that created this layer
+
   // Optimistic Locking
   version: integer('version').default(1).notNull(),
 
-  receiveDate: integer('receive_date', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  receiveDate: integer('receive_date', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
   ...timestampFields,
 }, (t) => ({
   itemBatchIdx: index('item_batch_idx').on(t.itemId, t.batchNumber),
@@ -195,7 +204,7 @@ export const inventoryLocationTransfers = sqliteTable('inventory_location_transf
 
   status: text('status').notNull().default('completed'), // "pending", "in_transit", "completed", "cancelled"
 
-  transferDate: integer('transfer_date', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  transferDate: integer('transfer_date', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
   ...timestampFields,
 }, (t) => ({
   itemIdx: index('transfers_item_idx').on(t.itemId),
@@ -212,7 +221,7 @@ export const stockReservations = sqliteTable('stock_reservations', {
   sourceId: integer('source_id').notNull(),
   qtyReserved: integer('qty_reserved').notNull(),
   status: text('status', { enum: ['ACTIVE', 'RELEASED', 'EXPIRED'] }).default('ACTIVE').notNull(),
-  reservedAt: integer('reserved_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  reservedAt: integer('reserved_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
   expiresAt: integer('expires_at', { mode: 'timestamp' }),
   ...timestampFields,
 }, (t) => ({
@@ -221,11 +230,53 @@ export const stockReservations = sqliteTable('stock_reservations', {
   statusIdx: index('stock_reservations_status_idx').on(t.status),
 }));
 
-export const stockReservationsRelations = relations(stockReservations, ({ one }) => ({
-  item: one(items, {
-    fields: [stockReservations.itemId],
-    references: [items.id],
-  }),
+// Inventory Adjustments for manual corrections
+export const inventoryAdjustments = sqliteTable('inventory_adjustments', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  itemId: integer('item_id').references(() => items.id).notNull(),
+
+  adjustmentDate: integer('adjustment_date', { mode: 'timestamp' }).notNull(),
+  adjustmentType: text('adjustment_type', {
+    enum: ['QUANTITY', 'COST', 'BOTH']
+  }).notNull(),
+
+  // Quantity Adjustment
+  quantityBefore: integer('quantity_before').notNull(),
+  quantityAfter: integer('quantity_after').notNull(),
+  quantityChange: integer('quantity_change').notNull(), // Can be positive or negative
+
+  // Cost Adjustment
+  costBefore: integer('cost_before'), // In Tiyin
+  costAfter: integer('cost_after'), // In Tiyin
+
+  // Location
+  warehouseId: integer('warehouse_id').references(() => warehouses.id),
+  locationId: integer('location_id').references(() => warehouseLocations.id),
+  batchNumber: text('batch_number'),
+
+  // Reason & Approval
+  reason: text('reason', {
+    enum: ['PHYSICAL_COUNT', 'DAMAGE', 'OBSOLETE', 'THEFT', 'CORRECTION', 'OTHER']
+  }).notNull(),
+  notes: text('notes'),
+
+  status: text('status', {
+    enum: ['DRAFT', 'PENDING_APPROVAL', 'APPROVED', 'REJECTED']
+  }).default('DRAFT').notNull(),
+
+  // Approval Workflow
+  createdBy: integer('created_by').references(() => users.id).notNull(),
+  approvedBy: integer('approved_by').references(() => users.id),
+  approvedAt: integer('approved_at', { mode: 'timestamp' }),
+
+  // GL Integration
+  journalEntryId: integer('journal_entry_id'), // Foreign key to journal entries
+
+  ...timestampFields,
+}, (t) => ({
+  itemIdx: index('adjustments_item_idx').on(t.itemId),
+  dateIdx: index('adjustments_date_idx').on(t.adjustmentDate),
+  statusIdx: index('adjustments_status_idx').on(t.status),
 }));
 
 // Audit Logs for forensic history
@@ -258,7 +309,7 @@ export const auditLogs = sqliteTable('audit_logs', {
   userAgent: text('user_agent'), // NEW: Browser tracking
 
   // Timestamps
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 
   // Legacy fields (for backward compatibility)
   tableName: text('table_name'), // Deprecated, use 'entity'
@@ -280,123 +331,21 @@ export const inventoryReserves = sqliteTable('inventory_reserves', {
   ...timestampFields,
 });
 
+
+export const inventoryTransactions = sqliteTable('inventory_transactions', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  itemId: integer('item_id').references(() => items.id).notNull(),
+  type: text('type', { enum: ['IN', 'OUT', 'ADJUSTMENT', 'TRANSFER'] }).notNull(),
+  quantity: integer('quantity').notNull(),
+  referenceType: text('reference_type', { enum: ['GRN', 'BILL', 'ORDER', 'ADJUSTMENT', 'TRANSFER'] }).notNull(),
+  referenceId: integer('reference_id').notNull(),
+  warehouseId: integer('warehouse_id').references(() => warehouses.id),
+  ...timestampFields,
+});
+
 // --- Relations ---
 
-export const itemsRelations = relations(items, ({ one, many }) => ({
-  category: one(categories, {
-    fields: [items.categoryId],
-    references: [categories.id],
-  }),
-  baseUom: one(uoms, {
-    fields: [items.baseUomId],
-    references: [uoms.id],
-    relationName: 'itemBaseUom'
-  }),
-  purchaseUom: one(uoms, {
-    fields: [items.purchaseUomId],
-    references: [uoms.id],
-    relationName: 'itemPurchaseUom'
-  }),
-  parent: one(items, {
-    fields: [items.parentId],
-    references: [items.id],
-    relationName: 'itemHierarchy'
-  }),
-  children: many(items, { relationName: 'itemHierarchy' }),
-  layers: many(inventoryLayers),
-}));
-
-export const warehousesRelations = relations(warehouses, ({ many }) => ({
-  locations: many(warehouseLocations),
-  inventoryLayers: many(inventoryLayers),
-  fromTransfers: many(inventoryLocationTransfers, { relationName: 'fromWarehouse' }),
-  toTransfers: many(inventoryLocationTransfers, { relationName: 'toWarehouse' }),
-}));
-
-export const warehouseLocationsRelations = relations(warehouseLocations, ({ one, many }) => ({
-  warehouse: one(warehouses, {
-    fields: [warehouseLocations.warehouseId],
-    references: [warehouses.id],
-  }),
-  reservedForItem: one(items, {
-    fields: [warehouseLocations.reservedForItemId],
-    references: [items.id],
-  }),
-  inventoryLayers: many(inventoryLayers),
-  fromTransfers: many(inventoryLocationTransfers, { relationName: 'fromLocation' }),
-  toTransfers: many(inventoryLocationTransfers, { relationName: 'toLocation' }),
-}));
-
-export const inventoryLayersRelations = relations(inventoryLayers, ({ one }) => ({
-  item: one(items, {
-    fields: [inventoryLayers.itemId],
-    references: [items.id],
-  }),
-  warehouse: one(warehouses, {
-    fields: [inventoryLayers.warehouseId],
-    references: [warehouses.id],
-  }),
-  location: one(warehouseLocations, {
-    fields: [inventoryLayers.locationId],
-    references: [warehouseLocations.id],
-  }),
-}));
-
-export const inventoryLocationTransfersRelations = relations(inventoryLocationTransfers, ({ one }) => ({
-  item: one(items, {
-    fields: [inventoryLocationTransfers.itemId],
-    references: [items.id],
-  }),
-  fromWarehouse: one(warehouses, {
-    fields: [inventoryLocationTransfers.fromWarehouseId],
-    references: [warehouses.id],
-    relationName: 'fromWarehouse',
-  }),
-  fromLocation: one(warehouseLocations, {
-    fields: [inventoryLocationTransfers.fromLocationId],
-    references: [warehouseLocations.id],
-    relationName: 'fromLocation',
-  }),
-  toWarehouse: one(warehouses, {
-    fields: [inventoryLocationTransfers.toWarehouseId],
-    references: [warehouses.id],
-    relationName: 'toWarehouse',
-  }),
-  toLocation: one(warehouseLocations, {
-    fields: [inventoryLocationTransfers.toLocationId],
-    references: [warehouseLocations.id],
-    relationName: 'toLocation',
-  }),
-}));
-
-export const categoriesRelations = relations(categories, ({ many }) => ({
-  items: many(items),
-}));
-
-export const uomRelations = relations(uoms, ({ many }) => ({
-  conversionsFrom: many(uomConversions, { relationName: 'fromUom' }),
-  conversionsTo: many(uomConversions, { relationName: 'toUom' }),
-}));
-
-export const uomConversionsRelations = relations(uomConversions, ({ one }) => ({
-  fromUom: one(uoms, {
-    fields: [uomConversions.fromUomId],
-    references: [uoms.id],
-    relationName: 'fromUom'
-  }),
-  toUom: one(uoms, {
-    fields: [uomConversions.toUomId],
-    references: [uoms.id],
-    relationName: 'toUom'
-  }),
-}));
-
-export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
-  user: one(users, {
-    fields: [auditLogs.userId],
-    references: [users.id],
-  }),
-}));
+// Relations have been moved to relations.ts to avoid circular dependencies.
 
 // --- Zod Schemas ---
 
@@ -427,5 +376,12 @@ export const selectInventoryLocationTransferSchema = createSelectSchema(inventor
 export const insertStockReservationSchema = createInsertSchema(stockReservations);
 export const selectStockReservationSchema = createSelectSchema(stockReservations);
 
+export const insertInventoryAdjustmentSchema = createInsertSchema(inventoryAdjustments);
+export const selectInventoryAdjustmentSchema = createSelectSchema(inventoryAdjustments);
+
 export const insertInventoryReserveSchema = createInsertSchema(inventoryReserves);
 export const selectInventoryReserveSchema = createSelectSchema(inventoryReserves);
+
+
+export const insertInventoryTransactionSchema = createInsertSchema(inventoryTransactions);
+export const selectInventoryTransactionSchema = createSelectSchema(inventoryTransactions);

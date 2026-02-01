@@ -7,8 +7,8 @@ import { routingSteps } from './manufacturing';
 
 // --- Shared Columns ---
 const timestampFields = {
-    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 };
 
 // --- Tables ---
@@ -43,29 +43,7 @@ export const bomItems = sqliteTable('bom_items', {
 
 // --- Relations ---
 
-export const bomHeadersRelations = relations(bomHeaders, ({ one, many }) => ({
-    item: one(items, {
-        fields: [bomHeaders.itemId],
-        references: [items.id],
-    }),
-    items: many(bomItems),
-}));
 
-export const bomItemsRelations = relations(bomItems, ({ one }) => ({
-    bom: one(bomHeaders, {
-        fields: [bomItems.bomId],
-        references: [bomHeaders.id],
-    }),
-    part: one(items, {
-        fields: [bomItems.componentItemId],
-        references: [items.id],
-        relationName: 'bomComponent'
-    }),
-    step: one(routingSteps, {
-        fields: [bomItems.routingStepId],
-        references: [routingSteps.id],
-    }),
-}));
 
 // --- Zod Schemas ---
 

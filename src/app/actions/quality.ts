@@ -4,6 +4,37 @@
 import { auth } from '@/auth';
 import { db } from '../../../db';
 import { z } from 'zod';
+
+// Helper to safely serialize timestamps (handles NaN from TEXT → INTEGER conversion)
+function serializeTimestamps<T>(obj: T): T {
+  if (obj === null || obj === undefined) return obj;
+
+  // Handle Date objects
+  if (obj instanceof Date) {
+    return (isNaN(obj.getTime()) ? null : obj) as T;
+  }
+
+  // Handle NaN numbers
+  if (typeof obj === 'number' && !isFinite(obj)) {
+    return null as T;
+  }
+
+  // Handle arrays
+  if (Array.isArray(obj)) {
+    return obj.map(serializeTimestamps) as T;
+  }
+
+  // Handle objects (including relational data)
+  if (typeof obj === 'object') {
+    const result: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      result[key] = serializeTimestamps(value);
+    }
+    return result as T;
+  }
+
+  return obj;
+}
 import { eq, and, inArray, desc, sql } from 'drizzle-orm';
 import {
   qualityTests,
@@ -21,7 +52,8 @@ import {
   warehouseLocations,
   inventoryLocationTransfers,
 } from '../../../db/schema/inventory';
-import { users, type UserRole } from '../../../db/schema/auth';
+import { users } from '../../../db/schema/auth';
+import { UserRole } from '@/auth.config';
 import { updateItemInventoryFields } from './inventory-tools';
 
 // ============================================================================
@@ -159,8 +191,8 @@ export async function getInspectionById(inspectionId: number) {
 
     return {
       success: true,
-      inspection,
-      tests: applicableTests,
+      inspection: serializeTimestamps(inspection),
+      tests: serializeTimestamps(applicableTests),
     };
   } catch (error) {
     console.error('getInspectionById error:', error);
@@ -192,7 +224,7 @@ export async function submitInspectionResults(input: unknown) {
   const val = submitInspectionSchema.parse(input);
 
   try {
-    await db.transaction(async (tx) => {
+    await db.transaction(async (tx: any) => {
       // 1. Load inspection
       const inspection = await tx
         .select()
@@ -231,7 +263,14 @@ export async function submitInspectionResults(input: unknown) {
           if (isNaN(numValue)) {
             throw new Error(`Invalid numeric value for test ${test.name}`);
           }
-          passed = numValue >= (test.minValue ?? -Infinity) && numValue <= (test.maxValue ?? Infinity);
+
+          passed = true;
+          if (test.minValue !== null && test.minValue !== undefined) {
+            if (numValue < test.minValue) passed = false;
+          }
+          if (test.maxValue !== null && test.maxValue !== undefined) {
+            if (numValue > test.maxValue) passed = false;
+          }
         }
 
         if (!passed) allPassed = false;
@@ -346,7 +385,7 @@ export async function getPendingInspections() {
       limit: 50,
     });
 
-    return { success: true, inspections: pending };
+    return { success: true, inspections: serializeTimestamps(pending) };
   } catch (error) {
     console.error('getPendingInspections error:', error);
     return {
@@ -399,7 +438,7 @@ export async function getInspections(filters?: {
       limit: 100,
     });
 
-    return { success: true, inspections };
+    return { success: true, inspections: serializeTimestamps(inspections) };
   } catch (error) {
     console.error('getInspections error:', error);
     return {

@@ -3,11 +3,13 @@ import { sql, relations } from 'drizzle-orm';
 import { integer, sqliteTable, text, real } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { items, uoms } from './inventory';
+import { fixedAssets } from './fixed_assets';
+import { users } from './auth';
 
 // --- Shared Columns ---
 const timestampFields = {
-    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 };
 
 // --- Tables ---
@@ -146,18 +148,12 @@ export const workOrderSteps = sqliteTable('work_order_steps', {
     additionalMaterials: text('additional_materials'), // JSON array of {itemId, qty} for mid-step material additions
 
     // Operator & Quality Tracking
-    operatorId: integer('operator_id').references(() => {
-        // Dynamically import users to avoid circular dependency
-        return require('./auth').users;
-    }),
+    operatorId: integer('operator_id').references(() => users.id),
     operatorName: text('operator_name'), // Denormalized for reporting performance
     qualityCheckPassed: integer('quality_check_passed', { mode: 'boolean' }),
     qualityNotes: text('quality_notes'), // JSON string for quality inspection details
     qualityMetrics: text('quality_metrics'), // JSON: {moistureContent?, visualQuality?, colorConsistency?, textureScore?, notes?}
-    inspectorId: integer('inspector_id').references(() => {
-        // Dynamically import users to avoid circular dependency
-        return require('./auth').users;
-    }),
+    inspectorId: integer('inspector_id').references(() => users.id),
 
     // Equipment Tracking (Phase 1A)
     equipmentUnitId: integer('equipment_unit_id').references(() => equipmentUnits.id),
@@ -175,9 +171,7 @@ export const workOrderStepStatus = sqliteTable('work_order_step_status', {
     progressPercent: integer('progress_percent').default(0), // 0-10000 for basis points (0-100%)
 
     // Live operator session
-    activeOperatorId: integer('active_operator_id').references(() => {
-        return require('./auth').users;
-    }),
+    activeOperatorId: integer('active_operator_id').references(() => users.id),
     sessionStartTime: integer('session_start_time', { mode: 'timestamp' }),
     lastHeartbeat: integer('last_heartbeat', { mode: 'timestamp' }), // For detecting stale sessions
 
@@ -254,9 +248,7 @@ export const productionLineKpiSnapshots = sqliteTable('production_line_kpi_snaps
 // Operator performance snapshot table
 export const operatorPerformanceSnapshots = sqliteTable('operator_performance_snapshots', {
     id: integer('id').primaryKey({ autoIncrement: true }),
-    operatorId: integer('operator_id').references(() => {
-        return require('./auth').users;
-    }).notNull(),
+    operatorId: integer('operator_id').references(() => users.id).notNull(),
     workCenterId: integer('work_center_id').references(() => workCenters.id).notNull(),
     snapshotDate: integer('snapshot_date', { mode: 'timestamp' }).notNull(),
 
@@ -378,7 +370,7 @@ export const lineIssues = sqliteTable('line_issues', {
     rootCause: text('root_cause'),
     correctiveAction: text('corrective_action'),
     preventiveAction: text('preventive_action'),
-    reportedAt: integer('reported_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+    reportedAt: integer('reported_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
     assignedAt: integer('assigned_at', { mode: 'timestamp' }),
     resolvedAt: integer('resolved_at', { mode: 'timestamp' }),
     closedAt: integer('closed_at', { mode: 'timestamp' }),
@@ -389,91 +381,7 @@ export const lineIssues = sqliteTable('line_issues', {
 
 // --- Relations ---
 
-export const workCentersRelations = relations(workCenters, ({ many }) => ({
-    routingSteps: many(routingSteps),
-    equipmentUnits: many(equipmentUnits),
-}));
 
-export const equipmentUnitsRelations = relations(equipmentUnits, ({ one, many }) => ({
-    workCenter: one(workCenters, {
-        fields: [equipmentUnits.workCenterId],
-        references: [workCenters.id],
-    }),
-    workOrderSteps: many(workOrderSteps),
-}));
-
-export const routingsRelations = relations(routings, ({ one, many }) => ({
-    item: one(items, {
-        fields: [routings.itemId],
-        references: [items.id],
-    }),
-    steps: many(routingSteps),
-}));
-
-export const routingStepsRelations = relations(routingSteps, ({ one }) => ({
-    routing: one(routings, {
-        fields: [routingSteps.routingId],
-        references: [routings.id],
-    }),
-    workCenter: one(workCenters, {
-        fields: [routingSteps.workCenterId],
-        references: [workCenters.id],
-    }),
-}));
-
-export const workOrdersRelations = relations(workOrders, ({ one, many }) => ({
-    item: one(items, {
-        fields: [workOrders.itemId],
-        references: [items.id],
-    }),
-    routing: one(routings, {
-        fields: [workOrders.routingId],
-        references: [routings.id],
-    }),
-    steps: many(workOrderSteps),
-}));
-
-export const workOrderStepsRelations = relations(workOrderSteps, ({ one, many }) => ({
-    workOrder: one(workOrders, {
-        fields: [workOrderSteps.workOrderId],
-        references: [workOrders.id],
-    }),
-    routingStep: one(routingSteps, {
-        fields: [workOrderSteps.routingStepId],
-        references: [routingSteps.id],
-    }),
-    equipmentUnit: one(equipmentUnits, {
-        fields: [workOrderSteps.equipmentUnitId],
-        references: [equipmentUnits.id],
-    }),
-    costs: many(workOrderStepCosts),
-    status: one(workOrderStepStatus, {
-        fields: [workOrderSteps.id],
-        references: [workOrderStepStatus.workOrderStepId],
-    }),
-    processReadings: many(processReadings),
-}));
-
-export const workOrderStepStatusRelations = relations(workOrderStepStatus, ({ one }) => ({
-    workOrderStep: one(workOrderSteps, {
-        fields: [workOrderStepStatus.workOrderStepId],
-        references: [workOrderSteps.id],
-    }),
-}));
-
-export const workOrderStepCostsRelations = relations(workOrderStepCosts, ({ one }) => ({
-    workOrderStep: one(workOrderSteps, {
-        fields: [workOrderStepCosts.workOrderStepId],
-        references: [workOrderSteps.id],
-    }),
-}));
-
-export const processReadingsRelations = relations(processReadings, ({ one }) => ({
-    workOrderStep: one(workOrderSteps, {
-        fields: [processReadings.workOrderStepId],
-        references: [workOrderSteps.id],
-    }),
-}));
 
 // --- Zod Schemas ---
 

@@ -197,6 +197,9 @@ export async function createExpense(input: unknown) {
 
     const validated = createExpenseSchema.parse(input);
 
+    // Check period lock (GAAP/IFRS compliance)
+    await checkPeriodLock(validated.expenseDate);
+
     // Get category with validation rules
     const categoryResults = await db
         .select()
@@ -399,8 +402,29 @@ export async function approveExpense(input: unknown): Promise<{ success: boolean
     const validated = approveExpenseSchema.parse(input);
 
     try {
-        const result = await db.transaction(async (tx) => {
-            // 1. Get expense
+        // Pre-transaction: Load expense and validate
+        const expenseCheck = await db
+            .select()
+            .from(expenses)
+            .where(eq(expenses.id, validated.expenseId))
+            .limit(1);
+
+        if (expenseCheck.length === 0) {
+            return { success: false, error: 'Expense not found' };
+        }
+
+        const expenseToValidate = expenseCheck[0];
+
+        // Validate status before transaction
+        if (expenseToValidate.status !== 'SUBMITTED' && expenseToValidate.status !== 'DRAFT') {
+            return { success: false, error: 'Only submitted or draft expenses can be approved' };
+        }
+
+        // Check period lock BEFORE transaction (GAAP/IFRS compliance)
+        await checkPeriodLock(expenseToValidate.expenseDate);
+
+        const result = await db.transaction(async (tx: any) => {
+            // 1. Re-fetch expense for consistency within transaction
             const expenseResults = await tx
                 .select()
                 .from(expenses)
@@ -413,6 +437,7 @@ export async function approveExpense(input: unknown): Promise<{ success: boolean
 
             const expense = expenseResults[0];
 
+            // Double-check status within transaction (defensive)
             if (expense.status !== 'SUBMITTED' && expense.status !== 'DRAFT') {
                 throw new Error('Only submitted or draft expenses can be approved');
             }
@@ -430,10 +455,7 @@ export async function approveExpense(input: unknown): Promise<{ success: boolean
 
             const category = categoryResults[0];
 
-            // 3. Check period lock
-            await checkPeriodLock(expense.expenseDate);
-
-            // 4. Create journal entry based on expense type
+            // 3. Create journal entry based on expense type
             let journalEntryLines: JournalLineInput[];
 
             if (expense.type === 'PETTY_CASH') {
@@ -485,12 +507,12 @@ export async function approveExpense(input: unknown): Promise<{ success: boolean
                 expense.expenseNumber
             );
 
-            // 5. Update GL account balances
+            // 4. Update GL account balances
             for (const line of journalEntryLines) {
                 await updateGLAccountBalance(line.accountCode, tx);
             }
 
-            // 6. Update expense status
+            // 5. Update expense status
             const updatedStatus = expense.type === 'PETTY_CASH' ? 'PAID' : 'APPROVED';
             const paidAt = expense.type === 'PETTY_CASH' ? new Date() : null;
 
@@ -567,8 +589,33 @@ export async function payReimbursableExpense(input: unknown) {
     const validated = payReimbursableExpenseSchema.parse(input);
 
     try {
-        const result = await db.transaction(async (tx) => {
-            // 1. Get expense
+        // Pre-transaction: Load expense and validate
+        const expenseCheck = await db
+            .select()
+            .from(expenses)
+            .where(eq(expenses.id, validated.expenseId))
+            .limit(1);
+
+        if (expenseCheck.length === 0) {
+            return { success: false, error: 'Expense not found' };
+        }
+
+        const expenseToValidate = expenseCheck[0];
+
+        // Validate status and type before transaction
+        if (expenseToValidate.status !== 'APPROVED') {
+            return { success: false, error: 'Expense must be approved before payment' };
+        }
+
+        if (expenseToValidate.type !== 'REIMBURSABLE') {
+            return { success: false, error: 'Only reimbursable expenses require payment' };
+        }
+
+        // Check period lock BEFORE transaction (GAAP/IFRS compliance)
+        await checkPeriodLock(validated.paymentDate);
+
+        const result = await db.transaction(async (tx: any) => {
+            // 1. Re-fetch expense for consistency within transaction
             const expenseResults = await tx
                 .select()
                 .from(expenses)
@@ -581,6 +628,7 @@ export async function payReimbursableExpense(input: unknown) {
 
             const expense = expenseResults[0];
 
+            // Double-check status within transaction (defensive)
             if (expense.status !== 'APPROVED') {
                 throw new Error('Expense must be approved before payment');
             }
@@ -589,10 +637,7 @@ export async function payReimbursableExpense(input: unknown) {
                 throw new Error('Only reimbursable expenses require payment');
             }
 
-            // 2. Check period lock
-            await checkPeriodLock(validated.paymentDate);
-
-            // 3. Create payment journal entry
+            // 2. Create payment journal entry
             // DR: Employee Payables (2150)
             // CR: Bank Account (1110)
             const journalEntryLines: JournalLineInput[] = [
@@ -617,11 +662,11 @@ export async function payReimbursableExpense(input: unknown) {
                 validated.paymentReference || expense.expenseNumber
             );
 
-            // 4. Update GL account balances
+            // 3. Update GL account balances
             await updateGLAccountBalance(ACCOUNTS.EMPLOYEE_PAYABLES, tx);
             await updateGLAccountBalance(ACCOUNTS.BANK_MAIN, tx);
 
-            // 5. Update expense status
+            // 4. Update expense status
             const [updatedExpense] = await tx
                 .update(expenses)
                 .set({

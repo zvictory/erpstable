@@ -7,8 +7,8 @@ import { vendorBillLines } from './purchasing';
 
 // --- Shared Columns ---
 const timestampFields = {
-    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 };
 
 // --- Tables ---
@@ -108,39 +108,7 @@ export const depreciationEntries = sqliteTable(
 
 // --- Relations ---
 
-export const fixedAssetsRelations = relations(fixedAssets, ({ many, one }) => ({
-    depreciationEntries: many(depreciationEntries),
-    assetAccount: one(glAccounts, {
-        fields: [fixedAssets.assetAccountCode],
-        references: [glAccounts.code],
-        relationName: 'assetAccount',
-    }),
-    depreciationExpenseAccount: one(glAccounts, {
-        fields: [fixedAssets.depreciationExpenseAccountCode],
-        references: [glAccounts.code],
-        relationName: 'depreciationExpenseAccount',
-    }),
-    accumulatedDepreciationAccount: one(glAccounts, {
-        fields: [fixedAssets.accumulatedDepreciationAccountCode],
-        references: [glAccounts.code],
-        relationName: 'accumulatedDepreciationAccount',
-    }),
-    vendorBillLine: one(vendorBillLines, {
-        fields: [fixedAssets.vendorBillLineId],
-        references: [vendorBillLines.id],
-    }),
-}));
 
-export const depreciationEntriesRelations = relations(depreciationEntries, ({ one }) => ({
-    asset: one(fixedAssets, {
-        fields: [depreciationEntries.assetId],
-        references: [fixedAssets.id],
-    }),
-    journalEntry: one(journalEntries, {
-        fields: [depreciationEntries.journalEntryId],
-        references: [journalEntries.id],
-    }),
-}));
 
 // --- Zod Schemas ---
 

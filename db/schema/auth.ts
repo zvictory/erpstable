@@ -2,12 +2,12 @@ import { sql, relations } from 'drizzle-orm';
 import { integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import { vendorBills } from './purchasing';
+
 
 // Shared timestamp fields
 const timestampFields = {
-    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 };
 
 // Users table
@@ -38,17 +38,7 @@ export const passwordResetTokens = sqliteTable('password_reset_tokens', {
 });
 
 // Relations
-export const usersRelations = relations(users, ({ many }) => ({
-    resetTokens: many(passwordResetTokens),
-    approvedBills: many(vendorBills),
-}));
 
-export const passwordResetTokensRelations = relations(passwordResetTokens, ({ one }) => ({
-    user: one(users, {
-        fields: [passwordResetTokens.userId],
-        references: [users.id],
-    }),
-}));
 
 // Zod Schemas
 export const insertUserSchema = createInsertSchema(users, {

@@ -5,8 +5,8 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
 // --- Shared Columns ---
 const timestampFields = {
-    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 };
 
 // --- Tables ---
@@ -51,6 +51,7 @@ export const journalEntryLines = sqliteTable('journal_entry_lines', {
     debit: integer('debit').default(0).notNull(),
     credit: integer('credit').default(0).notNull(),
 
+    // analyticAccountId: integer('analytic_account_id'), // Link to Analytic Account (Cost Center)
     description: text('description'), // Line item desc
 }, (t) => ({
     accountCodeIdx: index('idx_je_lines_account').on(t.accountCode),
@@ -64,25 +65,79 @@ export const systemSettings = sqliteTable('system_settings', {
     lockDate: integer('lock_date', { mode: 'timestamp' }), // Books closed up to this date
     preferences: text('preferences', { mode: 'json' }).notNull().default(sql`'{}'`), // Global preferences (feature flags, thresholds)
 
-    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 });
+
+export const taxRates = sqliteTable('tax_rates', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    name: text('name').notNull(), // e.g. "VAT 12%"
+    rate: integer('rate').notNull(), // Stored as decimal (e.g. 0.12) -> Wait, SQLite doesn't support decimal well. Use integer basis points? Or REAL?
+    // User requested "rate (0.12)". I will use real for rate multiplier, or integer basis points.
+    // Let's use REAL for simplicity as a multiplier.
+    rateMultiplier: integer('rate_multiplier').notNull(), // e.g. 1200 for 12.00%
+
+    glAccountId: text('gl_account_id').references(() => glAccounts.code), // Liability Account
+    isActive: integer('is_active', { mode: 'boolean' }).default(true),
+
+    isGroup: integer('is_group', { mode: 'boolean' }).default(false),
+    ...timestampFields,
+});
+
+export const taxGroups = sqliteTable('tax_groups', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    name: text('name').notNull(),
+    description: text('description'),
+    ...timestampFields,
+});
+
+export const analyticAccounts = sqliteTable('analytic_accounts', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    name: text('name').notNull(), // "Project X", "Admin Dept"
+    code: text('code').unique(), // "CC-01"
+    description: text('description'),
+    isActive: integer('is_active', { mode: 'boolean' }).default(true),
+    ...timestampFields,
+});
+
+export const bankStatements = sqliteTable('bank_statements', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    name: text('name').notNull(), // "Jan 2026 - Kapitalbank"
+
+    balanceStart: integer('balance_start').notNull(), // Tiyin
+    balanceEndReal: integer('balance_end_real').notNull(), // Tiyin (from Bank)
+    balanceEndSystem: integer('balance_end_system').default(0), // Tiyin (Calculated)
+
+    status: text('status', { enum: ['OPEN', 'RECONCILED'] }).default('OPEN').notNull(),
+    fileUrl: text('file_url'), // Link to uploaded CSV/PDF
+
+    ...timestampFields,
+});
+
+export const statementLines = sqliteTable('statement_lines', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    statementId: integer('statement_id').references(() => bankStatements.id, { onDelete: 'cascade' }).notNull(),
+
+    date: integer('date', { mode: 'timestamp' }).notNull(),
+    amount: integer('amount').notNull(), // Tiyin. Positive = Deposit, Negative = Withdrawal
+    description: text('description').notNull(),
+    reference: text('reference'), // Bank Ref
+
+    // Reconciliation Status
+    isReconciled: integer('is_reconciled', { mode: 'boolean' }).default(false).notNull(),
+    matchedJournalEntryId: integer('matched_journal_entry_id').references(() => journalEntries.id),
+
+    ...timestampFields,
+}, (t) => ({
+    statementIdIdx: index('stmt_lines_statement_id_idx').on(t.statementId),
+    matchedEntryIdx: index('stmt_lines_matched_entry_idx').on(t.matchedJournalEntryId),
+}));
+
+// Join table for Tax Groups if needed (Many-to-Many), but simple list for now.
+
 
 // --- Relations ---
 
-export const journalEntriesRelations = relations(journalEntries, ({ many }) => ({
-    lines: many(journalEntryLines),
-}));
 
-export const journalEntryLinesRelations = relations(journalEntryLines, ({ one }) => ({
-    journalEntry: one(journalEntries, {
-        fields: [journalEntryLines.journalEntryId],
-        references: [journalEntries.id],
-    }),
-    account: one(glAccounts, {
-        fields: [journalEntryLines.accountCode],
-        references: [glAccounts.code],
-    }),
-}));
 
 // --- Zod Schemas ---
 

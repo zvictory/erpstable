@@ -7,8 +7,8 @@ import { users } from './auth';
 
 // Shared timestamp fields
 const timestampFields = {
-    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 };
 
 // --- Tables ---
@@ -82,39 +82,7 @@ export const expenses = sqliteTable('expenses', {
 
 // --- Relations ---
 
-export const expenseCategoriesRelations = relations(expenseCategories, ({ one, many }) => ({
-    expenseAccount: one(glAccounts, {
-        fields: [expenseCategories.expenseAccountCode],
-        references: [glAccounts.code],
-    }),
-    expenses: many(expenses),
-}));
 
-export const expensesRelations = relations(expenses, ({ one }) => ({
-    category: one(expenseCategories, {
-        fields: [expenses.categoryId],
-        references: [expenseCategories.id],
-    }),
-    paidFromAccount: one(glAccounts, {
-        fields: [expenses.paidFromAccountCode],
-        references: [glAccounts.code],
-    }),
-    reimbursableToEmployee: one(users, {
-        fields: [expenses.reimbursableToEmployeeId],
-        references: [users.id],
-        relationName: 'reimbursableExpenses',
-    }),
-    approver: one(users, {
-        fields: [expenses.approvedBy],
-        references: [users.id],
-        relationName: 'approvedExpenses',
-    }),
-    creator: one(users, {
-        fields: [expenses.createdBy],
-        references: [users.id],
-        relationName: 'createdExpenses',
-    }),
-}));
 
 // --- Zod Schemas ---
 

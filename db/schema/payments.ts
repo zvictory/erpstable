@@ -6,8 +6,8 @@ import { vendors, vendorBills } from './purchasing';
 
 // --- Shared Columns ---
 const timestampFields = {
-    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 };
 
 // --- Tables ---
@@ -41,24 +41,7 @@ export const vendorPaymentAllocations = sqliteTable('vendor_payment_allocations'
 
 // --- Relations ---
 
-export const vendorPaymentsRelations = relations(vendorPayments, ({ one, many }) => ({
-    vendor: one(vendors, {
-        fields: [vendorPayments.vendorId],
-        references: [vendors.id],
-    }),
-    allocations: many(vendorPaymentAllocations),
-}));
 
-export const vendorPaymentAllocationsRelations = relations(vendorPaymentAllocations, ({ one }) => ({
-    payment: one(vendorPayments, {
-        fields: [vendorPaymentAllocations.paymentId],
-        references: [vendorPayments.id],
-    }),
-    bill: one(vendorBills, {
-        fields: [vendorPaymentAllocations.billId],
-        references: [vendorBills.id],
-    }),
-}));
 
 // --- Zod Schemas ---
 

@@ -7,10 +7,10 @@ import { users } from './auth';
 const timestampFields = {
   createdAt: integer('created_at', { mode: 'timestamp' })
     .notNull()
-    .default(sql`CURRENT_TIMESTAMP`),
+    .default(sql`(unixepoch())`),
   updatedAt: integer('updated_at', { mode: 'timestamp' })
     .notNull()
-    .default(sql`CURRENT_TIMESTAMP`),
+    .default(sql`(unixepoch())`),
 };
 
 // Notifications table
@@ -69,12 +69,7 @@ export const notifications = sqliteTable(
 );
 
 // Relations
-export const notificationsRelations = relations(notifications, ({ one }) => ({
-  user: one(users, {
-    fields: [notifications.userId],
-    references: [users.id],
-  }),
-}));
+
 
 // Zod schemas
 export const insertNotificationSchema = createInsertSchema(notifications);

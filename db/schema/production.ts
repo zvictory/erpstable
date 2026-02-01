@@ -2,13 +2,13 @@
 import { sql, relations } from 'drizzle-orm';
 import { integer, sqliteTable, text, real, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { items } from './inventory';
+import { items, warehouseLocations } from './inventory';
 import { users } from './auth';
 
 // --- Shared Columns ---
 const timestampFields = {
-    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 };
 
 // --- Tables ---
@@ -21,6 +21,7 @@ export const recipes = sqliteTable('recipes', {
     outputItemId: integer('output_item_id').notNull().references(() => items.id),
     expectedYieldPct: integer('expected_yield_pct').notNull(), // 30 = 30%
     isActive: integer('is_active', { mode: 'boolean' }).default(true).notNull(),
+    outputQuantity: real('output_quantity'), // Optional: explicit output amount
     ...timestampFields,
 });
 
@@ -40,8 +41,50 @@ export const productionRuns = sqliteTable('production_runs', {
     status: text('status', { enum: ['DRAFT', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'] }).default('DRAFT').notNull(),
     type: text('type', { enum: ['MIXING', 'SUBLIMATION'] }).notNull(),
     notes: text('notes'),
+
+    // Destination for output (where WIP goes after production)
+    destinationLocationId: integer('destination_location_id')
+        .references(() => warehouseLocations.id),
+
     ...timestampFields,
 });
+
+// Production Run Steps: Sequential steps within a production run with weight control
+export const productionRunSteps = sqliteTable('production_run_steps', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    runId: integer('run_id').notNull().references(() => productionRuns.id, { onDelete: 'cascade' }),
+    stepNumber: integer('step_number').notNull(), // 1, 2, 3...
+    stepName: text('step_name').notNull(), // "Peeling", "Mixing", "Drying"
+
+    // Expected values (from recipe or manual)
+    expectedInputQty: real('expected_input_qty').notNull(),
+    expectedOutputQty: real('expected_output_qty').notNull(),
+    expectedYieldPct: real('expected_yield_pct').notNull(),
+
+    // Actual values (entered by user)
+    actualInputQty: real('actual_input_qty'),
+    actualOutputQty: real('actual_output_qty'),
+    actualYieldPct: real('actual_yield_pct'),
+
+    // Weight variance tracking
+    weightVariancePct: real('weight_variance_pct'),
+    varianceReason: text('variance_reason'),
+    varianceAcknowledged: integer('variance_acknowledged', { mode: 'boolean' }).default(false),
+
+    // WIP item created at this step
+    outputWipItemId: integer('output_wip_item_id').references(() => items.id),
+    outputBatchNumber: text('output_batch_number'),
+
+    // Status
+    status: text('status', { enum: ['PENDING', 'IN_PROGRESS', 'COMPLETED'] }).default('PENDING').notNull(),
+    completedAt: integer('completed_at', { mode: 'timestamp' }),
+
+    ...timestampFields,
+}, (table) => ({
+    runIdx: index('prod_run_steps_run_idx').on(table.runId),
+    statusIdx: index('prod_run_steps_status_idx').on(table.status),
+    uniqueRunStep: uniqueIndex('run_step_unique').on(table.runId, table.stepNumber),
+}));
 
 // Inputs: Raw materials consumed
 export const productionInputs = sqliteTable('production_inputs', {
@@ -49,6 +92,9 @@ export const productionInputs = sqliteTable('production_inputs', {
     runId: integer('run_id').references(() => productionRuns.id).notNull(),
 
     itemId: integer('item_id').references(() => items.id).notNull(),
+
+    // Link to specific production step (for multi-step production)
+    stepId: integer('step_id').references(() => productionRunSteps.id),
 
     // We can link to specific inventory layer if manual batch selection is allowed
     // batchId: integer('batch_id').references(() => inventoryLayers.id),
@@ -93,6 +139,35 @@ export const productionCosts = sqliteTable('production_costs', {
     ...timestampFields,
 });
 
+// Production Run Dependencies: Track which runs feed into others (multi-stage production)
+export const productionRunDependencies = sqliteTable('production_run_dependencies', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+
+    // The parent run that produced the WIP item
+    parentRunId: integer('parent_run_id')
+        .references(() => productionRuns.id, { onDelete: 'cascade' })
+        .notNull(),
+
+    // The child run that consumed the WIP item
+    childRunId: integer('child_run_id')
+        .references(() => productionRuns.id, { onDelete: 'cascade' })
+        .notNull(),
+
+    // The WIP item linking them
+    itemId: integer('item_id')
+        .references(() => items.id)
+        .notNull(),
+
+    // Quantity consumed from parent by child (basis points: 100 = 1.00)
+    qtyConsumed: integer('qty_consumed').notNull(),
+
+    ...timestampFields,
+}, (table) => ({
+    parentRunIdx: index('prod_deps_parent_idx').on(table.parentRunId),
+    childRunIdx: index('prod_deps_child_idx').on(table.childRunId),
+    itemIdx: index('prod_deps_item_idx').on(table.itemId),
+}));
+
 // Labor Logs: Track employee time on production runs
 export const productionLaborLogs = sqliteTable('production_labor_logs', {
     id: integer('id').primaryKey({ autoIncrement: true }),
@@ -132,78 +207,36 @@ export const productionLaborLogs = sqliteTable('production_labor_logs', {
         .where(sql`clock_out_at IS NULL`),
 }));
 
+// Production Run Chains: Groups related multi-stage production runs
+export const productionRunChains = sqliteTable('production_run_chains', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    name: text('name').notNull(),
+    targetItemId: integer('target_item_id').notNull().references(() => items.id),
+    targetQuantity: real('target_quantity').notNull(),
+    status: text('status', { enum: ['DRAFT', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'] })
+        .default('DRAFT').notNull(),
+    createdBy: integer('created_by').references(() => users.id),
+    ...timestampFields,
+});
+
+// Links production runs to their parent chain
+export const productionRunChainMembers = sqliteTable('production_run_chain_members', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    chainId: integer('chain_id').notNull().references(() => productionRunChains.id, { onDelete: 'cascade' }),
+    runId: integer('run_id').notNull().references(() => productionRuns.id, { onDelete: 'cascade' }),
+    stageNumber: integer('stage_number').notNull(),
+    expectedInputQty: real('expected_input_qty').notNull(),
+    expectedOutputQty: real('expected_output_qty').notNull(),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+}, (table) => ({
+    chainIdx: index('chain_members_chain_idx').on(table.chainId),
+    runIdx: index('chain_members_run_idx').on(table.runId),
+    uniqueChainRun: uniqueIndex('chain_run_unique').on(table.chainId, table.runId),
+}));
+
 // --- Relations ---
 
-export const recipesRelations = relations(recipes, ({ one, many }) => ({
-    outputItem: one(items, {
-        fields: [recipes.outputItemId],
-        references: [items.id],
-    }),
-    ingredients: many(recipeItems),
-    productionRuns: many(productionRuns),
-}));
 
-export const recipeItemsRelations = relations(recipeItems, ({ one }) => ({
-    recipe: one(recipes, {
-        fields: [recipeItems.recipeId],
-        references: [recipes.id],
-    }),
-    item: one(items, {
-        fields: [recipeItems.itemId],
-        references: [items.id],
-    }),
-}));
-
-export const productionRunsRelations = relations(productionRuns, ({ one, many }) => ({
-    recipe: one(recipes, {
-        fields: [productionRuns.recipeId],
-        references: [recipes.id],
-    }),
-    inputs: many(productionInputs),
-    outputs: many(productionOutputs),
-    costs: many(productionCosts),
-    laborLogs: many(productionLaborLogs),
-}));
-
-export const productionInputsRelations = relations(productionInputs, ({ one }) => ({
-    run: one(productionRuns, {
-        fields: [productionInputs.runId],
-        references: [productionRuns.id],
-    }),
-    item: one(items, {
-        fields: [productionInputs.itemId],
-        references: [items.id],
-    }),
-}));
-
-export const productionOutputsRelations = relations(productionOutputs, ({ one }) => ({
-    run: one(productionRuns, {
-        fields: [productionOutputs.runId],
-        references: [productionRuns.id],
-    }),
-    item: one(items, {
-        fields: [productionOutputs.itemId],
-        references: [items.id],
-    }),
-}));
-
-export const productionCostsRelations = relations(productionCosts, ({ one }) => ({
-    run: one(productionRuns, {
-        fields: [productionCosts.runId],
-        references: [productionRuns.id],
-    }),
-}));
-
-export const productionLaborLogsRelations = relations(productionLaborLogs, ({ one }) => ({
-    run: one(productionRuns, {
-        fields: [productionLaborLogs.runId],
-        references: [productionRuns.id],
-    }),
-    user: one(users, {
-        fields: [productionLaborLogs.userId],
-        references: [users.id],
-    }),
-}));
 
 // --- Zod Schemas ---
 export const insertRecipeSchema = createInsertSchema(recipes);
@@ -212,5 +245,10 @@ export const insertProductionRunSchema = createInsertSchema(productionRuns);
 export const insertProductionInputSchema = createInsertSchema(productionInputs);
 export const insertProductionOutputSchema = createInsertSchema(productionOutputs);
 export const insertProductionCostSchema = createInsertSchema(productionCosts);
+export const insertProductionRunDependencySchema = createInsertSchema(productionRunDependencies);
 export const insertProductionLaborLogSchema = createInsertSchema(productionLaborLogs);
 export const selectProductionLaborLogSchema = createSelectSchema(productionLaborLogs);
+export const insertProductionRunChainSchema = createInsertSchema(productionRunChains);
+export const insertProductionRunChainMemberSchema = createInsertSchema(productionRunChainMembers);
+export const insertProductionRunStepSchema = createInsertSchema(productionRunSteps);
+export const selectProductionRunStepSchema = createSelectSchema(productionRunSteps);

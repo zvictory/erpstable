@@ -8,8 +8,8 @@ import { users } from './auth';
 
 // --- Shared Columns ---
 const timestampFields = {
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 };
 
 // --- Tables ---
@@ -131,91 +131,7 @@ export const serviceTicketAssets = sqliteTable('service_ticket_assets', {
 
 // --- Relations ---
 
-export const customerAssetsRelations = relations(customerAssets, ({ one, many }) => ({
-  customer: one(customers, {
-    fields: [customerAssets.customerId],
-    references: [customers.id],
-  }),
-  item: one(items, {
-    fields: [customerAssets.itemId],
-    references: [items.id],
-  }),
-  invoiceLine: one(invoiceLines, {
-    fields: [customerAssets.invoiceLineId],
-    references: [invoiceLines.id],
-  }),
-  serviceContract: one(serviceContracts, {
-    fields: [customerAssets.serviceContractId],
-    references: [serviceContracts.id],
-  }),
-  serviceTicketAssets: many(serviceTicketAssets),
-}));
 
-export const serviceContractsRelations = relations(serviceContracts, ({ one, many }) => ({
-  customer: one(customers, {
-    fields: [serviceContracts.customerId],
-    references: [customers.id],
-  }),
-  assignedTechnician: one(users, {
-    fields: [serviceContracts.assignedTechnicianId],
-    references: [users.id],
-  }),
-  sourceInvoice: one(invoices, {
-    fields: [serviceContracts.sourceInvoiceId],
-    references: [invoices.id],
-  }),
-  refillItems: many(contractRefillItems),
-  customerAssets: many(customerAssets),
-  serviceTickets: many(serviceTickets),
-}));
-
-export const contractRefillItemsRelations = relations(contractRefillItems, ({ one }) => ({
-  contract: one(serviceContracts, {
-    fields: [contractRefillItems.contractId],
-    references: [serviceContracts.id],
-  }),
-  item: one(items, {
-    fields: [contractRefillItems.itemId],
-    references: [items.id],
-  }),
-}));
-
-export const serviceTicketsRelations = relations(serviceTickets, ({ one, many }) => ({
-  customer: one(customers, {
-    fields: [serviceTickets.customerId],
-    references: [customers.id],
-  }),
-  contract: one(serviceContracts, {
-    fields: [serviceTickets.serviceContractId],
-    references: [serviceContracts.id],
-  }),
-  assignedTechnician: one(users, {
-    fields: [serviceTickets.assignedTechnicianId],
-    references: [users.id],
-  }),
-  serviceInvoice: one(invoices, {
-    fields: [serviceTickets.serviceInvoiceId],
-    references: [invoices.id],
-    relationName: 'serviceTicketInvoice',
-  }),
-  sourceInvoice: one(invoices, {
-    fields: [serviceTickets.sourceInvoiceId],
-    references: [invoices.id],
-    relationName: 'serviceTicketSource',
-  }),
-  ticketAssets: many(serviceTicketAssets),
-}));
-
-export const serviceTicketAssetsRelations = relations(serviceTicketAssets, ({ one }) => ({
-  ticket: one(serviceTickets, {
-    fields: [serviceTicketAssets.ticketId],
-    references: [serviceTickets.id],
-  }),
-  asset: one(customerAssets, {
-    fields: [serviceTicketAssets.assetId],
-    references: [customerAssets.id],
-  }),
-}));
 
 // --- Zod Schemas ---
 

@@ -8,8 +8,8 @@ import { journalEntries } from './finance';
 
 // Shared timestamp fields
 const timestampFields = {
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 };
 
 // ============================================
@@ -48,23 +48,7 @@ export const payrollPeriods = sqliteTable(
   })
 );
 
-export const payrollPeriodsRelations = relations(payrollPeriods, ({ one, many }) => ({
-  payslips: many(payslips),
-  approver: one(users, {
-    fields: [payrollPeriods.approvedBy],
-    references: [users.id],
-    relationName: "approver",
-  }),
-  creator: one(users, {
-    fields: [payrollPeriods.createdBy],
-    references: [users.id],
-    relationName: "creator",
-  }),
-  journalEntry: one(journalEntries, {
-    fields: [payrollPeriods.journalEntryId],
-    references: [journalEntries.id],
-  }),
-}));
+
 
 // ============================================
 // PAYSLIPS (Per Employee)
@@ -104,21 +88,7 @@ export const payslips = sqliteTable(
   })
 );
 
-export const payslipsRelations = relations(payslips, ({ one, many }) => ({
-  period: one(payrollPeriods, {
-    fields: [payslips.periodId],
-    references: [payrollPeriods.id],
-  }),
-  employee: one(users, {
-    fields: [payslips.userId],
-    references: [users.id],
-  }),
-  items: many(payslipItems),
-  journalEntry: one(journalEntries, {
-    fields: [payslips.journalEntryId],
-    references: [journalEntries.id],
-  }),
-}));
+
 
 // ============================================
 // PAYSLIP ITEMS (Line Items)
@@ -138,7 +108,7 @@ export const payslipItems = sqliteTable(
     accountCode: text("account_code"), // e.g., "6010", "2410"
 
     // Audit
-    createdAt: integer("created_at", { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: integer("created_at", { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
   },
   (table) => ({
     payslipIdx: index("payslip_items_payslip_id_idx").on(table.payslipId),
@@ -146,12 +116,7 @@ export const payslipItems = sqliteTable(
   })
 );
 
-export const payslipItemsRelations = relations(payslipItems, ({ one }) => ({
-  payslip: one(payslips, {
-    fields: [payslipItems.payslipId],
-    references: [payslips.id],
-  }),
-}));
+
 
 // ============================================
 // EMPLOYEE COMPENSATION (Temporal)
@@ -180,7 +145,7 @@ export const employeeCompensation = sqliteTable(
 
     // Audit
     createdBy: integer("created_by").notNull().references(() => users.id),
-    createdAt: integer("created_at", { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: integer("created_at", { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
   },
   (table) => ({
     userEffectiveIdx: index("employee_compensation_user_effective_idx").on(
@@ -192,15 +157,4 @@ export const employeeCompensation = sqliteTable(
   })
 );
 
-export const employeeCompensationRelations = relations(employeeCompensation, ({ one }) => ({
-  employee: one(users, {
-    fields: [employeeCompensation.userId],
-    references: [users.id],
-    relationName: "employee",
-  }),
-  creator: one(users, {
-    fields: [employeeCompensation.createdBy],
-    references: [users.id],
-    relationName: "compensationCreator",
-  }),
-}));
+

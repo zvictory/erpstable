@@ -2,13 +2,13 @@
 import { sql, relations } from 'drizzle-orm';
 import { integer, sqliteTable, text, uniqueIndex, index } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { items } from './inventory';
+import { items, warehouses, warehouseLocations } from './inventory';
 import { users } from './auth';
 
 // --- Shared Columns ---
 const timestampFields = {
-    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 };
 
 // --- Tables ---
@@ -21,7 +21,7 @@ export const vendors = sqliteTable('vendors', {
     phone: text('phone'),
     address: text('address'),
 
-    currency: text('currency').default('UZS').notNull(), // UZS, USD
+    currency: text('currency').default('сўм').notNull(), // сўм, USD
     paymentTerms: text('payment_terms'), // "Net 30", "Immediate"
 
     status: text('status', { enum: ['ACTIVE', 'ARCHIVED'] }).default('ACTIVE').notNull(),
@@ -94,62 +94,50 @@ export const vendorBillLines = sqliteTable('vendor_bill_lines', {
 
     lineNumber: integer('line_number').notNull().default(0),
     assetId: integer('asset_id'), // FK to fixedAssets - nullable for non-capitalized lines
-    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
+    taxRateId: integer('tax_rate_id'), // Link to Tax Rates
+    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+});
+
+export const landedCostAllocations = sqliteTable('landed_cost_allocations', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+
+    // The Cost Source (e.g. Freight Bill Line) - must be a service item
+    serviceBillLineId: integer('service_bill_line_id').references(() => vendorBillLines.id).notNull(),
+
+    // The Destination (e.g. Goods Receipt Bill) - the bill containing items to revalue
+    targetBillId: integer('target_bill_id').references(() => vendorBills.id).notNull(),
+
+    // Allocation Logic
+    allocationMethod: text('allocation_method', { enum: ['VALUE', 'QUANTITY', 'VOLUME'] }).default('VALUE').notNull(),
+    amountAllocated: integer('amount_allocated').notNull(), // The portion of the service bill line used here (Tiyin)
+
+    ...timestampFields,
+}, (t) => ({
+    serviceLineIdx: index('lca_service_line_idx').on(t.serviceBillLineId),
+    targetBillIdx: index('lca_target_bill_idx').on(t.targetBillId),
+}));
+
+export const goodsReceivedNotes = sqliteTable('goods_received_notes', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    billId: integer('bill_id').references(() => vendorBills.id),
+    status: text('status', { enum: ['PENDING', 'PARTIAL', 'RECEIVED', 'CANCELLED'] }).default('PENDING').notNull(),
+    receivedAt: integer('received_at', { mode: 'timestamp' }),
+    warehouseId: integer('warehouse_id').references(() => warehouses.id),
+    notes: text('notes'),
+    ...timestampFields,
+});
+
+export const grnItems = sqliteTable('grn_items', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    grnId: integer('grn_id').references(() => goodsReceivedNotes.id, { onDelete: 'cascade' }).notNull(),
+    itemId: integer('item_id').references(() => items.id).notNull(),
+    expectedQty: integer('expected_qty').notNull(),
+    receivedQty: integer('received_qty').default(0).notNull(),
 });
 
 // --- Relations ---
 
-export const vendorsRelations = relations(vendors, ({ many }) => ({
-    purchaseOrders: many(purchaseOrders),
-    bills: many(vendorBills),
-}));
 
-export const purchaseOrdersRelations = relations(purchaseOrders, ({ one, many }) => ({
-    vendor: one(vendors, {
-        fields: [purchaseOrders.vendorId],
-        references: [vendors.id],
-    }),
-    lines: many(purchaseOrderLines),
-    bills: many(vendorBills),
-}));
-
-export const purchaseOrderLinesRelations = relations(purchaseOrderLines, ({ one }) => ({
-    purchaseOrder: one(purchaseOrders, {
-        fields: [purchaseOrderLines.poId],
-        references: [purchaseOrders.id],
-    }),
-    item: one(items, {
-        fields: [purchaseOrderLines.itemId],
-        references: [items.id],
-    }),
-}));
-
-export const vendorBillsRelations = relations(vendorBills, ({ one, many }) => ({
-    vendor: one(vendors, {
-        fields: [vendorBills.vendorId],
-        references: [vendors.id],
-    }),
-    purchaseOrder: one(purchaseOrders, {
-        fields: [vendorBills.poId],
-        references: [purchaseOrders.id],
-    }),
-    approver: one(users, {
-        fields: [vendorBills.approvedBy],
-        references: [users.id],
-    }),
-    lines: many(vendorBillLines),
-}));
-
-export const vendorBillLinesRelations = relations(vendorBillLines, ({ one }) => ({
-    bill: one(vendorBills, {
-        fields: [vendorBillLines.billId],
-        references: [vendorBills.id],
-    }),
-    item: one(items, {
-        fields: [vendorBillLines.itemId],
-        references: [items.id],
-    }),
-}));
 
 // --- Zod Schemas ---
 
@@ -167,3 +155,9 @@ export const selectVendorBillSchema = createSelectSchema(vendorBills);
 
 export const insertVendorBillLineSchema = createInsertSchema(vendorBillLines);
 export const selectVendorBillLineSchema = createSelectSchema(vendorBillLines);
+
+export const insertGRNSchema = createInsertSchema(goodsReceivedNotes);
+export const selectGRNSchema = createSelectSchema(goodsReceivedNotes);
+
+export const insertGRNItemSchema = createInsertSchema(grnItems);
+export const selectGRNItemSchema = createSelectSchema(grnItems);
