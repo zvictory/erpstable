@@ -11,8 +11,9 @@ import CustomerForm from '@/components/sales/CustomerForm';
 import { deleteInvoice } from '@/app/actions/sales';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import DeleteInvoiceModal from '@/components/sales/DeleteInvoiceModal';
-import { LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard, Users, Plus, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from 'next-intl';
 
 interface Customer {
     id: number;
@@ -31,21 +32,32 @@ interface KPIStats {
 interface CustomerCenterLayoutProps {
     customers: Customer[];
     items: { id: number; name: string; sku: string | null; salesPrice?: number }[];
+    taxRates?: {
+        id: number;
+        name: string;
+        rateMultiplier: number;
+        isActive: boolean;
+    }[];
     selectedCustomer?: any;
     initialSelectedId?: number;
     kpis?: KPIStats;
+    users?: { id: number; name: string }[];
 }
 
 export function CustomerCenterLayout({
     customers,
     items,
+    taxRates = [],
     selectedCustomer,
     initialSelectedId,
-    kpis
+    kpis,
+    users = []
 }: CustomerCenterLayoutProps) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const t = useTranslations('sales.customers');
+    const tCommon = useTranslations('common');
 
     // URL State management
     const selectedId = searchParams.get('customerId') ? parseInt(searchParams.get('customerId')!) : initialSelectedId;
@@ -156,50 +168,69 @@ export function CustomerCenterLayout({
     };
 
     return (
-        <div className="flex flex-col h-screen max-h-screen pt-4 overflow-hidden relative">
-            <div className="px-6 mb-2">
-                <Button variant="ghost" size="sm" onClick={() => router.push('/')} className="gap-2 text-muted-foreground pl-0 hover:pl-2 transition-all">
-                    <LayoutDashboard className="h-4 w-4" />
-                    <span>Dashboard</span>
-                </Button>
-            </div>
-
-            {/* Top Section: Money Bar */}
-            <div className="px-6 mb-4">
-                <CustomerKPIs
-                    openQuotes={kpiStats.openQuotes}
-                    unbilledOrders={kpiStats.unbilledOrders}
-                    overdueAR={kpiStats.overdueAR}
-                    paidLast30={kpiStats.paidLast30}
-                />
-            </div>
-
-            {/* Bottom Section: Split Pane */}
-            <div className="flex flex-1 overflow-hidden border-t border-slate-200">
+        <div className="flex h-screen bg-slate-50 overflow-hidden relative">
+            {/* Left Column: Customer List (Full Height) */}
+            <div className="w-[380px] border-r border-slate-200 flex flex-col bg-white overflow-hidden shrink-0">
                 <CustomerList
                     customers={customers}
                     selectedId={selectedId}
                     onSelect={handleSelectCustomer}
                     onNewCustomer={() => updateUrl({ action: 'new' })}
                 />
+            </div>
 
-                <CustomerProfile
-                    customer={selectedCustomer}
-                    onEdit={() => updateUrl({ action: 'edit' })}
-                    onDeleteSuccess={() => {
-                        updateUrl({ customerId: null });
-                        router.refresh();
-                    }}
-                    onNewInvoice={() => updateUrl({ invoiceId: 'new' })}
-                    onNewPayment={() => updateUrl({ paymentId: 'new' })}
-                    onViewTransaction={(id, type) => {
-                        const numericId = id.replace(/^(invoice|payment)-/, '');
-                        if (type === 'Invoice') updateUrl({ invoiceId: numericId });
-                        else if (type === 'Payment') updateUrl({ paymentId: numericId });
-                    }}
-                    onEditTransaction={handleEditTransaction}
-                    onDeleteTransaction={handleDeleteTransaction}
-                />
+            {/* Right Column: Details & Stats */}
+            <div className="flex-1 flex flex-col overflow-hidden">
+                {/* Fixed Header */}
+                <div className="h-14 border-b border-slate-200 bg-white flex items-center px-6 shrink-0 z-10">
+                    <Button variant="ghost" size="sm" onClick={() => router.push('/')} className="gap-2 text-muted-foreground pl-0 hover:pl-2 transition-all">
+                        <LayoutDashboard className="h-4 w-4" />
+                        <span>{t('dashboard')}</span>
+                    </Button>
+                </div>
+
+                {/* Main Content Area - Scrollable */}
+                <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6">
+                    <div className="max-w-6xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        {/* Scoreboards start from this pane */}
+                        <CustomerKPIs
+                            openQuotes={kpiStats.openQuotes}
+                            unbilledOrders={kpiStats.unbilledOrders}
+                            overdueAR={kpiStats.overdueAR}
+                            paidLast30={kpiStats.paidLast30}
+                        />
+
+                        {selectedCustomer ? (
+                            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden min-h-[600px]">
+                                <CustomerProfile
+                                    customer={selectedCustomer}
+                                    onEdit={() => updateUrl({ action: 'edit' })}
+                                    onDeleteSuccess={() => {
+                                        updateUrl({ customerId: null });
+                                        router.refresh();
+                                    }}
+                                    onNewInvoice={() => updateUrl({ invoiceId: 'new' })}
+                                    onNewPayment={() => updateUrl({ paymentId: 'new' })}
+                                    onViewTransaction={(id, type) => {
+                                        const numericId = id.replace(/^(invoice|payment)-/, '');
+                                        if (type === 'Invoice') updateUrl({ invoiceId: numericId });
+                                        else if (type === 'Payment') updateUrl({ paymentId: numericId });
+                                    }}
+                                    onEditTransaction={handleEditTransaction}
+                                    onDeleteTransaction={handleDeleteTransaction}
+                                />
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center h-[500px] text-slate-400 bg-white rounded-xl border-2 border-dashed border-slate-200">
+                                <div className="bg-slate-50 p-6 rounded-full mb-4">
+                                    <Users className="h-16 w-16 opacity-10" />
+                                </div>
+                                <h3 className="text-lg font-medium text-slate-900 mb-1">{t('select_detail')}</h3>
+                                <p className="text-sm max-w-xs text-center">{t('select_customer_hint')}</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* Slide-Over Drawers */}
@@ -216,7 +247,9 @@ export function CustomerCenterLayout({
                             invoiceId={invoiceAction && invoiceAction !== 'new' ? parseInt(invoiceAction) : undefined}
                             customers={customers as any}
                             items={items as any}
+                            taxRates={taxRates}
                             isGlobalMode={isGlobalInvoiceMode}
+                            users={users}
                             onSuccess={() => {
                                 handleCloseDrawer('invoice');
                                 router.refresh();

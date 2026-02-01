@@ -36,7 +36,8 @@ export function PickingClient() {
   const loadPickList = async () => {
     try {
       setLoading(true);
-      const worklist = await getPickingWorklist();
+      // TODO: Pass actual line items from order/shipment
+      const worklist = await getPickingWorklist([]);
 
       // Transform worklist to pick items
       const items: PickItem[] = worklist.map((item: any) => ({

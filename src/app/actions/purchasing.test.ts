@@ -163,19 +163,19 @@ describe('Vendor Bill GL Posting', () => {
     expect(lines).toHaveLength(3); // Now grouped: 1340, 5100, 2100
 
     // Check debit to 1340 (should be aggregated: item1 + item2)
-    const line1340 = lines.find(l => l.accountCode === '1340');
+    const line1340 = lines.find((l: any) => l.accountCode === '1340');
     expect(line1340).toBeDefined();
     expect(line1340?.debit).toBe(200000); // 100,000 + 100,000 aggregated
     expect(line1340?.credit).toBe(0);
 
     // Check debit to default service account for item3
-    const line5100 = lines.find(l => l.accountCode === '5100');
+    const line5100 = lines.find((l: any) => l.accountCode === '5100');
     expect(line5100).toBeDefined();
     expect(line5100?.debit).toBe(50000); // 1 * 50000
     expect(line5100?.credit).toBe(0);
 
     // Check credit to AP
-    const lineAP = lines.find(l => l.accountCode === '2100');
+    const lineAP = lines.find((l: any) => l.accountCode === '2100');
     expect(lineAP).toBeDefined();
     expect(lineAP?.debit).toBe(0);
     expect(lineAP?.credit).toBe(250000); // Total
@@ -232,7 +232,7 @@ describe('Vendor Bill GL Posting', () => {
     // Should have 2 lines: one debit to 1340 (aggregated), one credit to 2100
     expect(lines).toHaveLength(2);
 
-    const line1340 = lines.find(l => l.accountCode === '1340');
+    const line1340 = lines.find((l: any) => l.accountCode === '1340');
     expect(line1340?.debit).toBe(150000); // 100,000 + 50,000 aggregated
   });
 });
@@ -422,13 +422,13 @@ describe('Update Vendor Bill - Inventory & GL Cleanup', () => {
     // Should have 3 lines: Dr 1310, Dr 1340, Cr 2100
     expect(lines).toHaveLength(3);
 
-    const line1310 = lines.find(l => l.accountCode === '1310');
+    const line1310 = lines.find((l: any) => l.accountCode === '1310');
     expect(line1310?.debit).toBe(50000); // RM item
 
-    const line1340 = lines.find(l => l.accountCode === '1340');
+    const line1340 = lines.find((l: any) => l.accountCode === '1340');
     expect(line1340?.debit).toBe(60000); // FG item
 
-    const lineAP = lines.find(l => l.accountCode === '2100');
+    const lineAP = lines.find((l: any) => l.accountCode === '2100');
     expect(lineAP?.credit).toBe(110000); // Total
   });
 

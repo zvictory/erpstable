@@ -3,7 +3,7 @@
 import { db } from '../../../db';
 import { customers, invoices, invoiceLines, customerPayments, paymentAllocations } from '../../../db/schema/sales';
 import { items, inventoryLayers, inventoryLocationTransfers } from '../../../db/schema/inventory';
-import { journalEntries, journalEntryLines } from '../../../db/schema/finance';
+import { journalEntries, journalEntryLines, taxRates } from '../../../db/schema/finance';
 import { eq, sql, inArray, and, asc, gt, desc } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -11,6 +11,14 @@ import { ACCOUNTS } from '@/lib/accounting-config';
 import { checkPeriodLock } from './finance';
 import { logAuditEvent, getChangedFields } from '@/lib/audit';
 import { serviceTickets, serviceTicketAssets, customerAssets } from '../../../db/schema/service';
+import {
+    calculateLineTax,
+    aggregateInvoiceTotals,
+    calculateLineWithDiscount,
+    aggregateInvoiceTotalsWithDiscounts
+} from '@/lib/finance-utils';
+import { getCustomerPrice } from '@/lib/sales/pricing';
+import { calculateCommission } from '@/lib/sales/commissions';
 
 // --- Zod Schemas for Actions ---
 
@@ -21,6 +29,9 @@ const invoiceLineInputSchema = z.object({
     description: z.string().optional(),
     revenueAccountId: z.number().optional(), // For overriding default sales account
     warehouseId: z.number().optional(), // NEW - optional for warehouse-specific picking
+    taxRateId: z.number().optional(), // New Line-Level Tax
+    discountPercent: z.number().min(0).max(10000).default(0), // Basis points (1250 = 12.5%)
+    discountAmount: z.number().min(0).default(0), // Tiyin (fixed discount)
 });
 
 const createInvoiceSchema = z.object({
@@ -29,9 +40,12 @@ const createInvoiceSchema = z.object({
     dueDate: z.coerce.date(),
     invoiceNumber: z.string(),
     lines: z.array(invoiceLineInputSchema).min(1),
-    subtotal: z.number(), // Tiyin
+    grossSubtotal: z.number().optional(), // NEW: Gross amount (pre-discount)
+    totalDiscount: z.number().optional(), // NEW: Total discounts
+    subtotal: z.number(), // Net subtotal (gross - discount) or legacy subtotal
     taxTotal: z.number(), // Tiyin
     totalAmount: z.number(), // Tiyin
+    salesRepId: z.number().optional(), // NEW: Sales Rep
 });
 
 const createPaymentSchema = z.object({
@@ -83,9 +97,9 @@ export async function getCustomerCenterData(selectedId?: number) {
             invoicesByCustomer.get(inv.customerId)!.push(inv);
         });
 
-        const customersWithBalances = allCustomers.map(c => {
+        const customersWithBalances = allCustomers.map((c: any) => {
             const custInvoices = invoicesByCustomer.get(c.id) || [];
-            const balance = custInvoices.reduce((sum, inv) => sum + inv.balanceRemaining, 0);
+            const balance = custInvoices.reduce((sum: number, inv: any) => sum + inv.balanceRemaining, 0);
             const isOverdue = custInvoices.some(inv => new Date(inv.dueDate) < new Date());
             return { ...c, invoices: custInvoices, balance, isOverdue };
         });
@@ -100,12 +114,12 @@ export async function getCustomerCenterData(selectedId?: number) {
                 const selectedInvoices = await db.select().from(invoices).where(eq(invoices.customerId, selectedId)).orderBy(desc(invoices.date));
                 const selectedPayments = await db.select().from(customerPayments).where(eq(customerPayments.customerId, selectedId)).orderBy(desc(customerPayments.date));
                 selectedCustomer = { ...selectedCustomer, invoices: selectedInvoices, payments: selectedPayments };
-                const openInvoices = selectedCustomer.invoices.filter(i => i.status !== 'PAID');
-                const openBalance = openInvoices.reduce((sum, i) => sum + i.balanceRemaining, 0); // Use balanceRemaining
+                const openInvoices = selectedCustomer.invoices.filter((i: any) => i.status !== 'PAID');
+                const openBalance = openInvoices.reduce((sum: number, i: any) => sum + i.balanceRemaining, 0); // Use balanceRemaining
 
                 const overdueAmount = openInvoices
-                    .filter(i => new Date(i.dueDate) < new Date())
-                    .reduce((sum, i) => sum + i.balanceRemaining, 0);
+                    .filter((i: any) => new Date(i.dueDate) < new Date())
+                    .reduce((sum: number, i: any) => sum + i.balanceRemaining, 0);
 
                 const transactions = [
                     ...selectedCustomer.invoices.map(inv => ({
@@ -153,48 +167,115 @@ export async function getCustomerCenterData(selectedId?: number) {
     }
 }
 
+/**
+ * Calculate the correct price for an item based on customer pricelist rules
+ * Used by UI when selecting items or changing quantity
+ */
+export async function calculateItemPriceAction(customerId: number, itemId: number, quantity: number) {
+    'use server';
+    try {
+        const result = await getCustomerPrice(customerId, itemId, quantity);
+        return { success: true, ...result };
+    } catch (error: any) {
+        console.error('Price Calc Error:', error);
+        return { success: false, error: error.message };
+    }
+}
+
 export async function createInvoice(data: z.infer<typeof createInvoiceSchema>) {
     try {
         const validated = createInvoiceSchema.parse(data);
 
-        // Validate tax amounts match (GAAP/IFRS compliance)
-        const expectedTotal = validated.subtotal + validated.taxTotal;
-        if (validated.totalAmount !== expectedTotal) {
-            throw new Error(
-                `Tax calculation mismatch: Total (${validated.totalAmount}) must equal Subtotal (${validated.subtotal}) + Tax (${validated.taxTotal})`
-            );
-        }
-
         // Check period lock (GAAP/IFRS compliance - prevent posting to closed periods)
         await checkPeriodLock(validated.date);
 
-        return await db.transaction(async (tx) => {
+        // --- DISCOUNT & TAX ENGINE (Sales 2.0 Phase 2) ---
+        // 1. Fetch Tax Rates to get Line Multipliers
+        const activeTaxRates = await db.select().from(taxRates);
+        const taxRateMap = new Map(activeTaxRates.map((t: any) => [t.id, t]));
+
+        // 2. Validate discounts don't exceed gross amounts
+        for (const line of validated.lines) {
+            const lineGross = Math.round(line.quantity * line.rate);
+            if (line.discountAmount > lineGross) {
+                throw new Error(
+                    `Line item ${line.itemId}: Discount (${line.discountAmount}) cannot exceed gross amount (${lineGross})`
+                );
+            }
+            if (line.discountPercent > 10000) {
+                throw new Error(
+                    `Line item ${line.itemId}: Discount percent (${line.discountPercent / 100}%) cannot exceed 100%`
+                );
+            }
+        }
+
+        // 3. Prepare lines for calculation with discounts
+        const linesForCalc = validated.lines.map((line: any) => {
+            const tr = line.taxRateId ? taxRateMap.get(line.taxRateId) : undefined;
+            return {
+                quantity: line.quantity,
+                unitPrice: line.rate,
+                discountPercent: line.discountPercent || 0,
+                discountAmount: line.discountAmount || 0,
+                taxRateMultiplier: tr ? tr.rateMultiplier : 0,
+                taxGlAccountId: tr?.glAccountId,
+            };
+        });
+
+        // 4. Calculate Aggregated Totals with Discounts (Server is Source of Truth)
+        const calcResult = aggregateInvoiceTotalsWithDiscounts(linesForCalc);
+
+        // 5. Validate or Override Client Totals (within rounding tolerance)
+        if (Math.abs(validated.totalAmount - calcResult.grandTotal) > 100) {
+            console.warn(
+                `Client Total ${validated.totalAmount} != Server Calc ${calcResult.grandTotal}. Using Server Calc.`
+            );
+        }
+
+        // Use Server Calculated Values for Financial Integrity
+        const finalGrossSubtotal = calcResult.grossSubtotal;
+        const finalTotalDiscount = calcResult.totalDiscount;
+        const finalNetSubtotal = calcResult.netSubtotal;
+        const finalTaxTotal = calcResult.totalTax;
+        const finalTotalAmount = calcResult.grandTotal;
+
+        return await db.transaction(async (tx: any) => {
             // 1. Create Invoice Header
             const [newInvoice] = await tx.insert(invoices).values({
                 customerId: validated.customerId,
                 date: validated.date,
                 dueDate: validated.dueDate,
                 invoiceNumber: validated.invoiceNumber,
-                subtotal: validated.subtotal,
-                taxTotal: validated.taxTotal,
-                totalAmount: validated.totalAmount,
-                balanceRemaining: validated.totalAmount, // Initially full amount
+                subtotal: finalNetSubtotal, // Net subtotal (post-discount)
+                taxTotal: finalTaxTotal,
+                totalAmount: finalTotalAmount,
+                balanceRemaining: finalTotalAmount, // Initially full amount
                 status: 'OPEN',
+                salesRepId: validated.salesRepId,
             }).returning();
 
-            // 2. Create Invoice Lines
+            // 2. Create Invoice Lines with Discount & Tax Calculation
             let createdLines: (typeof invoiceLines.$inferSelect)[] = [];
             if (validated.lines.length > 0) {
                 createdLines = await tx.insert(invoiceLines).values(
-                    validated.lines.map(line => ({
-                        invoiceId: newInvoice.id,
-                        itemId: line.itemId,
-                        quantity: line.quantity,
-                        rate: line.rate,
-                        amount: Math.round(line.quantity * line.rate), // Ensure Tiyin integrity
-                        description: line.description,
-                        revenueAccountId: line.revenueAccountId,
-                    }))
+                    validated.lines.map((line, idx) => {
+                        // Calculate per-line amounts using the same utility
+                        const lineCalc = calculateLineWithDiscount(linesForCalc[idx]);
+
+                        return {
+                            invoiceId: newInvoice.id,
+                            itemId: line.itemId,
+                            quantity: line.quantity,
+                            rate: line.rate,
+                            amount: lineCalc.grossAmount, // Gross amount (pre-discount)
+                            discountPercent: line.discountPercent || 0,
+                            discountAmount: lineCalc.discountAmount, // Calculated discount
+                            taxAmount: lineCalc.taxAmount, // Calculated tax (on net)
+                            description: line.description,
+                            revenueAccountId: line.revenueAccountId,
+                            taxRateId: line.taxRateId,
+                        };
+                    })
                 ).returning();
             }
 
@@ -203,7 +284,7 @@ export async function createInvoice(data: z.infer<typeof createInvoiceSchema>) {
                 const machineItems = await tx.select()
                     .from(items)
                     .where(and(
-                        inArray(items.id, validated.lines.map(l => l.itemId)),
+                        inArray(items.id, validated.lines.map((l: any) => l.itemId)),
                         eq(items.requiresInstallation, true)
                     ));
 
@@ -251,7 +332,7 @@ export async function createInvoice(data: z.infer<typeof createInvoiceSchema>) {
                     let assetSequence = (assetResult[0]?.count || 0) + 1;
 
                     // Create customer assets and link to ticket
-                    const machineLines = createdLines.filter(line =>
+                    const machineLines = createdLines.filter((line: any) =>
                         machineItems.some(item => item.id === line.itemId)
                     );
 
@@ -295,33 +376,61 @@ export async function createInvoice(data: z.infer<typeof createInvoiceSchema>) {
                 isPosted: true,
             }).returning();
 
-            // Debit AR (1200)
+            // --- 4-WAY JOURNAL ENTRY (with Discounts) ---
+
+            // Entry 1: Debit AR for Grand Total (what customer owes: net + tax)
             await tx.insert(journalEntryLines).values({
                 journalEntryId: je.id,
-                accountCode: ACCOUNTS.AR, // Accounts Receivable
-                debit: validated.totalAmount,
+                accountCode: ACCOUNTS.AR,
+                debit: finalTotalAmount,
                 credit: 0,
                 description: `Invoice #${validated.invoiceNumber} - Customer #${validated.customerId}`,
             });
 
-            // Credit Sales Income (4100)
+            // Entry 2: Credit Sales Income for Gross Revenue (pre-discount)
             await tx.insert(journalEntryLines).values({
                 journalEntryId: je.id,
-                accountCode: ACCOUNTS.SALES_INCOME, // Sales Income - Default
+                accountCode: ACCOUNTS.SALES_INCOME,
                 debit: 0,
-                credit: validated.subtotal,
+                credit: finalGrossSubtotal,
                 description: `Revenue - Invoice #${validated.invoiceNumber}`,
             });
 
-            // Credit Sales Tax Payable (2200) - GAAP/IFRS Compliance
-            if (validated.taxTotal > 0) {
+            // Entry 3: Debit Sales Discounts (Contra-Revenue) - ONLY IF DISCOUNTS EXIST
+            if (finalTotalDiscount > 0) {
                 await tx.insert(journalEntryLines).values({
                     journalEntryId: je.id,
-                    accountCode: ACCOUNTS.SALES_TAX, // Sales Tax Payable
-                    debit: 0,
-                    credit: validated.taxTotal,
-                    description: `Sales Tax - Invoice #${validated.invoiceNumber}`,
+                    accountCode: ACCOUNTS.SALES_DISCOUNTS, // 4200 - Contra-Revenue
+                    debit: finalTotalDiscount,
+                    credit: 0,
+                    description: `Discount - Invoice #${validated.invoiceNumber}`,
                 });
+            }
+
+            // Entry 4: Credit Sales Tax Payable (by GL Account)
+            if (finalTaxTotal > 0) {
+                for (const [glAccount, taxAmt] of Object.entries(calcResult.taxBreakdown)) {
+                    if (taxAmt > 0) {
+                        await tx.insert(journalEntryLines).values({
+                            journalEntryId: je.id,
+                            accountCode: glAccount || ACCOUNTS.SALES_TAX,
+                            debit: 0,
+                            credit: taxAmt,
+                            description: `Sales Tax - Invoice #${validated.invoiceNumber}`,
+                        });
+                    }
+                }
+
+                // Fallback for unmapped tax (safety net)
+                if (Object.keys(calcResult.taxBreakdown).length === 0) {
+                    await tx.insert(journalEntryLines).values({
+                        journalEntryId: je.id,
+                        accountCode: ACCOUNTS.SALES_TAX,
+                        debit: 0,
+                        credit: finalTaxTotal,
+                        description: `Sales Tax (Unmapped) - Invoice #${validated.invoiceNumber}`,
+                    });
+                }
             }
 
             // 4. Financial Event B: Cost of Goods Sold (COGS) & Inventory Deduction (FIFO)
@@ -351,7 +460,7 @@ export async function createInvoice(data: z.infer<typeof createInvoiceSchema>) {
                     .orderBy(asc(inventoryLayers.receiveDate), asc(inventoryLayers.id)); // FIFO
 
                 // Calculate total available
-                const totalAvailable = layers.reduce((sum, l) => sum + l.remainingQty, 0);
+                const totalAvailable = layers.reduce((sum: number, l: any) => sum + l.remainingQty, 0);
 
                 if (totalAvailable < qtyRemainingToDeduct) {
                     const warehouseContext = line.warehouseId
@@ -507,7 +616,7 @@ export async function updateInvoice(invoiceId: number, data: z.infer<typeof crea
         // Check period lock for the new date (GAAP/IFRS compliance)
         await checkPeriodLock(data.date);
 
-        return await db.transaction(async (tx) => {
+        return await db.transaction(async (tx: any) => {
             // 1. Verify invoice exists and is editable
             const existingInvoiceResults = await tx.select().from(invoices).where(eq(invoices.id, invoiceId)).limit(1);
             const existingInvoice = existingInvoiceResults[0];
@@ -591,7 +700,7 @@ export async function updateInvoice(invoiceId: number, data: z.infer<typeof crea
                     ))
                     .orderBy(asc(inventoryLayers.receiveDate), asc(inventoryLayers.id));
 
-                const totalAvailable = layers.reduce((sum, l) => sum + l.remainingQty, 0);
+                const totalAvailable = layers.reduce((sum: number, l: any) => sum + l.remainingQty, 0);
 
                 if (totalAvailable < qtyRemainingToDeduct) {
                     throw new Error(`Insufficient stock for item #${line.itemId}. Required: ${qtyRemainingToDeduct}, Available: ${totalAvailable}`);
@@ -714,17 +823,25 @@ export async function deleteInvoice(invoiceId: number) {
     'use server';
 
     try {
-        return await db.transaction(async (tx) => {
-            // 1. Verify invoice exists
+        // Pre-transaction: Load invoice and validate
+        const invoiceCheck = await db.select().from(invoices).where(eq(invoices.id, invoiceId)).limit(1);
+        const invoiceToValidate = invoiceCheck[0];
+
+        if (!invoiceToValidate) {
+            return { success: false, error: 'Invoice not found' };
+        }
+
+        // Check period lock BEFORE transaction (GAAP/IFRS compliance)
+        await checkPeriodLock(invoiceToValidate.date);
+
+        return await db.transaction(async (tx: any) => {
+            // Re-fetch invoice for consistency within transaction
             const invoiceResults = await tx.select().from(invoices).where(eq(invoices.id, invoiceId)).limit(1);
             const invoice = invoiceResults[0];
 
             if (!invoice) {
                 return { success: false, error: 'Invoice not found' };
             }
-
-            // Check period lock - cannot delete invoices in closed periods (GAAP/IFRS compliance)
-            await checkPeriodLock(invoice.date);
 
             // 2. Reverse inventory consumption (restore to layers)
             const lines = await tx.select().from(invoiceLines).where(eq(invoiceLines.invoiceId, invoiceId));
@@ -787,7 +904,10 @@ export async function receivePayment(data: z.infer<typeof createPaymentSchema>) 
     try {
         const validated = createPaymentSchema.parse(data);
 
-        return await db.transaction(async (tx) => {
+        // Check period lock (GAAP/IFRS compliance)
+        await checkPeriodLock(validated.date);
+
+        return await db.transaction(async (tx: any) => {
             // 1. Create Payment Record
             const [newPayment] = await tx.insert(customerPayments).values({
                 customerId: validated.customerId,
@@ -820,6 +940,12 @@ export async function receivePayment(data: z.infer<typeof createPaymentSchema>) 
                         status: newStatus
                     })
                     .where(eq(invoices.id, alloc.invoiceId));
+
+                // 2a. Trigger Commission Calculation if PAID
+                if (newStatus === 'PAID') {
+                    // This is an async task, but we await it to ensure consistency in MVP
+                    await calculateCommission(alloc.invoiceId);
+                }
             }
 
             // 3. Create GL Entries

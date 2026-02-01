@@ -1,18 +1,22 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { getItemHistory, getItemHistoryBreakdown } from '@/app/actions/inventory';
+import { getItemHistory, getItemHistoryBreakdown, exportItemHistoryCSV } from '@/app/actions/inventory';
 import { clsx } from 'clsx';
 import { Link } from '@/navigation';
 import { useParams, useRouter } from 'next/navigation';
-import { Loader2, Pencil, Trash2 } from 'lucide-react';
+import { Loader2, Pencil, Trash2, Settings, Download } from 'lucide-react';
 import { getBillById } from '@/app/actions/purchasing';
 import { getInvoiceById, deleteInvoice } from '@/app/actions/sales';
 import DeleteBillModal from '@/components/purchasing/DeleteBillModal';
 import DeleteInvoiceModal from '@/components/sales/DeleteInvoiceModal';
+import InventoryAdjustmentModal from '@/components/inventory/InventoryAdjustmentModal';
 
 interface ItemHistoryTabProps {
     itemId: number;
+    itemName?: string;
+    currentQuantity?: number;
+    currentCost?: number;
 }
 
 interface HistoryRow {
@@ -28,6 +32,10 @@ interface HistoryRow {
     record_id: number;
     runningBalance: number;
     vendorId?: number | null;
+    warehouse_name?: string | null;
+    location_code?: string | null;
+    gl_account?: string | null;
+    gl_account_type?: string | null;
 }
 
 // Helper: Map transaction type to URL
@@ -46,6 +54,8 @@ function getTransactionLink(row: HistoryRow): string {
         'invoice': (row, id) => `/sales/invoices/${id}`,
         'production-input': (row, id) => `/manufacturing/production/${id}`,
         'production-output': (row, id) => `/manufacturing/production/${id}`,
+        'transfer': (row, id) => `/inventory/transfers/${id}`,
+        'adjustment': (row, id) => `#`, // No detail page for adjustments yet
     };
 
     const mapper = linkMap[prefix];
@@ -105,6 +115,26 @@ function getTransactionMetadata(row: HistoryRow): TransactionMetadata {
         };
     }
 
+    // Transfers: View only
+    if (prefix === 'transfer') {
+        return {
+            canEdit: false,
+            canDelete: false,
+            editTooltip: 'Transfers cannot be edited from here',
+            deleteTooltip: 'Transfers cannot be deleted from here',
+        };
+    }
+
+    // Adjustments: View only (for now - could add edit/delete later)
+    if (prefix === 'adjustment') {
+        return {
+            canEdit: false,
+            canDelete: false,
+            editTooltip: 'Adjustments cannot be edited',
+            deleteTooltip: 'Adjustments cannot be deleted',
+        };
+    }
+
     return {
         canEdit: false,
         canDelete: false,
@@ -113,7 +143,12 @@ function getTransactionMetadata(row: HistoryRow): TransactionMetadata {
     };
 }
 
-export default function ItemHistoryTab({ itemId }: ItemHistoryTabProps) {
+export default function ItemHistoryTab({
+    itemId,
+    itemName = 'Item',
+    currentQuantity = 0,
+    currentCost = 0
+}: ItemHistoryTabProps) {
     const params = useParams();
     const locale = (params.locale as string) || 'en';
     const router = useRouter();
@@ -134,6 +169,9 @@ export default function ItemHistoryTab({ itemId }: ItemHistoryTabProps) {
     const [deletingTransaction, setDeletingTransaction] = useState<HistoryRow | null>(null);
     const [deleteModalType, setDeleteModalType] = useState<'bill' | 'invoice' | null>(null);
 
+    // State for adjustment modal
+    const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
+
     // Load history on mount and when filters change
     useEffect(() => {
         const loadHistory = async () => {
@@ -150,10 +188,17 @@ export default function ItemHistoryTab({ itemId }: ItemHistoryTabProps) {
                     transactionType: filters.type,
                 });
 
-                setHistory(data as HistoryRow[]);
+                // Ensure data is an array
+                if (Array.isArray(data)) {
+                    setHistory(data as HistoryRow[]);
+                } else {
+                    console.warn('getItemHistory returned non-array data:', data);
+                    setHistory([]);
+                }
             } catch (err) {
                 console.error('Error loading history:', err);
                 setError(err instanceof Error ? err.message : 'Failed to load history');
+                setHistory([]); // Reset to empty array on error
             } finally {
                 setLoading(false);
             }
@@ -209,8 +254,58 @@ export default function ItemHistoryTab({ itemId }: ItemHistoryTabProps) {
         setDeleteModalType(prefix as 'bill' | 'invoice');
     };
 
+    // Handle export to CSV
+    const handleExportCSV = async () => {
+        try {
+            const startDate = filters.startDate ? new Date(filters.startDate) : undefined;
+            const endDate = filters.endDate ? new Date(filters.endDate) : undefined;
+
+            const csv = await exportItemHistoryCSV(itemId, {
+                startDate,
+                endDate,
+                transactionType: filters.type,
+            });
+
+            // Create blob and download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `item-${itemId}-history-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error('Export error:', err);
+            alert('Failed to export history');
+        }
+    };
+
     return (
         <div className="space-y-4">
+            {/* Header with Action Buttons */}
+            <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-slate-900">Transaction History</h3>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={handleExportCSV}
+                        disabled={!Array.isArray(history) || history.length === 0}
+                        className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <Download size={16} />
+                        Export CSV
+                    </button>
+                    <button
+                        onClick={() => setShowAdjustmentModal(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                    >
+                        <Settings size={16} />
+                        Adjust Inventory
+                    </button>
+                </div>
+            </div>
+
             {/* Filters Section */}
             <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -292,7 +387,7 @@ export default function ItemHistoryTab({ itemId }: ItemHistoryTabProps) {
             )}
 
             {/* History Table */}
-            {!loading && history.length > 0 && (
+            {!loading && Array.isArray(history) && history.length > 0 && (
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead className="sticky top-0 bg-slate-100 border-b border-slate-200 z-10">
@@ -301,6 +396,8 @@ export default function ItemHistoryTab({ itemId }: ItemHistoryTabProps) {
                                 <th className="px-4 py-3 text-left font-semibold text-slate-700">Type</th>
                                 <th className="px-4 py-3 text-left font-semibold text-slate-700">Reference</th>
                                 <th className="px-4 py-3 text-left font-semibold text-slate-700">Partner</th>
+                                <th className="px-4 py-3 text-left font-semibold text-slate-700">Location</th>
+                                <th className="px-4 py-3 text-left font-semibold text-slate-700">GL Account</th>
                                 <th className="px-4 py-3 text-right font-semibold text-slate-700">Qty Change</th>
                                 <th className="px-4 py-3 text-right font-semibold text-slate-700">Cost/Price</th>
                                 <th className="px-4 py-3 text-right font-semibold text-slate-700 w-32">Running Balance</th>
@@ -345,6 +442,28 @@ export default function ItemHistoryTab({ itemId }: ItemHistoryTabProps) {
                                         </td>
                                         <td className="px-4 py-3 text-slate-600">
                                             {row.partner}
+                                        </td>
+                                        <td className="px-4 py-3 text-slate-600 text-sm">
+                                            {row.warehouse_name && row.location_code ? (
+                                                <div className="flex flex-col">
+                                                    <span className="font-medium">{row.warehouse_name}</span>
+                                                    <span className="text-xs text-slate-400">{row.location_code}</span>
+                                                </div>
+                                            ) : row.warehouse_name ? (
+                                                <span className="font-medium">{row.warehouse_name}</span>
+                                            ) : (
+                                                <span className="text-slate-300 text-xs">-</span>
+                                            )}
+                                        </td>
+                                        <td className="px-4 py-3 text-slate-600 text-sm">
+                                            {row.gl_account && row.gl_account !== '-' ? (
+                                                <div className="flex flex-col">
+                                                    <span className="font-mono font-semibold">{row.gl_account}</span>
+                                                    <span className="text-xs text-slate-400">{row.gl_account_type}</span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-slate-300 text-xs">-</span>
+                                            )}
                                         </td>
                                         <td className={clsx(
                                             'px-4 py-3 text-right font-mono font-semibold',
@@ -413,7 +532,7 @@ export default function ItemHistoryTab({ itemId }: ItemHistoryTabProps) {
             )}
 
             {/* Summary Footer */}
-            {history.length > 0 && (
+            {Array.isArray(history) && history.length > 0 && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
                     <div className="flex justify-between items-center">
                         <span className="text-slate-600">
@@ -465,6 +584,22 @@ export default function ItemHistoryTab({ itemId }: ItemHistoryTabProps) {
                     onSuccess={() => {
                         setDeletingTransaction(null);
                         setDeleteModalType(null);
+                        router.refresh();
+                    }}
+                />
+            )}
+
+            {/* Inventory Adjustment Modal */}
+            {showAdjustmentModal && (
+                <InventoryAdjustmentModal
+                    itemId={itemId}
+                    itemName={itemName}
+                    currentQuantity={currentQuantity}
+                    currentCost={currentCost}
+                    onClose={() => setShowAdjustmentModal(false)}
+                    onSuccess={() => {
+                        setShowAdjustmentModal(false);
+                        // Reload history to show the new adjustment
                         router.refresh();
                     }}
                 />

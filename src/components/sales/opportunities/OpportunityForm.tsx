@@ -8,28 +8,28 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { createOpportunity, updateOpportunity } from '@/app/actions/crm';
+import { createDeal, updateDeal } from '@/app/actions/crm';
 
-const opportunityFormSchema = z.object({
+const dealFormSchema = z.object({
   title: z.string().min(1, 'Title is required'),
-  customerId: z.number().int().positive('Customer is required'),
-  estimatedValue: z.number().int().min(0, 'Value must be positive'),
-  probability: z.number().int().min(0).max(100).default(50),
-  expectedCloseDate: z.string().optional(),
+  customer_id: z.number().int().positive('Customer is required'),
+  value: z.number().int().min(0, 'Value must be positive'),
+  probability: z.number().int().min(0).max(100).optional(),
+  expected_close_date: z.string().optional(),
   description: z.string().optional(),
-  nextAction: z.string().optional(),
-  assignedToUserId: z.number().int().positive().optional(),
+  next_action: z.string().optional(),
+  owner_id: z.number().int().positive().optional(),
 });
 
-type OpportunityFormData = z.infer<typeof opportunityFormSchema>;
+type DealFormData = z.infer<typeof dealFormSchema>;
 
-interface OpportunityFormProps {
-  opportunity?: any;
+interface DealFormProps {
+  deal?: any;
   customers: Array<{ id: number; name: string }>;
   users?: Array<{ id: number; name: string }>;
 }
 
-export function OpportunityForm({ opportunity, customers, users = [] }: OpportunityFormProps) {
+export function OpportunityForm({ deal, customers, users = [] }: DealFormProps) {
   const t = useTranslations('crm.opportunities');
   const tCommon = useTranslations('common');
   const router = useRouter();
@@ -39,54 +39,54 @@ export function OpportunityForm({ opportunity, customers, users = [] }: Opportun
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<OpportunityFormData>({
-    resolver: zodResolver(opportunityFormSchema),
-    defaultValues: opportunity
+  } = useForm<DealFormData>({
+    resolver: zodResolver(dealFormSchema),
+    defaultValues: deal
       ? {
-          title: opportunity.title,
-          customerId: opportunity.customerId,
-          estimatedValue: opportunity.estimatedValue / 100, // Convert from Tiyin
-          probability: opportunity.probability,
-          expectedCloseDate: opportunity.expectedCloseDate
-            ? new Date(opportunity.expectedCloseDate).toISOString().split('T')[0]
+          title: deal.title,
+          customer_id: deal.customer_id,
+          value: deal.value / 100, // Convert from Tiyin
+          probability: deal.probability,
+          expected_close_date: deal.expected_close_date
+            ? new Date(deal.expected_close_date).toISOString().split('T')[0]
             : '',
-          description: opportunity.description || '',
-          nextAction: opportunity.nextAction || '',
-          assignedToUserId: opportunity.assignedToUserId || undefined,
+          description: deal.description || '',
+          next_action: deal.next_action || '',
+          owner_id: deal.owner_id || undefined,
         }
       : {
           probability: 50,
-          estimatedValue: 0,
+          value: 0,
         },
   });
 
-  const onSubmit = async (data: OpportunityFormData) => {
+  const onSubmit = async (data: DealFormData) => {
     setIsSubmitting(true);
     try {
       const submitData = {
         ...data,
-        estimatedValue: Math.round(data.estimatedValue * 100), // Convert to Tiyin
-        expectedCloseDate: data.expectedCloseDate
-          ? new Date(data.expectedCloseDate)
+        value: Math.round(data.value * 100), // Convert to Tiyin
+        expected_close_date: data.expected_close_date
+          ? new Date(data.expected_close_date)
           : undefined,
       };
 
-      const result = opportunity
-        ? await updateOpportunity(opportunity.id, submitData)
-        : await createOpportunity(submitData);
+      const result = deal
+        ? await updateDeal(deal.id, submitData)
+        : await createDeal(submitData);
 
       if (result.success) {
         toast.success(
-          opportunity ? t('messages.update_success') : t('messages.create_success')
+          deal ? t('messages.update_success') : t('messages.create_success')
         );
         router.push('/sales/pipeline');
         router.refresh();
       } else {
-        throw new Error('Failed to save opportunity');
+        throw new Error('Failed to save deal');
       }
     } catch (error) {
-      console.error('Error saving opportunity:', error);
-      toast.error('Failed to save opportunity. Please try again.');
+      console.error('Error saving deal:', error);
+      toast.error('Failed to save deal. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -122,7 +122,7 @@ export function OpportunityForm({ opportunity, customers, users = [] }: Opportun
               {t('fields.customer')} *
             </label>
             <select
-              {...register('customerId', { valueAsNumber: true })}
+              {...register('customer_id', { valueAsNumber: true })}
               className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select customer...</option>
@@ -132,25 +132,25 @@ export function OpportunityForm({ opportunity, customers, users = [] }: Opportun
                 </option>
               ))}
             </select>
-            {errors.customerId && (
-              <p className="text-red-600 text-sm mt-1">{errors.customerId.message}</p>
+            {errors.customer_id && (
+              <p className="text-red-600 text-sm mt-1">{errors.customer_id.message}</p>
             )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Estimated Value */}
+            {/* Value */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 {t('fields.estimated_value')} (UZS) *
               </label>
               <input
                 type="number"
-                {...register('estimatedValue', { valueAsNumber: true })}
+                {...register('value', { valueAsNumber: true })}
                 className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.estimatedValue && (
+              {errors.value && (
                 <p className="text-red-600 text-sm mt-1">
-                  {errors.estimatedValue.message}
+                  {errors.value.message}
                 </p>
               )}
             </div>
@@ -181,20 +181,20 @@ export function OpportunityForm({ opportunity, customers, users = [] }: Opportun
               </label>
               <input
                 type="date"
-                {...register('expectedCloseDate')}
+                {...register('expected_close_date')}
                 className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
 
-          {/* Assigned To */}
+          {/* Owner */}
           {users.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 {t('fields.assigned_to')}
               </label>
               <select
-                {...register('assignedToUserId', { valueAsNumber: true })}
+                {...register('owner_id', { valueAsNumber: true })}
                 className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Unassigned</option>
@@ -215,7 +215,7 @@ export function OpportunityForm({ opportunity, customers, users = [] }: Opportun
             <textarea
               {...register('description')}
               rows={4}
-              placeholder="Describe the opportunity, customer needs, and context..."
+              placeholder="Describe the deal, customer needs, and context..."
               className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -227,7 +227,7 @@ export function OpportunityForm({ opportunity, customers, users = [] }: Opportun
             </label>
             <input
               type="text"
-              {...register('nextAction')}
+              {...register('next_action')}
               placeholder="e.g., Schedule demo call, Send proposal, Follow up..."
               className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

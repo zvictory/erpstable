@@ -107,7 +107,7 @@ export function WorkOrderForm({ workOrderId, onClose }: WorkOrderFormProps) {
                 onChange={e => setFormData({ ...formData, laborHours: parseFloat(e.target.value) || 0 })}
               />
               <p className="text-xs text-slate-500 mt-1">
-                {t('estimated_labor_cost')}: {((formData.laborHours * 50_000) / 100).toFixed(2)} UZS
+                {t('estimated_labor_cost')}: {((formData.laborHours * 50_000) / 100).toFixed(2)} сўм
               </p>
             </div>
 

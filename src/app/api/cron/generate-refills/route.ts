@@ -19,7 +19,6 @@ export async function GET(request: Request) {
     const result = await generateRecurringRefills(true);
 
     return NextResponse.json({
-      success: true,
       timestamp: new Date().toISOString(),
       ...result.results,
     });

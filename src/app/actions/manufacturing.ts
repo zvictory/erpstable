@@ -110,7 +110,7 @@ export async function submitProductionStage(
     }
 ) {
     try {
-        return await db.transaction(async (tx) => {
+        return await db.transaction(async (tx: any) => {
         // ========== PHASE 1: SETUP & VALIDATION ==========
         const currentStepResults = await tx.select().from(workOrderSteps).where(eq(workOrderSteps.id, stepId)).limit(1);
         const currentStep = currentStepResults[0];
@@ -829,13 +829,13 @@ export async function getDashboardData(filters?: {
         // Apply filters
         let filtered = results;
         if (filters?.workCenterId) {
-            filtered = filtered.filter(r => r.workCenterId === filters.workCenterId);
+            filtered = filtered.filter((r: any) => r.workCenterId === filters.workCenterId);
         }
         if (filters?.operatorId) {
-            filtered = filtered.filter(r => r.activeOperatorId === filters.operatorId);
+            filtered = filtered.filter((r: any) => r.activeOperatorId === filters.operatorId);
         }
         if (filters?.status && filters.status !== 'all') {
-            filtered = filtered.filter(r => r.realtimeStatus === filters.status);
+            filtered = filtered.filter((r: any) => r.realtimeStatus === filters.status);
         }
 
         // Transform to dashboard format
@@ -920,7 +920,7 @@ export async function getEquipmentUnits(workCenterId: number) {
             .orderBy(asc(equipmentUnits.unitCode));
 
         // Calculate maintenance status for each unit
-        const unitsWithStatus = units.map(unit => {
+        const unitsWithStatus = units.map((unit: any) => {
             const hoursUntilMaintenance = unit.maintenanceIntervalHours 
                 ? (unit.maintenanceIntervalHours - (unit.totalOperatingHours || 0))
                 : null;

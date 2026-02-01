@@ -1,6 +1,6 @@
 import { OpportunityForm } from '@/components/sales/opportunities/OpportunityForm';
-import { db } from '../../../../../db';
-import { users, customers } from '../../../../../db/schema';
+import { db } from '@/db';
+import { users, customers } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 
 export default async function NewOpportunityPage() {
@@ -19,14 +19,14 @@ export default async function NewOpportunityPage() {
         id: true,
         name: true,
       },
-      orderBy: (customers, { asc }) => [asc(customers.name)],
+      orderBy: (customersTable: any, { asc }: any) => [asc(customersTable.name)],
     }),
   ]);
 
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-slate-900 mb-6">New Opportunity</h1>
+        <h1 className="text-3xl font-bold text-slate-900 mb-6">New Deal</h1>
         <OpportunityForm customers={activeCustomers} users={activeUsers} />
       </div>
     </div>

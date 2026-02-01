@@ -30,6 +30,7 @@ export interface AssetDetail extends AssetWithBookValue {
     depreciationMethod: string;
     disposalDate?: Date;
     vendorBillLineId?: number;
+    assetAccountCode: string;
     depreciationExpenseAccountCode: string;
     accumulatedDepreciationAccountCode: string;
 }
@@ -169,7 +170,7 @@ export async function capitalizeAsset(
         }
 
         // Use transaction for safety
-        const result = await db.transaction(async (tx) => {
+        const result = await db.transaction(async (tx: any) => {
             // 1. Create fixed asset record
             const [asset] = await tx
                 .insert(fixedAssets)

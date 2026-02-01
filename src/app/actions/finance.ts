@@ -45,8 +45,8 @@ export async function createJournalEntry(
     await checkPeriodLock(date);
 
     // Validate Balanced Entry
-    const totalDebit = lines.reduce((sum, line) => sum + line.debit, 0);
-    const totalCredit = lines.reduce((sum, line) => sum + line.credit, 0);
+    const totalDebit = lines.reduce((sum: number, line: any) => sum + line.debit, 0);
+    const totalCredit = lines.reduce((sum: number, line: any) => sum + line.credit, 0);
 
     if (totalDebit !== totalCredit) {
         throw new Error(`Unbalanced Entry: Debit ${totalDebit} != Credit ${totalCredit}`);
@@ -644,7 +644,7 @@ export async function getAccountRegister(
         }));
 
         // Sort by date and then by line ID (chronological order)
-        lines.sort((a, b) => {
+        lines.sort((a: any, b: any) => {
             const dateCompare = new Date(a.journalEntry.date).getTime() - new Date(b.journalEntry.date).getTime();
             if (dateCompare !== 0) return dateCompare;
             return a.id - b.id;
@@ -652,9 +652,9 @@ export async function getAccountRegister(
 
         // 3. Fetch vendor information for bill-linked transactions
         const billTransactionIds = lines
-            .map(l => l.journalEntry.transactionId)
-            .filter(tid => tid?.startsWith('bill-'))
-            .map(tid => parseInt(tid!.replace('bill-', '').split('-')[0]));
+            .map((l: any) => l.journalEntry.transactionId)
+            .filter((tid: any) => tid?.startsWith('bill-'))
+            .map((tid: any) => parseInt(tid!.replace('bill-', '').split('-')[0]));
 
         const vendorMap = new Map<number, { vendorId: number; vendorName: string }>();
 
@@ -667,7 +667,7 @@ export async function getAccountRegister(
                 .innerJoin(vendors, eq(vendorBills.vendorId, vendors.id))
                 .where(inArray(vendorBills.id, billTransactionIds));
 
-            billsWithVendors.forEach(({ bill, vendor }) => {
+            billsWithVendors.forEach(({ bill, vendor }: any) => {
                 vendorMap.set(bill.id, {
                     vendorId: vendor.id,
                     vendorName: vendor.name
@@ -677,7 +677,7 @@ export async function getAccountRegister(
 
         // 4. Calculate running balance based on account type
         let runningBalance = 0;
-        const transactions = lines.map(line => {
+        const transactions = lines.map((line: any) => {
             const debit = line.debit || 0;
             const credit = line.credit || 0;
 
@@ -720,8 +720,8 @@ export async function getAccountRegister(
         });
 
         // 5. Calculate summary statistics
-        const totalDebit = lines.reduce((sum, l) => sum + (l.debit || 0), 0);
-        const totalCredit = lines.reduce((sum, l) => sum + (l.credit || 0), 0);
+        const totalDebit = lines.reduce((sum: number, l: any) => sum + (l.debit || 0), 0);
+        const totalCredit = lines.reduce((sum: number, l: any) => sum + (l.credit || 0), 0);
 
         return {
             account: { ...account, isActive: account.isActive ?? false } as any,
@@ -943,7 +943,7 @@ export async function reconcileLine(statementLineId: number, journalEntryId: num
             // If Deposit (+100), we expect a Debit to Bank (+100).
             // If Withdrawal (-100), we expect a Credit to Bank (100).
 
-            const matchingJeLine = jeLines.find(l => {
+            const matchingJeLine = jeLines.find((l: any) => {
                 if (lineAmount > 0) {
                     // Deposit -> Look for Debit = 100
                     return l.debit === lineAmount;
@@ -1038,7 +1038,7 @@ export async function getJournalEntryById(jeId: number) {
             description: entryWithLines.description,
             reference: entryWithLines.reference,
             isPosted: entryWithLines.isPosted,
-            lines: entryWithLines.lines.map(line => ({
+            lines: entryWithLines.lines.map((line: any) => ({
                 id: line.id,
                 accountCode: line.accountCode,
                 debit: line.debit,
@@ -1078,8 +1078,8 @@ export async function updateJournalEntry(
         await checkPeriodLock(date);
 
         // Validate balanced entry
-        const totalDebit = lines.reduce((sum, line) => sum + line.debit, 0);
-        const totalCredit = lines.reduce((sum, line) => sum + line.credit, 0);
+        const totalDebit = lines.reduce((sum: number, line: any) => sum + line.debit, 0);
+        const totalCredit = lines.reduce((sum: number, line: any) => sum + line.credit, 0);
 
         if (totalDebit !== totalCredit) {
             throw new Error(
@@ -1287,8 +1287,8 @@ export async function createOpeningBalanceEntry(data: {
         }
 
         // Validate balanced entry
-        const totalDebit = lines.reduce((sum, line) => sum + line.debit, 0);
-        const totalCredit = lines.reduce((sum, line) => sum + line.credit, 0);
+        const totalDebit = lines.reduce((sum: number, line: any) => sum + line.debit, 0);
+        const totalCredit = lines.reduce((sum: number, line: any) => sum + line.credit, 0);
 
         if (totalDebit !== totalCredit) {
             throw new Error(`Entry is not balanced. Debit: ${totalDebit}, Credit: ${totalCredit}`);

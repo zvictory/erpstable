@@ -1,15 +1,17 @@
-import { getOpportunities, getPipelineStats } from '@/app/actions/crm';
-import { PipelineKanbanBoard } from '@/components/sales/pipeline/PipelineKanbanBoard';
+import { getDeals, getPipelineStats } from '@/app/actions/crm';
+import KanbanBoard from '@/components/crm/KanbanBoard';
 import { PipelineStatsCards } from '@/components/sales/pipeline/PipelineStatsCards';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 
 export const dynamic = 'force-dynamic';
 
 export default async function PipelinePage() {
-  const [opportunities, stats] = await Promise.all([
-    getOpportunities(),
+  const t = await getTranslations('crm.pipeline');
+  const [deals, stats] = await Promise.all([
+    getDeals(),
     getPipelineStats(),
   ]);
 
@@ -20,15 +22,15 @@ export default async function PipelinePage() {
         <div className="max-w-[1600px] mx-auto px-6 py-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">Sales Pipeline</h1>
+              <h1 className="text-3xl font-bold text-slate-900">{t('title')}</h1>
               <p className="text-slate-600 mt-1">
-                Manage opportunities and track deals through your sales process
+                {t('meta_description')}
               </p>
             </div>
-            <Link href="/sales/opportunities/new">
+            <Link href="/sales/deals/new">
               <Button>
                 <Plus size={16} className="mr-2" />
-                New Opportunity
+                {t('btn_new_deal')}
               </Button>
             </Link>
           </div>
@@ -41,7 +43,7 @@ export default async function PipelinePage() {
       {/* Kanban Board */}
       <div className="flex-1 overflow-x-auto">
         <div className="max-w-[1600px] mx-auto px-6 py-6">
-          <PipelineKanbanBoard opportunities={opportunities} />
+          <KanbanBoard initialDeals={deals} />
         </div>
       </div>
     </div>

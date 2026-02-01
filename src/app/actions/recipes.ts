@@ -37,7 +37,7 @@ export async function createRecipe(data: z.infer<typeof createRecipeSchema>) {
   try {
     const validated = createRecipeSchema.parse(data);
 
-    const result = await db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx: any) => {
       // 1. Create recipe
       const [recipe] = await tx.insert(recipes).values({
         name: validated.name,
@@ -156,7 +156,7 @@ export async function updateRecipe(data: z.infer<typeof updateRecipeSchema>) {
   try {
     const validated = updateRecipeSchema.parse(data);
 
-    const result = await db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx: any) => {
       // 1. Update recipe
       const updateData: any = { updatedAt: new Date() };
       if (validated.name !== undefined) updateData.name = validated.name;
@@ -251,5 +251,112 @@ export async function getRecipesForItem(itemId: number) {
   } catch (error: any) {
     console.error('Get Recipes For Item Error:', error);
     return [];
+  }
+}
+
+// --- Production Routing Types and Actions ---
+
+export interface RoutingNode {
+  itemId: number;
+  itemName: string;
+  itemClass: 'RAW_MATERIAL' | 'WIP' | 'FINISHED_GOODS';
+  recipeId?: number;
+  recipeName?: string;
+  processType?: 'MIXING' | 'SUBLIMATION' | 'UNKNOWN';
+  ingredients: RoutingNode[];
+}
+
+/**
+ * Infers the process type based on the transition between item classes
+ */
+function inferProcessType(fromClass: string, toClass: string): 'MIXING' | 'SUBLIMATION' | 'UNKNOWN' {
+  if (fromClass === 'RAW_MATERIAL' && toClass === 'WIP') return 'MIXING';
+  if (fromClass === 'WIP' && toClass === 'FINISHED_GOODS') return 'SUBLIMATION';
+  if (fromClass === 'RAW_MATERIAL' && toClass === 'FINISHED_GOODS') return 'SUBLIMATION';
+  return 'UNKNOWN';
+}
+
+/**
+ * Recursively builds the production routing tree for an item
+ * by tracing backwards through recipes and BOMs
+ */
+export async function getItemRoutingPath(
+  itemId: number,
+  visited: Set<number> = new Set()
+): Promise<RoutingNode | null> {
+  try {
+    // 1. Validate input
+    const validated = z.object({ itemId: z.number().int().positive() }).parse({ itemId });
+
+    // 2. Check for circular dependencies
+    if (visited.has(validated.itemId)) {
+      throw new Error(`Circular dependency detected for item ${validated.itemId}`);
+    }
+
+    // Mark as visited
+    const newVisited = new Set(visited);
+    newVisited.add(validated.itemId);
+
+    // 3. Get base item
+    const item = await db.query.items.findFirst({
+      where: eq(items.id, validated.itemId),
+      columns: { id: true, name: true, itemClass: true }
+    });
+
+    if (!item) return null;
+
+    // 4. Find recipe that produces this item
+    const recipe = await db.query.recipes.findFirst({
+      where: and(
+        eq(recipes.outputItemId, validated.itemId),
+        eq(recipes.isActive, true)
+      ),
+      with: {
+        ingredients: {
+          with: { item: true }
+        }
+      }
+    });
+
+    // 5. If no recipe, it's a purchased item (end of chain)
+    if (!recipe) {
+      return {
+        itemId: item.id,
+        itemName: item.name,
+        itemClass: item.itemClass as RoutingNode['itemClass'],
+        ingredients: []
+      };
+    }
+
+    // 6. Recursively process ingredients
+    const ingredientNodes: RoutingNode[] = [];
+
+    for (const ing of recipe.ingredients) {
+      const ingRouting = await getItemRoutingPath(ing.itemId, newVisited);
+      if (ingRouting) {
+        ingredientNodes.push(ingRouting);
+      }
+    }
+
+    // 7. Infer process type from first ingredient's class to this item's class
+    const processType = ingredientNodes.length > 0
+      ? inferProcessType(
+          ingredientNodes[0].itemClass || 'RAW_MATERIAL',
+          item.itemClass
+        )
+      : 'UNKNOWN';
+
+    return {
+      itemId: item.id,
+      itemName: item.name,
+      itemClass: item.itemClass as RoutingNode['itemClass'],
+      recipeId: recipe.id,
+      recipeName: recipe.name,
+      processType,
+      ingredients: ingredientNodes
+    };
+  } catch (error: any) {
+    console.error('Get Item Routing Path Error:', error);
+    throw error;
   }
 }

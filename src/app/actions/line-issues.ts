@@ -112,13 +112,13 @@ export async function getOpenIssues(workCenterId: number) {
     .orderBy(desc(lineIssues.reportedAt));
 
     // Filter for open, assigned, and in_progress statuses
-    const openIssues = results.filter(r =>
+    const openIssues = results.filter((r: any) =>
       r.status === 'open' || r.status === 'assigned' || r.status === 'in_progress'
     );
 
     return {
       success: true,
-      openIssues: openIssues.map(issue => {
+      openIssues: openIssues.map((issue: any) => {
         const reportedAt = issue.reportedAt instanceof Date ? issue.reportedAt : new Date(issue.reportedAt as any);
         return {
           ...issue,
@@ -159,7 +159,7 @@ export async function getLineIssuesHistory(params: {
 
     return {
       success: true,
-      issues: results.map(issue => {
+      issues: results.map((issue: any) => {
         const reportedAt = issue.reportedAt instanceof Date ? issue.reportedAt : new Date(issue.reportedAt as any);
         return {
           ...issue,

@@ -1,5 +1,5 @@
-import { db } from '../../../../db';
-import { invoices } from '../../../../db/schema';
+import { db } from '@/db';
+import { invoices } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,7 @@ export default async function QuotesPage() {
           name: true,
         },
       },
-      opportunity: {
+      deal: {
         columns: {
           id: true,
           title: true,
@@ -41,7 +41,7 @@ export default async function QuotesPage() {
           <Link href="/sales/pipeline">
             <Button>
               <Plus size={16} className="mr-2" />
-              New Quote (from Opportunity)
+              New Quote (from Deal)
             </Button>
           </Link>
         </div>
@@ -52,7 +52,7 @@ export default async function QuotesPage() {
             <FileText size={48} className="mx-auto text-slate-300 mb-4" />
             <p className="text-slate-500 mb-4">No quotes yet</p>
             <p className="text-sm text-slate-400 mb-6">
-              Create quotes from opportunities in the pipeline
+              Create quotes from deals in the pipeline
             </p>
             <Link href="/sales/pipeline">
               <Button>Go to Pipeline</Button>
@@ -70,7 +70,7 @@ export default async function QuotesPage() {
                     Customer
                   </th>
                   <th className="text-left px-6 py-3 text-sm font-semibold text-slate-700">
-                    Opportunity
+                    Deal
                   </th>
                   <th className="text-left px-6 py-3 text-sm font-semibold text-slate-700">
                     Date
@@ -87,7 +87,7 @@ export default async function QuotesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {quotes.map((quote) => (
+                {quotes.map((quote: any) => (
                   <tr key={quote.id} className="hover:bg-slate-50">
                     <td className="px-6 py-4">
                       <Link
@@ -101,12 +101,12 @@ export default async function QuotesPage() {
                       {quote.customer.name}
                     </td>
                     <td className="px-6 py-4 text-slate-600">
-                      {quote.opportunity ? (
+                      {quote.deal ? (
                         <Link
-                          href={`/sales/opportunities/${quote.opportunity.id}`}
+                          href={`/sales/opportunities/${quote.deal.id}`}
                           className="text-blue-600 hover:underline"
                         >
-                          {quote.opportunity.title}
+                          {quote.deal.title}
                         </Link>
                       ) : (
                         '-'

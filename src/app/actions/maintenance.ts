@@ -94,7 +94,7 @@ export async function getUpcomingMaintenance(workCenterId: number, daysAhead: nu
 
     return {
       success: true,
-      upcomingMaintenance: results.map(m => {
+      upcomingMaintenance: results.map((m: any) => {
         const nextDueAt = m.nextDueAt instanceof Date ? m.nextDueAt : new Date(m.nextDueAt as any);
         return {
           ...m,
@@ -242,7 +242,7 @@ export async function getMaintenanceHistory(params: {
 
     return {
       success: true,
-      maintenanceHistory: results.map(m => {
+      maintenanceHistory: results.map((m: any) => {
         const actualStart = m.actualStart instanceof Date ? m.actualStart : new Date(m.actualStart as any);
         const actualEnd = m.actualEnd instanceof Date ? m.actualEnd : (m.actualEnd ? new Date(m.actualEnd as any) : null);
         return {
@@ -432,7 +432,7 @@ export async function generateMaintenanceWorkOrders(daysAhead: number = 30) {
       taskPerformed: schedule.taskName,
       scheduledStart: schedule.nextDueAt,
       actualStart: schedule.nextDueAt, // Placeholder, will be updated when started
-      technicianId: schedule.assignedTechnicianId || session.user.id,
+      technicianId: schedule.assignedTechnicianId || parseInt(session.user.id!),
       status: 'planned',
       workOrderNumber: woNumber,
     }).returning();
@@ -567,7 +567,7 @@ export async function completeWorkOrderWithCosts(input: unknown) {
   const laborCost = Math.round(data.laborHours * TECHNICIAN_HOURLY_RATE);
 
   // Calculate parts cost
-  const partsCost = (data.partsUsed || []).reduce((sum, part) =>
+  const partsCost = (data.partsUsed || []).reduce((sum: number, part: any) =>
     sum + (part.quantity * part.unitCost), 0
   );
 
@@ -695,7 +695,7 @@ export async function approveMaintenanceWorkOrder(workOrderId: number) {
   await db.update(maintenanceEvents)
     .set({
       status: 'completed',
-      approvedByUserId: session.user.id,
+      approvedByUserId: parseInt(session.user.id!),
       approvedAt: now,
       journalEntryId: glResult.journalEntryId,
       updatedAt: now,
@@ -750,17 +750,17 @@ export async function getMaintenanceCalendar(
   ];
 
   if (filters?.assetIds && filters.assetIds.length > 0) {
-    const orCondition = or(...filters.assetIds.map(id => eq(maintenanceEvents.fixedAssetId, id)));
+    const orCondition = or(...filters.assetIds.map((id: any) => eq(maintenanceEvents.fixedAssetId, id)));
     if (orCondition) conditions.push(orCondition);
   }
 
   if (filters?.technicianIds && filters.technicianIds.length > 0) {
-    const orCondition = or(...filters.technicianIds.map(id => eq(maintenanceEvents.technicianId, id)));
+    const orCondition = or(...filters.technicianIds.map((id: any) => eq(maintenanceEvents.technicianId, id)));
     if (orCondition) conditions.push(orCondition);
   }
 
   if (filters?.statuses && filters.statuses.length > 0) {
-    const orCondition = or(...filters.statuses.map(status => eq(maintenanceEvents.status, status)));
+    const orCondition = or(...filters.statuses.map((status: any) => eq(maintenanceEvents.status, status)));
     if (orCondition) conditions.push(orCondition);
   }
 
@@ -778,10 +778,10 @@ export async function getMaintenanceCalendar(
   // Get summary stats
   const stats = {
     total: events.length,
-    planned: events.filter(e => e.status === 'planned').length,
-    in_progress: events.filter(e => e.status === 'in_progress').length,
-    completed: events.filter(e => e.status === 'completed').length,
-    overdue: events.filter(e =>
+    planned: events.filter((e: any) => e.status === 'planned').length,
+    in_progress: events.filter((e: any) => e.status === 'in_progress').length,
+    completed: events.filter((e: any) => e.status === 'completed').length,
+    overdue: events.filter((e: any) =>
       e.status === 'planned' &&
       new Date(e.scheduledStart as any) < new Date()
     ).length,

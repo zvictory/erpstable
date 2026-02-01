@@ -24,7 +24,7 @@ import { transferInventoryLocation } from './inventory-locations';
  */
 export async function scanBarcode(code: string) {
   const session = await auth();
-  if (!session?.user?.businessId) {
+  if (!session?.user) {
     throw new Error('Unauthorized');
   }
 
@@ -36,23 +36,17 @@ export async function scanBarcode(code: string) {
 
   // Try item lookup (barcode or SKU)
   const item = await db.query.items.findFirst({
-    where: and(
-      eq(items.businessId, session.user.businessId),
-      or(eq(items.barcode, trimmedCode), eq(items.sku, trimmedCode))
-    ),
+    where: or(eq(items.barcode, trimmedCode), eq(items.sku, trimmedCode)),
     with: {
       category: true,
-      unit: true,
+      baseUom: true,
     },
   });
 
   if (item) {
     // Get stock locations for this item
     const stockLocations = await db.query.inventoryLayers.findMany({
-      where: and(
-        eq(inventoryLayers.itemId, item.id),
-        eq(inventoryLayers.businessId, session.user.businessId)
-      ),
+      where: eq(inventoryLayers.itemId, item.id),
       with: {
         location: {
           with: {
@@ -72,20 +66,20 @@ export async function scanBarcode(code: string) {
     }>();
 
     for (const layer of stockLocations) {
-      if (!layer.location) continue;
+      if (!layer.location || !layer.locationId) continue;
 
-      const key = layer.locationId;
+      const key = String(layer.locationId);
       const existing = locationMap.get(key);
 
       if (existing) {
-        existing.quantity += layer.quantity;
+        existing.quantity += layer.remainingQty;
       } else {
         locationMap.set(key, {
-          locationId: layer.locationId,
+          locationId: String(layer.locationId),
           locationCode: layer.location.locationCode,
-          locationName: layer.location.name,
+          locationName: layer.location.locationCode,
           warehouseName: layer.location.warehouse?.name || '',
-          quantity: layer.quantity,
+          quantity: layer.remainingQty,
         });
       }
     }
@@ -98,7 +92,7 @@ export async function scanBarcode(code: string) {
         sku: item.sku,
         barcode: item.barcode,
         category: item.category?.name,
-        unit: item.unit?.abbreviation,
+        unit: item.baseUom?.code,
         qoh: item.quantityOnHand,
       },
       locations: Array.from(locationMap.values()),
@@ -108,7 +102,7 @@ export async function scanBarcode(code: string) {
   // Try location lookup
   const location = await db.query.warehouseLocations.findFirst({
     where: and(
-      eq(warehouseLocations.businessId, session.user.businessId),
+      
       eq(warehouseLocations.locationCode, trimmedCode)
     ),
     with: {
@@ -121,12 +115,12 @@ export async function scanBarcode(code: string) {
     const stockLayers = await db.query.inventoryLayers.findMany({
       where: and(
         eq(inventoryLayers.locationId, location.id),
-        eq(inventoryLayers.businessId, session.user.businessId)
+        
       ),
       with: {
         item: {
           with: {
-            unit: true,
+            baseUom: true,
           },
         },
       },
@@ -144,18 +138,18 @@ export async function scanBarcode(code: string) {
     for (const layer of stockLayers) {
       if (!layer.item) continue;
 
-      const key = layer.itemId;
+      const key = String(layer.itemId);
       const existing = itemMap.get(key);
 
       if (existing) {
-        existing.quantity += layer.quantity;
+        existing.quantity += layer.remainingQty;
       } else {
         itemMap.set(key, {
-          itemId: layer.itemId,
+          itemId: String(layer.itemId),
           itemName: layer.item.name,
-          sku: layer.item.sku,
-          unit: layer.item.unit?.abbreviation || '',
-          quantity: layer.quantity,
+          sku: layer.item.sku || '',
+          unit: layer.item.baseUom?.code || '',
+          quantity: layer.remainingQty,
         });
       }
     }
@@ -165,7 +159,7 @@ export async function scanBarcode(code: string) {
       data: {
         id: location.id,
         code: location.locationCode,
-        name: location.name,
+        name: location.locationCode,
         zone: location.zone,
         warehouseName: location.warehouse?.name,
       },
@@ -176,7 +170,7 @@ export async function scanBarcode(code: string) {
   // Try warehouse lookup
   const warehouse = await db.query.warehouses.findFirst({
     where: and(
-      eq(warehouses.businessId, session.user.businessId),
+      
       eq(warehouses.code, trimmedCode)
     ),
   });
@@ -213,7 +207,7 @@ const wmsTransferSchema = z.object({
  */
 export async function wmsTransferStock(input: unknown) {
   const session = await auth();
-  if (!session?.user?.businessId) {
+  if (!session?.user) {
     throw new Error('Unauthorized');
   }
 
@@ -222,7 +216,7 @@ export async function wmsTransferStock(input: unknown) {
   // Resolve source location
   const sourceLocation = await db.query.warehouseLocations.findFirst({
     where: and(
-      eq(warehouseLocations.businessId, session.user.businessId),
+      
       eq(warehouseLocations.locationCode, validated.sourceLocationCode)
     ),
   });
@@ -234,7 +228,7 @@ export async function wmsTransferStock(input: unknown) {
   // Resolve destination location
   const destLocation = await db.query.warehouseLocations.findFirst({
     where: and(
-      eq(warehouseLocations.businessId, session.user.businessId),
+      
       eq(warehouseLocations.locationCode, validated.destinationLocationCode)
     ),
   });
@@ -243,13 +237,29 @@ export async function wmsTransferStock(input: unknown) {
     throw new Error(`Destination location not found: ${validated.destinationLocationCode}`);
   }
 
+  // Find item by SKU (itemId in WMS context is the barcode/SKU)
+  const item = await db.query.items.findFirst({
+    where: or(
+      eq(items.sku, validated.itemId),
+      eq(items.barcode, validated.itemId)
+    ),
+  });
+
+  if (!item) {
+    throw new Error(`Item not found: ${validated.itemId}`);
+  }
+
   // Call existing transfer action
+  // Note: transferInventoryLocation needs batchNumber, warehouse IDs, and location IDs
   return await transferInventoryLocation({
-    itemId: validated.itemId,
-    sourceLocationId: sourceLocation.id,
-    destinationLocationId: destLocation.id,
+    itemId: item.id,
+    batchNumber: `WMS-TRANSFER-${Date.now()}`,
+    fromLocationId: sourceLocation.id,
+    toWarehouseId: destLocation.warehouseId,
+    toLocationId: destLocation.id,
     quantity: validated.quantity,
-    notes: validated.notes,
+    transferReason: 'WMS_TRANSFER',
+    operatorName: validated.notes,
   });
 }
 
@@ -259,14 +269,18 @@ export async function wmsTransferStock(input: unknown) {
 
 export async function wmsGetItemDetails(itemId: string) {
   const session = await auth();
-  if (!session?.user?.businessId) {
+  if (!session?.user) {
     throw new Error('Unauthorized');
   }
 
+  // Find item by SKU or barcode (itemId in WMS context)
   const item = await db.query.items.findFirst({
-    where: and(eq(items.id, itemId), eq(items.businessId, session.user.businessId)),
+    where: or(
+      eq(items.sku, itemId),
+      eq(items.barcode, itemId)
+    ),
     with: {
-      unit: true,
+      baseUom: true,
       category: true,
     },
   });
@@ -280,7 +294,7 @@ export async function wmsGetItemDetails(itemId: string) {
     name: item.name,
     sku: item.sku,
     barcode: item.barcode,
-    unit: item.unit?.abbreviation || '',
+    unit: item.baseUom?.code || '',
     category: item.category?.name || '',
     qoh: item.quantityOnHand,
   };
@@ -292,15 +306,13 @@ export async function wmsGetItemDetails(itemId: string) {
 
 export async function wmsGetLocationDetails(locationId: string) {
   const session = await auth();
-  if (!session?.user?.businessId) {
+  if (!session?.user) {
     throw new Error('Unauthorized');
   }
 
+  // Find location by location code (locationId in WMS context is the location code)
   const location = await db.query.warehouseLocations.findFirst({
-    where: and(
-      eq(warehouseLocations.id, locationId),
-      eq(warehouseLocations.businessId, session.user.businessId)
-    ),
+    where: eq(warehouseLocations.locationCode, locationId),
     with: {
       warehouse: true,
     },
@@ -313,7 +325,7 @@ export async function wmsGetLocationDetails(locationId: string) {
   return {
     id: location.id,
     code: location.locationCode,
-    name: location.name,
+    name: location.locationCode, // Use locationCode as name since there's no separate name field
     zone: location.zone || '',
     warehouseName: location.warehouse?.name || '',
   };

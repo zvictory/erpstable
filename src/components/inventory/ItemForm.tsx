@@ -15,7 +15,7 @@ const itemSchema = z.object({
     sku: z.string().optional(),
     type: z.enum(['INVENTORY', 'SERVICE', 'NON_INVENTORY']),
     baseUomId: z.coerce.number().min(1, "UOM is required"),
-    categoryId: z.coerce.number().optional(),
+    categoryId: z.coerce.number().min(1, "Category is required"),
     salesPrice: z.coerce.number().min(0),
     standardCost: z.coerce.number().min(0),
     description: z.string().optional(),

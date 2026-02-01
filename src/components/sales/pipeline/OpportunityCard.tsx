@@ -10,17 +10,17 @@ interface OpportunityCardProps {
   opportunity: {
     id: number;
     title: string;
-    estimatedValue: number;
+    value: number;
     probability: number;
     customer: {
       id: number;
       name: string;
     };
-    assignedToUser?: {
+    owner?: {
       id: number;
       name: string;
     } | null;
-    expectedCloseDate?: Date | null;
+    expected_close_date?: Date | null;
   };
 }
 
@@ -85,7 +85,7 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
             <div>
               <p className="text-xs text-slate-500 mb-1">{t('card.value')}</p>
               <p className="text-sm font-semibold text-slate-900">
-                {formatCurrency(opportunity.estimatedValue)}
+                {formatCurrency(opportunity.value)}
               </p>
             </div>
             <div>
@@ -101,18 +101,18 @@ export function OpportunityCard({ opportunity }: OpportunityCardProps) {
 
           {/* Metadata */}
           <div className="space-y-2">
-            {opportunity.assignedToUser && (
+            {opportunity.owner && (
               <div className="flex items-center gap-2 text-xs text-slate-500">
                 <User size={12} />
-                <span className="truncate">{opportunity.assignedToUser.name}</span>
+                <span className="truncate">{opportunity.owner.name}</span>
               </div>
             )}
 
-            {opportunity.expectedCloseDate && (
+            {opportunity.expected_close_date && (
               <div className="flex items-center gap-2 text-xs text-slate-500">
                 <Calendar size={12} />
                 <span>
-                  {new Date(opportunity.expectedCloseDate).toLocaleDateString()}
+                  {new Date(opportunity.expected_close_date).toLocaleDateString()}
                 </span>
               </div>
             )}

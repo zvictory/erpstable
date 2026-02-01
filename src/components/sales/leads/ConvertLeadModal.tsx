@@ -24,10 +24,10 @@ const conversionSchema = z.object({
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   phone: z.string().optional(),
   address: z.string().optional(),
-  creditLimit: z.number().int().min(0).default(0),
+  creditLimit: z.number().int().min(0).optional(),
 
   // Opportunity creation
-  createOpportunity: z.boolean().default(false),
+  createOpportunity: z.boolean().optional(),
   opportunityTitle: z.string().optional(),
   opportunityValue: z.number().int().min(0).optional(),
   opportunityProbability: z.number().int().min(0).max(100).optional(),
@@ -39,11 +39,11 @@ type ConversionFormData = z.infer<typeof conversionSchema>;
 interface ConvertLeadModalProps {
   lead: {
     id: number;
-    fullName: string;
-    company: string | null;
+    contact_name: string;
+    company_name: string | null;
     email: string | null;
     phone: string | null;
-    estimatedValue: number;
+    estimated_value: number;
   };
   isOpen: boolean;
   onClose: () => void;
@@ -64,12 +64,12 @@ export function ConvertLeadModal({ lead, isOpen, onClose }: ConvertLeadModalProp
   } = useForm<ConversionFormData>({
     resolver: zodResolver(conversionSchema),
     defaultValues: {
-      name: lead.company || lead.fullName,
+      name: lead.company_name || lead.contact_name,
       email: lead.email || '',
       phone: lead.phone || '',
       creditLimit: 0,
       createOpportunity: false,
-      opportunityValue: lead.estimatedValue / 100, // Convert from Tiyin to UZS
+      opportunityValue: lead.estimated_value / 100, // Convert from Tiyin to сўм
       opportunityProbability: 50,
     },
   });
@@ -87,9 +87,9 @@ export function ConvertLeadModal({ lead, isOpen, onClose }: ConvertLeadModalProp
           email: data.email,
           phone: data.phone,
           address: data.address,
-          creditLimit: Math.round(data.creditLimit * 100), // Convert to Tiyin
+          creditLimit: Math.round((data.creditLimit ?? 0) * 100), // Convert to Tiyin
         },
-        createOpportunity: data.createOpportunity,
+        createOpportunity: data.createOpportunity ?? false,
         opportunityData: data.createOpportunity
           ? {
               title: data.opportunityTitle || `Deal with ${data.name}`,

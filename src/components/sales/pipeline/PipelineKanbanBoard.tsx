@@ -17,42 +17,41 @@ import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { KanbanColumn } from './KanbanColumn';
 import { OpportunityCard } from './OpportunityCard';
-import { updateOpportunityStage } from '@/app/actions/crm';
+import { updateDealStage } from '@/app/actions/crm';
 
-interface Opportunity {
+interface Deal {
   id: number;
   title: string;
-  estimatedValue: number;
+  value: number;
   probability: number;
   stage: string;
   customer: {
     id: number;
     name: string;
   };
-  assignedToUser?: {
+  owner?: {
     id: number;
     name: string;
   } | null;
-  expectedCloseDate?: Date | null;
+  expected_close_date?: Date | null;
 }
 
 interface PipelineKanbanBoardProps {
-  opportunities: Opportunity[];
+  deals: Deal[];
 }
 
 const STAGES = [
-  'LEAD',
-  'QUALIFIED',
+  'DISCOVERY',
   'PROPOSAL',
   'NEGOTIATION',
   'CLOSED_WON',
   'CLOSED_LOST',
 ] as const;
 
-export function PipelineKanbanBoard({ opportunities: initialOpportunities }: PipelineKanbanBoardProps) {
+export function PipelineKanbanBoard({ deals: initialDeals }: PipelineKanbanBoardProps) {
   const t = useTranslations('crm.pipeline');
-  const [opportunities, setOpportunities] = useState(initialOpportunities);
-  const [activeOpportunity, setActiveOpportunity] = useState<Opportunity | null>(null);
+  const [deals, setDeals] = useState(initialDeals);
+  const [activeDeal, setActiveDeal] = useState<Deal | null>(null);
 
   // Configure sensors for drag-and-drop
   const sensors = useSensors(
@@ -66,45 +65,45 @@ export function PipelineKanbanBoard({ opportunities: initialOpportunities }: Pip
     })
   );
 
-  // Group opportunities by stage
-  const opportunitiesByStage = STAGES.reduce((acc, stage) => {
-    acc[stage] = opportunities.filter(opp => opp.stage === stage);
+  // Group deals by stage
+  const dealsByStage = STAGES.reduce((acc, stage) => {
+    acc[stage] = deals.filter(deal => deal.stage === stage);
     return acc;
-  }, {} as Record<string, Opportunity[]>);
+  }, {} as Record<string, Deal[]>);
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
-    const opportunity = opportunities.find(o => o.id === active.id);
-    setActiveOpportunity(opportunity || null);
+    const deal = deals.find(d => d.id === active.id);
+    setActiveDeal(deal || null);
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
-    setActiveOpportunity(null);
+    setActiveDeal(null);
 
     if (!over) return;
 
-    const opportunityId = active.id as number;
+    const dealId = active.id as number;
     const newStage = over.id as string;
 
-    // Find the opportunity
-    const opportunity = opportunities.find(o => o.id === opportunityId);
-    if (!opportunity) return;
+    // Find the deal
+    const deal = deals.find(d => d.id === dealId);
+    if (!deal) return;
 
     // If stage didn't change, do nothing
-    if (opportunity.stage === newStage) return;
+    if (deal.stage === newStage) return;
 
     // Optimistic update
-    const oldOpportunities = [...opportunities];
-    setOpportunities(prev =>
-      prev.map(opp =>
-        opp.id === opportunityId ? { ...opp, stage: newStage } : opp
+    const oldDeals = [...deals];
+    setDeals(prev =>
+      prev.map(d =>
+        d.id === dealId ? { ...d, stage: newStage } : d
       )
     );
 
     try {
       // Update on server
-      const result = await updateOpportunityStage(opportunityId, newStage);
+      const result = await updateDealStage(dealId, newStage);
 
       if (!result.success) {
         throw new Error('Failed to update stage');
@@ -113,8 +112,8 @@ export function PipelineKanbanBoard({ opportunities: initialOpportunities }: Pip
       toast.success(t('opportunities.messages.stage_update_success'));
     } catch (error) {
       // Revert on error
-      console.error('Failed to update opportunity stage:', error);
-      setOpportunities(oldOpportunities);
+      console.error('Failed to update deal stage:', error);
+      setDeals(oldDeals);
       toast.error('Failed to update stage. Please try again.');
     }
   };
@@ -132,16 +131,16 @@ export function PipelineKanbanBoard({ opportunities: initialOpportunities }: Pip
             key={stage}
             stage={stage}
             title={t(`stages.${stage.toLowerCase()}` as any)}
-            opportunities={opportunitiesByStage[stage]}
+            opportunities={dealsByStage[stage]}
           />
         ))}
       </div>
 
       {/* Drag Overlay */}
       <DragOverlay>
-        {activeOpportunity ? (
+        {activeDeal ? (
           <div className="rotate-3">
-            <OpportunityCard opportunity={activeOpportunity} />
+            <OpportunityCard opportunity={activeDeal} />
           </div>
         ) : null}
       </DragOverlay>

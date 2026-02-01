@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getMaintenanceCalendar } from '@/app/actions/maintenance';
-import { formatCurrency, formatDate } from '@/lib/format';
+import { formatCurrency, formatDateRu } from '@/lib/format';
 import { WorkOrderForm } from './WorkOrderForm';
 
 interface WorkOrder {
@@ -133,7 +133,7 @@ export function WorkOrdersList() {
                       {wo.assetName || '-'}
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-600">
-                      {wo.scheduledStart ? formatDate(new Date(wo.scheduledStart)) : '-'}
+                      {wo.scheduledStart ? formatDateRu(new Date(wo.scheduledStart)) : '-'}
                     </td>
                     <td className="px-6 py-4">
                       {getStatusBadge(wo.status)}

@@ -47,9 +47,9 @@ export function TransferWizardClient() {
 
       if (result.type === 'ITEM') {
         setSourceItem({
-          id: result.data.id,
+          id: String(result.data.id),
           name: result.data.name,
-          sku: result.data.sku,
+          sku: result.data.sku || '',
           unit: result.data.unit || '',
           qoh: result.data.qoh,
         });
@@ -74,7 +74,7 @@ export function TransferWizardClient() {
 
       if (result.type === 'LOCATION') {
         setDestLocation({
-          id: result.data.id,
+          id: String(result.data.id),
           code: result.data.code,
           name: result.data.name,
           warehouseName: result.data.warehouseName || '',

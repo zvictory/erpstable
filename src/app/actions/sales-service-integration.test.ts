@@ -361,7 +361,7 @@ describe('Sales-Service Integration: Auto-create Installation Tickets', () => {
 
     expect(assets).toHaveLength(2);
 
-    const assetItemIds = assets.map(a => a.itemId).sort();
+    const assetItemIds = assets.map((a: any) => a.itemId).sort();
     expect(assetItemIds).toEqual([machineItemId, machine2.id].sort());
   });
 

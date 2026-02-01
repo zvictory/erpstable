@@ -250,7 +250,7 @@ export async function createInstallationTicket(input: unknown) {
     throw new Error(`Invoice #${validated.invoiceId} not found`);
   }
 
-  return await db.transaction(async (tx) => {
+  return await db.transaction(async (tx: any) => {
     // Generate ticket number
     const ticketNumber = await generateTicketNumber();
 
@@ -369,13 +369,13 @@ export async function generateRecurringRefills(skipAuth = false) {
       // Check period lock
       await checkPeriodLock(currentDate);
 
-      await db.transaction(async (tx) => {
+      await db.transaction(async (tx: any) => {
         // Generate invoice number
         const invoiceNumber = await generateRefillInvoiceNumber();
 
         // Calculate totals
         let subtotal = 0;
-        const lines = contract.refillItems.map(refillItem => {
+        const lines = contract.refillItems.map((refillItem: any) => {
           const lineAmount = refillItem.quantityPerCycle * refillItem.contractUnitPrice;
           subtotal += lineAmount;
           return {
@@ -503,14 +503,13 @@ export async function completeServiceTicket(input: unknown) {
   const currentDate = new Date();
   await checkPeriodLock(currentDate);
 
-  return await db.transaction(async (tx) => {
+  return await db.transaction(async (tx: any) => {
     // Calculate labor cost
     const laborHoursDecimal = Math.round(validated.laborHours * 100); // Store as integer * 100
     const laborCost = Math.round(validated.laborHours * LABOR_RATE_TIYIN);
 
     // Calculate parts cost
-    const partsCost = validated.partsUsed.reduce(
-      (sum, part) => sum + part.quantity * part.unitCost,
+    const partsCost = validated.partsUsed.reduce((sum: number, part: any) => sum + part.quantity * part.unitCost,
       0
     );
 
@@ -596,7 +595,7 @@ export async function completeServiceTicket(input: unknown) {
 
     // Update asset status to ACTIVE if this was an installation ticket
     if (ticket.ticketType === 'INSTALLATION' && ticket.ticketAssets.length > 0) {
-      const assetIds = ticket.ticketAssets.map(ta => ta.assetId);
+      const assetIds = ticket.ticketAssets.map((ta: any) => ta.assetId);
       for (const assetId of assetIds) {
         await tx.update(customerAssets)
           .set({
@@ -641,7 +640,7 @@ export async function createServiceContract(input: unknown) {
     throw new Error(`Customer #${validated.customerId} not found`);
   }
 
-  return await db.transaction(async (tx) => {
+  return await db.transaction(async (tx: any) => {
     // Generate contract number
     const contractNumber = await generateContractNumber();
 
@@ -754,7 +753,7 @@ export async function expireOldContracts() {
   }
 
   // Update contracts to EXPIRED status
-  const contractIds = expiredContracts.map(c => c.id);
+  const contractIds = expiredContracts.map((c: any) => c.id);
 
   await db.update(serviceContracts)
     .set({
@@ -1292,7 +1291,7 @@ export async function updateContractRefillItems(
   }
 
   // Use transaction to replace all items
-  await db.transaction(async (tx) => {
+  await db.transaction(async (tx: any) => {
     // Delete existing items
     await tx.delete(contractRefillItems)
       .where(eq(contractRefillItems.contractId, contractId));
@@ -1489,7 +1488,7 @@ export async function createServiceTicket(input: unknown) {
     }
   }
 
-  return await db.transaction(async (tx) => {
+  return await db.transaction(async (tx: any) => {
     // Generate ticket number
     const ticketNumber = await generateTicketNumber();
 

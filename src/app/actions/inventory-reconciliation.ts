@@ -302,7 +302,7 @@ export async function getInventoryReconciliation(): Promise<ReconciliationSummar
   };
 
   // 6. Format Pending Approvals
-  const expectedDiscrepancies: PendingApproval[] = pendingBills.map((bill) => ({
+  const expectedDiscrepancies: PendingApproval[] = pendingBills.map((bill: any) => ({
     billId: bill.id,
     billNumber: bill.billNumber || `BILL-${bill.id}`,
     vendorName: bill.vendorName || 'Unknown Vendor',
@@ -340,8 +340,7 @@ export async function getAutoFixPreview(): Promise<AutoFixPreview> {
   const itemsToAdjust = problemItems.filter((item) => item.issueType === 'MISSING_LAYERS');
 
   // Calculate total value impact (from adjustments only, syncs don't change value)
-  const totalValueImpact = itemsToAdjust.reduce(
-    (sum, item) => sum + item.cachedValue,
+  const totalValueImpact = itemsToAdjust.reduce((sum: number, item: any) => sum + item.cachedValue,
     0
   );
 
@@ -369,7 +368,7 @@ export async function executeAutoFix(): Promise<FixResult> {
     };
   }
 
-  return await db.transaction(async (tx) => {
+  return await db.transaction(async (tx: any) => {
     const reconciliation = await getInventoryReconciliation();
     const { problemItems } = reconciliation;
 

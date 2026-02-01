@@ -18,7 +18,7 @@ export async function createBillPayment(data: PayBillData) {
     console.log('💸 Processing Payment:', data);
 
     try {
-        const result = await db.transaction(async (tx) => {
+        const result = await db.transaction(async (tx: any) => {
             // 1. Load Bill
             const billResults = await tx.select().from(vendorBills).where(eq(vendorBills.id, data.billId)).limit(1);
             const bill = billResults[0];

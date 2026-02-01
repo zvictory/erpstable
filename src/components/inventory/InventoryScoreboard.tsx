@@ -3,6 +3,8 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Banknote, Package, AlertTriangle, XCircle } from 'lucide-react';
 import { formatCurrency, formatNumber } from '@/lib/format';
+import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 
 interface InventoryScoreboardProps {
     metrics: {
@@ -14,9 +16,11 @@ interface InventoryScoreboardProps {
 }
 
 export function InventoryScoreboard({ metrics }: InventoryScoreboardProps) {
+    const t = useTranslations('inventory.item_center.scoreboard');
+
     const cards = [
         {
-            label: 'Total Valuation',
+            labelKey: 'total_valuation',
             value: formatCurrency(metrics.totalValue),
             icon: Banknote,
             iconBg: 'bg-slate-100',
@@ -24,7 +28,7 @@ export function InventoryScoreboard({ metrics }: InventoryScoreboardProps) {
             valueColor: 'text-slate-900'
         },
         {
-            label: 'Total SKUs',
+            labelKey: 'total_skus',
             value: formatNumber(metrics.totalSKUs),
             icon: Package,
             iconBg: 'bg-slate-100',
@@ -32,7 +36,7 @@ export function InventoryScoreboard({ metrics }: InventoryScoreboardProps) {
             valueColor: 'text-slate-900'
         },
         {
-            label: 'Low Stock Alerts',
+            labelKey: 'low_stock_alerts',
             value: formatNumber(metrics.lowStock),
             icon: AlertTriangle,
             iconBg: 'bg-amber-50',
@@ -40,7 +44,7 @@ export function InventoryScoreboard({ metrics }: InventoryScoreboardProps) {
             valueColor: 'text-amber-600'
         },
         {
-            label: 'Out of Stock',
+            labelKey: 'out_of_stock',
             value: formatNumber(metrics.outOfStock),
             icon: XCircle,
             iconBg: 'bg-rose-50',
@@ -50,27 +54,48 @@ export function InventoryScoreboard({ metrics }: InventoryScoreboardProps) {
     ];
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {cards.map((card) => {
+        <div className="grid grid-cols-1 md:grid-cols-4 w-full bg-white border border-slate-200 divide-x divide-slate-200 rounded-xl shadow-sm overflow-hidden">
+            {cards.map((card, index) => {
                 const Icon = card.icon;
+                const isWarning = card.labelKey === 'low_stock_alerts';
+                const isError = card.labelKey === 'out_of_stock';
+
                 return (
-                    <Card key={card.label}>
-                        <CardContent className="pt-6">
-                            <div className="flex items-center gap-3">
-                                <div className={`p-3 rounded-full ${card.iconBg}`}>
-                                    <Icon className={`h-5 w-5 ${card.iconColor}`} />
-                                </div>
-                                <div className="flex-1">
-                                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        {card.label}
-                                    </div>
-                                    <div className={`text-2xl font-bold font-numbers ${card.valueColor}`}>
-                                        {card.value}
-                                    </div>
-                                </div>
+                    <div
+                        key={card.labelKey}
+                        className={cn(
+                            "p-4 transition-colors cursor-pointer group",
+                            isWarning ? "border-t-4 border-t-amber-500 hover:bg-amber-50/30" :
+                                isError ? "border-t-4 border-t-rose-500 hover:bg-rose-50/30" :
+                                    "border-t-4 border-t-slate-400 hover:bg-slate-50"
+                        )}
+                    >
+                        <div className="flex justify-between items-start mb-1">
+                            <span className={cn(
+                                "text-xs font-semibold uppercase tracking-wide transition-colors",
+                                isWarning ? "text-amber-600 group-hover:text-amber-700" :
+                                    isError ? "text-rose-600 group-hover:text-rose-700" :
+                                        "text-slate-500 group-hover:text-slate-700"
+                            )}>
+                                {t(card.labelKey)}
+                            </span>
+                            <div className={cn(
+                                "p-1 rounded-md",
+                                isWarning ? "bg-amber-50" : isError ? "bg-rose-50" : "bg-slate-50"
+                            )}>
+                                <Icon className={cn(
+                                    "h-4 w-4",
+                                    isWarning ? "text-amber-600" : isError ? "text-rose-600" : "text-slate-400"
+                                )} />
                             </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                        <div className={cn(
+                            "text-2xl font-bold font-numbers leading-tight",
+                            card.valueColor
+                        )}>
+                            {card.value}
+                        </div>
+                    </div>
                 );
             })}
         </div>

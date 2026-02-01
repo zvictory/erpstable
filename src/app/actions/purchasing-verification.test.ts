@@ -172,25 +172,25 @@ describe('Verification Tests - Bill Inventory Valuation Implementation', () => {
 
       expect(lines).toHaveLength(4);
 
-      const line1310 = lines.find(l => l.accountCode === '1310');
+      const line1310 = lines.find((l: any) => l.accountCode === '1310');
       expect(line1310).toBeDefined();
       expect(line1310?.debit).toBe(100000);
       expect(line1310?.credit).toBe(0);
       console.log('✅ Dr 1310 (Raw Materials): 100,000');
 
-      const line1340 = lines.find(l => l.accountCode === '1340');
+      const line1340 = lines.find((l: any) => l.accountCode === '1340');
       expect(line1340).toBeDefined();
       expect(line1340?.debit).toBe(100000);
       expect(line1340?.credit).toBe(0);
       console.log('✅ Dr 1340 (Finished Goods): 100,000');
 
-      const line5100 = lines.find(l => l.accountCode === '5100');
+      const line5100 = lines.find((l: any) => l.accountCode === '5100');
       expect(line5100).toBeDefined();
       expect(line5100?.debit).toBe(50000);
       expect(line5100?.credit).toBe(0);
       console.log('✅ Dr 5100 (Expense): 50,000');
 
-      const lineAP = lines.find(l => l.accountCode === '2100');
+      const lineAP = lines.find((l: any) => l.accountCode === '2100');
       expect(lineAP).toBeDefined();
       expect(lineAP?.debit).toBe(0);
       expect(lineAP?.credit).toBe(250000);
@@ -289,7 +289,7 @@ describe('Verification Tests - Bill Inventory Valuation Implementation', () => {
         eq(journalEntryLines.journalEntryId, je.id)
       );
 
-      const line1310 = lines.find(l => l.accountCode === '1310');
+      const line1310 = lines.find((l: any) => l.accountCode === '1310');
       expect(line1310?.debit).toBe(60000); // 50 * 1200
       console.log('✅ GL updated: Dr 1310 = 60,000');
     });

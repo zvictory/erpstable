@@ -23,7 +23,7 @@ export async function getAuditLogs(filters?: {
     }
 
     // Build query conditions
-    const conditions = [];
+    const conditions: any[] = [];
 
     if (filters?.entity) {
         conditions.push(eq(auditLogs.entity, filters.entity));

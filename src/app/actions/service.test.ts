@@ -328,7 +328,7 @@ describe('Service Module Server Actions', () => {
       expect(result.results.errors.length).toBeGreaterThanOrEqual(1);
 
       // Verify our specific empty contract was in the errors
-      const ourError = result.results.errors.find(e => e.contractId === emptyContract.id);
+      const ourError = result.results.errors.find((e: any) => e.contractId === emptyContract.id);
       expect(ourError).toBeDefined();
       expect(ourError?.error).toBe('No refill items configured');
     });

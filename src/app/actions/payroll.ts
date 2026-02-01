@@ -115,6 +115,7 @@ export async function createPayrollPeriod(input: unknown) {
     endDate: data.endDate,
     payDate: data.payDate,
     status: 'DRAFT',
+    createdBy: parseInt(session.user.id!),
   }).returning();
 
   return { success: true, period: period[0] };
@@ -347,25 +348,25 @@ export async function approvePayrollPeriod(input: unknown) {
   await db.insert(journalEntryLines).values(lines);
 
   // Update GL account balances (values in Tiyin)
-  await db.execute(sql`
+  await db.run(sql`
     UPDATE gl_accounts
     SET balance = balance + ${totalGross}
     WHERE code = ${ACCOUNTS.SALARY_EXPENSE}
   `);
 
-  await db.execute(sql`
+  await db.run(sql`
     UPDATE gl_accounts
     SET balance = balance + ${totalNet}
     WHERE code = ${ACCOUNTS.SALARIES_PAYABLE}
   `);
 
-  await db.execute(sql`
+  await db.run(sql`
     UPDATE gl_accounts
     SET balance = balance + ${totalIncomeTax}
     WHERE code = ${ACCOUNTS.TAX_PAYABLE_INCOME}
   `);
 
-  await db.execute(sql`
+  await db.run(sql`
     UPDATE gl_accounts
     SET balance = balance + ${totalPensionFund}
     WHERE code = ${ACCOUNTS.TAX_PAYABLE_PENSION}
@@ -492,25 +493,25 @@ export async function processPayrollPayment(input: unknown) {
   await db.insert(journalEntryLines).values(lines);
 
   // Update GL account balances (values in Tiyin)
-  await db.execute(sql`
+  await db.run(sql`
     UPDATE gl_accounts
     SET balance = balance - ${totalNet}
     WHERE code = ${ACCOUNTS.SALARIES_PAYABLE}
   `);
 
-  await db.execute(sql`
+  await db.run(sql`
     UPDATE gl_accounts
     SET balance = balance - ${totalIncomeTax}
     WHERE code = ${ACCOUNTS.TAX_PAYABLE_INCOME}
   `);
 
-  await db.execute(sql`
+  await db.run(sql`
     UPDATE gl_accounts
     SET balance = balance - ${totalPensionFund}
     WHERE code = ${ACCOUNTS.TAX_PAYABLE_PENSION}
   `);
 
-  await db.execute(sql`
+  await db.run(sql`
     UPDATE gl_accounts
     SET balance = balance - ${totalPayment}
     WHERE code = ${data.bankAccountCode}

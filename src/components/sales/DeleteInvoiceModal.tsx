@@ -166,7 +166,7 @@ export default function DeleteInvoiceModal({ isOpen, onClose, onSuccess, invoice
               <div className="flex justify-between items-center">
                 <span className="text-sm text-slate-600">{t('details.amount')}</span>
                 <span className="text-sm font-bold text-slate-900">
-                  {(invoice.totalAmount / 100).toLocaleString()} UZS
+                  {(invoice.totalAmount / 100).toLocaleString()} сўм
                 </span>
               </div>
               <div className="flex justify-between items-center">

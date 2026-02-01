@@ -1,18 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, usePathname } from '@/navigation';
 import { useTranslations } from 'next-intl';
-import {
-    ChevronLeft, Check, Users, ShoppingCart, Truck,
-    CreditCard, Banknote, Package, Activity, Hammer,
-    BoxSelect, PieChart, FileBarChart, Receipt,
-    FlaskConical, Snowflake, Building2, Factory,
-    LayoutDashboard, Settings, ChevronRight, BookOpen, ClipboardCheck, Wallet, Wrench,
-    TrendingUp, UserPlus, FileText as FileTextIcon
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { UserRole } from '@/auth.config';
+import { NAVIGATION_CONFIG, filterNavByRole } from '@/lib/navigation-config';
 
 interface SidebarProps {
     className?: string;
@@ -26,6 +20,9 @@ export default function Sidebar({ className, isCollapsed, toggleCollapse, userRo
     const pathname = usePathname();
 
     const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
+
+    // Filter navigation by user role
+    const visibleNav = filterNavByRole(NAVIGATION_CONFIG, userRole);
 
     const NavGroup = ({ title, children }: { title: string; children: React.ReactNode }) => (
         <div className="mb-6">
@@ -78,43 +75,21 @@ export default function Sidebar({ className, isCollapsed, toggleCollapse, userRo
                 </div>
             </div>
 
-            {/* Navigation Content */}
+            {/* Dynamic Navigation */}
             <div className="flex-1 overflow-y-auto py-6 custom-scrollbar">
-
-                {/* Commercial */}
-                <NavGroup title={t('commercial')}>
-                    <NavItem href="/" icon={LayoutDashboard} label={t('dashboard')} active={pathname === '/'} />
-                    <NavItem href="/sales/pipeline" icon={TrendingUp} label={t('pipeline')} active={isActive('/sales/pipeline')} />
-                    <NavItem href="/sales/leads" icon={UserPlus} label={t('leads')} active={isActive('/sales/leads')} />
-                    <NavItem href="/sales/customers" icon={Users} label={t('customers')} active={isActive('/sales/customers')} />
-                    <NavItem href="/sales/quotes" icon={FileTextIcon} label={t('quotes')} active={isActive('/sales/quotes')} />
-                    <NavItem href="/sales/invoices" icon={Receipt} label={t('invoices')} active={isActive('/sales/invoices')} />
-                    <NavItem href="/sales/estimates" icon={FileText} label={t('estimates')} active={isActive('/sales/estimates')} />
-                </NavGroup>
-
-                {/* Supply Chain */}
-                <NavGroup title={t('supply_chain')}>
-                    <NavItem href="/purchasing/vendors" icon={Users} label={t('vendors')} active={isActive('/purchasing/vendors')} />
-                    <NavItem href="/purchasing/orders" icon={ShoppingCart} label={t('purchase_orders')} active={isActive('/purchasing/orders')} />
-                    <NavItem href="/inventory/items" icon={Package} label={t('items_services')} active={isActive('/inventory/items')} />
-                    <NavItem href="/inventory/reconciliation" icon={ClipboardCheck} label={t('reconciliation')} active={isActive('/inventory/reconciliation')} />
-                    <NavItem href="/manufacturing/lines" icon={Factory} label={t('production_lines')} active={isActive('/manufacturing/lines')} />
-                    <NavItem href="/manufacturing/mixing" icon={FlaskConical} label={t('mixing')} active={isActive('/manufacturing/mixing')} />
-                    <NavItem href="/manufacturing/sublimation" icon={Snowflake} label={t('sublimation')} active={isActive('/manufacturing/sublimation')} />
-                    <NavItem href="/maintenance" icon={Wrench} label={t('maintenance')} active={isActive('/maintenance')} />
-                </NavGroup>
-
-                {/* Finance */}
-                <NavGroup title={t('finance')}>
-                    <NavItem href="/finance/chart-of-accounts" icon={FileBarChart} label={t('chart_of_accounts')} active={isActive('/finance/chart-of-accounts')} />
-                    <NavItem href="/finance/general-ledger" icon={BookOpen} label={t('general_ledger')} active={isActive('/finance/general-ledger')} />
-                    <NavItem href="/finance/cash-accounts" icon={Wallet} label={t('cash_accounts')} active={isActive('/finance/cash-accounts')} />
-                    <NavItem href="/finance/fixed-assets" icon={Building2} label={t('fixed_assets')} active={isActive('/finance/fixed-assets')} />
-                    <NavItem href="/expenses" icon={Wallet} label={t('expenses')} active={isActive('/expenses')} />
-                    <NavItem href="/finance/reports" icon={PieChart} label={t('financial_reports')} active={isActive('/finance/reports')} />
-                    <NavItem href="/reports" icon={PieChart} label={t('reports_center')} active={isActive('/reports')} />
-                    <NavItem href="/settings" icon={Settings} label={t('settings')} active={isActive('/settings')} />
-                </NavGroup>
+                {visibleNav.map((group) => (
+                    <NavGroup key={group.titleKey} title={t(group.titleKey)}>
+                        {group.items.map((item) => (
+                            <NavItem
+                                key={item.href}
+                                href={item.href}
+                                icon={item.icon}
+                                label={t(item.labelKey)}
+                                active={isActive(item.href)}
+                            />
+                        ))}
+                    </NavGroup>
+                ))}
             </div>
 
             {/* Footer / Collapse Toggle */}
@@ -129,8 +104,3 @@ export default function Sidebar({ className, isCollapsed, toggleCollapse, userRo
         </aside>
     );
 }
-
-// Helper icons
-const FileText = ({ className, size }: { className?: string, size?: number }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size || 24} height={size || 24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /><line x1="16" x2="8" y1="13" y2="13" /><line x1="16" x2="8" y1="17" y2="17" /><line x1="10" x2="8" y1="9" y2="9" /></svg>
-);

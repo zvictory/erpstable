@@ -5,36 +5,6 @@ import { auth } from '@/auth';
 import { db } from '../../../db';
 import { z } from 'zod';
 
-// Helper to safely serialize timestamps (handles NaN from TEXT → INTEGER conversion)
-function serializeTimestamps<T>(obj: T): T {
-  if (obj === null || obj === undefined) return obj;
-
-  // Handle Date objects
-  if (obj instanceof Date) {
-    return (isNaN(obj.getTime()) ? null : obj) as T;
-  }
-
-  // Handle NaN numbers
-  if (typeof obj === 'number' && !isFinite(obj)) {
-    return null as T;
-  }
-
-  // Handle arrays
-  if (Array.isArray(obj)) {
-    return obj.map(serializeTimestamps) as T;
-  }
-
-  // Handle objects (including relational data)
-  if (typeof obj === 'object') {
-    const result: any = {};
-    for (const [key, value] of Object.entries(obj)) {
-      result[key] = serializeTimestamps(value);
-    }
-    return result as T;
-  }
-
-  return obj;
-}
 import { eq, and, inArray, desc, sql } from 'drizzle-orm';
 import {
   qualityTests,
@@ -191,8 +161,8 @@ export async function getInspectionById(inspectionId: number) {
 
     return {
       success: true,
-      inspection: serializeTimestamps(inspection),
-      tests: serializeTimestamps(applicableTests),
+      inspection,
+      tests: applicableTests,
     };
   } catch (error) {
     console.error('getInspectionById error:', error);
@@ -385,7 +355,7 @@ export async function getPendingInspections() {
       limit: 50,
     });
 
-    return { success: true, inspections: serializeTimestamps(pending) };
+    return { success: true, inspections: pending };
   } catch (error) {
     console.error('getPendingInspections error:', error);
     return {
@@ -438,7 +408,7 @@ export async function getInspections(filters?: {
       limit: 100,
     });
 
-    return { success: true, inspections: serializeTimestamps(inspections) };
+    return { success: true, inspections };
   } catch (error) {
     console.error('getInspections error:', error);
     return {

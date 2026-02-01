@@ -31,7 +31,7 @@ export async function repostMissingGL() {
 
                 try {
                     // Create GL Entry Logic (Duplicated from saveVendorBill for safety/isolation)
-                    await db.transaction(async (tx) => {
+                    await db.transaction(async (tx: any) => {
                         const [newJE] = await tx.insert(journalEntries).values({
                             date: bill.billDate, // Use original bill date
                             description: `Vendor Bill: ${bill.billNumber} (Reposted)`, // Mark as reposted

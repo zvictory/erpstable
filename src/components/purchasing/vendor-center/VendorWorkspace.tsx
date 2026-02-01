@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/button";
 import { Edit, Plus, FileText, History, User, Settings as SettingsIcon } from 'lucide-react';
-import { formatCurrency } from '@/lib/format';
+import { formatCurrency, formatDateRu } from '@/lib/format';
 
 interface Transaction {
     id: string;
@@ -65,7 +65,10 @@ export function VendorWorkspace({ vendor, onEdit, onNewBill }: VendorWorkspacePr
                 <div>
                     <h1 className="mb-1">{vendor.name}</h1>
                     <div className="flex items-center gap-3">
-                        <Badge variant={vendor.openBalance > 0 ? "warning" : "success"}>
+                        <Badge
+                            variant={vendor.openBalance > 0 ? "secondary" : "default"}
+                            className={vendor.openBalance > 0 ? "bg-yellow-100 text-yellow-700" : "bg-green-100 text-green-700"}
+                        >
                             {vendor.openBalance > 0 ? "Outstanding Balance" : "Clear Account"}
                         </Badge>
                         <span className="text-xs text-slate-400 font-numbers tracking-tight">
@@ -144,12 +147,15 @@ export function VendorWorkspace({ vendor, onEdit, onNewBill }: VendorWorkspacePr
                                                 </div>
                                                 <div>
                                                     <div className="text-sm font-medium text-slate-900">{tx.ref}</div>
-                                                    <div className="text-[11px] text-slate-400">{formatDate(tx.date)} &bull; {tx.type}</div>
+                                                    <div className="text-[11px] text-slate-400">{formatDateRu(tx.date)} &bull; {tx.type}</div>
                                                 </div>
                                             </div>
                                             <div className="text-right">
                                                 <div className="text-sm font-numbers font-bold text-slate-900">{formatCurrency(tx.amount)}</div>
-                                                <Badge variant={tx.status === 'PAID' || tx.status === 'CLOSED' ? "success" : "warning"} className="text-[10px] px-1.5 py-0">
+                                                <Badge
+                                                    variant={tx.status === 'PAID' || tx.status === 'CLOSED' ? "default" : "secondary"}
+                                                    className={`text-[10px] px-1.5 py-0 ${tx.status === 'PAID' || tx.status === 'CLOSED' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}
+                                                >
                                                     {tx.status}
                                                 </Badge>
                                             </div>
@@ -189,12 +195,15 @@ export function VendorWorkspace({ vendor, onEdit, onNewBill }: VendorWorkspacePr
                                     <tbody className="divide-y divide-slate-50">
                                         {vendor.transactions?.map(tx => (
                                             <tr key={tx.id} className="hover:bg-slate-50/50 transition-colors">
-                                                <td className="px-4 py-3 text-slate-600 font-numbers">{formatDate(tx.date)}</td>
+                                                <td className="px-4 py-3 text-slate-600 font-numbers">{formatDateRu(tx.date)}</td>
                                                 <td className="px-4 py-3 font-medium text-slate-900">{tx.type}</td>
                                                 <td className="px-4 py-3 text-slate-600">{tx.ref}</td>
                                                 <td className="px-4 py-3 text-right font-numbers font-semibold">{formatCurrency(tx.amount)}</td>
                                                 <td className="px-4 py-3 text-right">
-                                                    <Badge variant={tx.status === 'PAID' || tx.status === 'CLOSED' ? "success" : "warning"} className="text-[10px]">
+                                                    <Badge
+                                                        variant={tx.status === 'PAID' || tx.status === 'CLOSED' ? "default" : "secondary"}
+                                                        className={`text-[10px] ${tx.status === 'PAID' || tx.status === 'CLOSED' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}
+                                                    >
                                                         {tx.status}
                                                     </Badge>
                                                 </td>

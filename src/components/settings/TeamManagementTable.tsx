@@ -177,7 +177,7 @@ export default function TeamManagementTable({ initialUsers }: TeamManagementTabl
                                     {/* Status Badge */}
                                     <TableCell>
                                         <Badge
-                                            variant={user.isActive ? 'success' : 'outline'}
+                                            variant={user.isActive ? 'default' : 'outline'}
                                             className={
                                                 user.isActive
                                                     ? 'bg-green-50 text-green-700 border-green-200'

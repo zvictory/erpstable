@@ -69,7 +69,7 @@ export function NewExpenseModal({
         setError(null);
 
         try {
-            // Convert UZS to Tiyin
+            // Convert сўм to Tiyin
             const amountInTiyin = Math.round(data.amount * 100);
 
             const expenseData: any = {
@@ -264,7 +264,7 @@ export function NewExpenseModal({
                                     disabled={isSubmitting}
                                 />
                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
-                                    UZS
+                                    сўм
                                 </div>
                             </div>
                             {errors.amount && (
@@ -272,7 +272,7 @@ export function NewExpenseModal({
                             )}
                             {selectedCategory?.maxAmount && (
                                 <p className="mt-1 text-xs text-slate-500">
-                                    {t('fields.amount_limit')}: {selectedCategory.maxAmount / 100} UZS
+                                    {t('fields.amount_limit')}: {selectedCategory.maxAmount / 100} сўм
                                 </p>
                             )}
                         </div>

@@ -193,7 +193,7 @@ export function TransferFundsModal({
                                         <p className="text-slate-600">
                                             {t('balance_before')}:{' '}
                                             <span className="font-semibold">
-                                                {(fromAccount.balance / 100).toLocaleString()} UZS
+                                                {(fromAccount.balance / 100).toLocaleString()} сўм
                                             </span>
                                         </p>
                                         {amount && parseFloat(amount) > 0 && (
@@ -203,7 +203,7 @@ export function TransferFundsModal({
                                                 } font-medium`}
                                             >
                                                 {t('balance_after')}:{' '}
-                                                {(fromBalanceAfter / 100).toLocaleString()} UZS
+                                                {(fromBalanceAfter / 100).toLocaleString()} сўм
                                             </p>
                                         )}
                                     </div>
@@ -271,13 +271,13 @@ export function TransferFundsModal({
                                         <p className="text-slate-600">
                                             {t('balance_before')}:{' '}
                                             <span className="font-semibold">
-                                                {(toAccount.balance / 100).toLocaleString()} UZS
+                                                {(toAccount.balance / 100).toLocaleString()} сўм
                                             </span>
                                         </p>
                                         {amount && parseFloat(amount) > 0 && (
                                             <p className="text-emerald-600 font-medium">
                                                 {t('balance_after')}:{' '}
-                                                {(toBalanceAfter / 100).toLocaleString()} UZS
+                                                {(toBalanceAfter / 100).toLocaleString()} сўм
                                             </p>
                                         )}
                                     </div>

@@ -18,6 +18,7 @@ import { UserRole } from '@/auth.config';
 import { getPreferences } from './preferences';
 import { getPreferenceBoolean, getPreferenceInteger } from '@/lib/preferences';
 import { generateInspection } from './quality';
+import { createPendingGRN } from './inventory';
 import { logAuditEvent } from '@/lib/audit';
 
 // --- Validation Schemas ---
@@ -161,8 +162,8 @@ export async function getVendorCenterData(selectedId?: number) {
         const vendorsWithBalances = allVendors.map(v => ({
             ...v,
             balance: allBills
-                .filter(b => b.vendorId === v.id)
-                .reduce((sum, b) => sum + b.totalAmount, 0)
+                .filter((b: any) => b.vendorId === v.id)
+                .reduce((sum: number, b: any) => sum + b.totalAmount, 0)
         }));
 
         let selectedVendor = null;
@@ -180,18 +181,18 @@ export async function getVendorCenterData(selectedId?: number) {
                 selectedVendor = { ...selectedVendor, purchaseOrders: poList, bills };
 
                 // Calculate KPIs
-                const openBills = bills.filter(b => b.status !== 'PAID');
-                const openBalance = openBills.reduce((sum, b) => sum + b.totalAmount, 0);
+                const openBills = bills.filter((b: any) => b.status !== 'PAID');
+                const openBalance = openBills.reduce((sum: number, b: any) => sum + b.totalAmount, 0);
 
-                const paidBills = selectedVendor.bills.filter(b => b.status === 'PAID');
+                const paidBills = selectedVendor.bills.filter((b: any) => b.status === 'PAID');
                 const lastPaymentDate = paidBills.length > 0
-                    ? new Date(Math.max(...paidBills.map(b => new Date(b.billDate).getTime())))
+                    ? new Date(Math.max(...paidBills.map((b: any) => new Date(b.billDate).getTime())))
                     : null;
 
                 const thisYear = new Date().getFullYear();
                 const ytdVolume = selectedVendor.purchaseOrders
-                    .filter(po => new Date(po.date).getFullYear() === thisYear)
-                    .reduce((sum, po) => sum + (po.totalAmount || 0), 0);
+                    .filter((po: any) => new Date(po.date).getFullYear() === thisYear)
+                    .reduce((sum: number, po: any) => sum + (po.totalAmount || 0), 0);
 
                 // Group history for Transaction List tab
                 const transactions = [
@@ -257,40 +258,40 @@ export async function getVendorCenterData(selectedId?: number) {
         const allBillsForStats = await db.select().from(vendorBills);
 
         // Open POs (OPEN or PARTIAL status)
-        const openPOs = allPOs.filter(po => po.status === 'OPEN' || po.status === 'PARTIAL');
+        const openPOs = allPOs.filter((po: any) => po.status === 'OPEN' || po.status === 'PARTIAL');
         const openPOsStats = {
             count: openPOs.length,
-            total: openPOs.reduce((sum, po) => sum + (po.totalAmount || 0), 0)
+            total: openPOs.reduce((sum: number, po: any) => sum + (po.totalAmount || 0), 0)
         };
 
         // Open Bills (OPEN or PARTIAL status)
-        const openBillsList = allBillsForStats.filter(b => b.status === 'OPEN' || b.status === 'PARTIAL');
+        const openBillsList = allBillsForStats.filter((b: any) => b.status === 'OPEN' || b.status === 'PARTIAL');
         const openBillsStats = {
             count: openBillsList.length,
-            total: openBillsList.reduce((sum, b) => sum + b.totalAmount, 0)
+            total: openBillsList.reduce((sum: number, b: any) => sum + b.totalAmount, 0)
         };
 
         // Overdue Bills (OPEN/PARTIAL and past due date - assume Net 30 from bill date)
         const now = new Date();
-        const overdueBills = openBillsList.filter(b => {
+        const overdueBills = openBillsList.filter((b: any) => {
             const dueDate = new Date(b.billDate);
             dueDate.setDate(dueDate.getDate() + 30); // Net 30
             return now > dueDate;
         });
         const overdueStats = {
             count: overdueBills.length,
-            total: overdueBills.reduce((sum, b) => sum + b.totalAmount, 0)
+            total: overdueBills.reduce((sum: number, b: any) => sum + b.totalAmount, 0)
         };
 
         // Paid in last 30 days
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const paidBills = allBillsForStats.filter(b =>
+        const paidBills = allBillsForStats.filter((b: any) =>
             b.status === 'PAID' && new Date(b.updatedAt) >= thirtyDaysAgo
         );
         const paidLast30Stats = {
             count: paidBills.length,
-            total: paidBills.reduce((sum, b) => sum + b.totalAmount, 0)
+            total: paidBills.reduce((sum: number, b: any) => sum + b.totalAmount, 0)
         };
 
         return {
@@ -312,9 +313,9 @@ export async function getVendorCenterData(selectedId?: number) {
 export async function savePurchaseOrder(data: z.infer<typeof purchasingDocSchema>) {
     try {
         const val = purchasingDocSchema.parse(data);
-        const totalAmount = val.items.reduce((sum, item) => sum + Math.round(item.quantity * item.unitPrice), 0);
+        const totalAmount = val.items.reduce((sum: number, item: any) => sum + Math.round(item.quantity * item.unitPrice), 0);
 
-        await db.transaction(async (tx) => {
+        return await db.transaction(async (tx: any) => {
             const [po] = await tx.insert(purchaseOrders).values({
                 vendorId: val.vendorId,
                 date: val.date,
@@ -334,13 +335,16 @@ export async function savePurchaseOrder(data: z.infer<typeof purchasingDocSchema
                     description: item.description,
                 });
             }
-        });
 
-        try {
-            revalidatePath('/purchasing/vendors');
-            revalidatePath('/purchasing/orders');
-        } catch (e) { }
-        return { success: true };
+            try {
+                revalidatePath('/purchasing/vendors');
+                revalidatePath('/purchasing/orders');
+            } catch (e) { }
+            return {
+                success: true,
+                message: `Purchase Order ${val.refNumber} saved successfully`
+            };
+        });
     } catch (error: any) {
         console.error('Save PO Error:', error);
         return { success: false, error: error.message || 'Failed to save PO' };
@@ -350,9 +354,9 @@ export async function savePurchaseOrder(data: z.infer<typeof purchasingDocSchema
 export async function saveItemReceipt(data: z.infer<typeof purchasingDocSchema>) {
     try {
         const val = purchasingDocSchema.parse(data);
-        const totalAmount = val.items.reduce((sum, item) => sum + Math.round(item.quantity * item.unitPrice), 0);
+        const totalAmount = val.items.reduce((sum: number, item: any) => sum + Math.round(item.quantity * item.unitPrice), 0);
 
-        await db.transaction(async (tx) => {
+        return await db.transaction(async (tx: any) => {
             // 2. Update PO lines if linked (Inventory layers are NOT created here - bills are the source of inventory)
             if (val.poId) {
                 for (const item of val.items) {
@@ -395,13 +399,13 @@ export async function saveItemReceipt(data: z.infer<typeof purchasingDocSchema>)
                     .set({ status: 'PARTIAL' })
                     .where(eq(purchaseOrders.id, val.poId));
             }
-        });
 
-        try {
-            revalidatePath('/purchasing/vendors');
-            revalidatePath('/inventory/items');
-        } catch (e) { }
-        return { success: true };
+            try {
+                revalidatePath('/purchasing/vendors');
+                revalidatePath('/inventory/items');
+            } catch (e) { }
+            return { success: true };
+        });
     } catch (error: any) {
         console.error('Save Receipt Error:', error);
         return { success: false, error: error.message || 'Failed to save receipt' };
@@ -437,7 +441,7 @@ export async function createVendorBill(data: any) {
                 const billPrice = parseFloat(billItem.unitPrice as any) || 0;
 
                 // Find matching PO line
-                const poLine = poLines.find(pl => pl.itemId === billItemId);
+                const poLine = poLines.find((pl: any) => pl.itemId === billItemId);
                 if (!poLine) {
                     throw new Error(
                         `Item #${billItemId} is not on Purchase Order #${val.poId}. ` +
@@ -475,7 +479,7 @@ export async function createVendorBill(data: any) {
         }
 
         // Convert to Tiyin (integers) safely
-        const totalSubtotalTiyin = val.items.reduce((sum, item) => {
+        const totalSubtotalTiyin = val.items.reduce((sum: number, item: any) => {
             const qty = parseFloat(item.quantity as any) || 0;
             const rate = parseFloat(item.unitPrice as any) || 0;
             return sum + Math.round(qty * rate * 100);
@@ -506,7 +510,7 @@ export async function createVendorBill(data: any) {
             userRole !== UserRole.ADMIN; // User is not admin
 
         // Pre-validation: Load all items and validate
-        const itemIds = val.items.map(item => Number(item.itemId));
+        const itemIds = val.items.map((item: any) => Number(item.itemId));
         const itemsData = await db.select({
             id: items.id,
             name: items.name,
@@ -515,7 +519,7 @@ export async function createVendorBill(data: any) {
             valuationMethod: items.valuationMethod,
         }).from(items).where(inArray(items.id, itemIds));
 
-        const itemsMap = new Map(itemsData.map(i => [i.id, i]));
+        const itemsMap = new Map(itemsData.map((i: any) => [i.id, i]));
 
         // Validate all items exist
         for (const item of val.items) {
@@ -525,9 +529,9 @@ export async function createVendorBill(data: any) {
 
         // Variables to capture for post-transaction QC inspection generation
         let billId = 0;
-        const inspectionsToGenerate: Array<{itemId: number; batchNumber: string; quantity: number}> = [];
+        const inspectionsToGenerate: Array<{ itemId: number; batchNumber: string; quantity: number }> = [];
 
-        await db.transaction(async (tx) => {
+        const result = await db.transaction(async (tx: any) => {
             // 1. Create Bill
             const [bill] = await tx.insert(vendorBills).values({
                 vendorId: Number(val.vendorId),
@@ -607,7 +611,7 @@ export async function createVendorBill(data: any) {
                 }
 
                 // 3b. Update denormalized inventory fields after creating layers
-                const uniqueItemIds = [...new Set(val.items.map(item => Number(item.itemId)))];
+                const uniqueItemIds = [...new Set(val.items.map((item: any) => Number(item.itemId)))];
                 for (const itemId of uniqueItemIds) {
                     try {
                         await updateItemInventoryFields(itemId, tx);
@@ -703,23 +707,44 @@ export async function createVendorBill(data: any) {
             } else {
                 console.log('⏸️  GL posting skipped - Bill requires approval');
             }
+
+            // ✅ Return transaction result
+            return {
+                success: true,
+                billId: bill.id,
+                inspectionsNeeded: inspectionsToGenerate.length > 0
+            };
         });
 
         // Generate QC inspections after transaction completes (only if layers were created)
-        if (inspectionsToGenerate.length > 0) {
+        if (result.success && result.inspectionsNeeded) {
             for (const inspection of inspectionsToGenerate) {
-                await generateInspection({
+                const inspectionResult = await generateInspection({
                     sourceType: 'PURCHASE_RECEIPT',
-                    sourceId: billId,
+                    sourceId: result.billId,
                     batchNumber: inspection.batchNumber,
                     itemId: inspection.itemId,
                     quantity: inspection.quantity,
                 });
+
+                if (inspectionResult.success && !inspectionResult.qcRequired) {
+                    // Update layer to NOT_REQUIRED if no tests found
+                    await db.update(inventoryLayers)
+                        .set({ qcStatus: 'NOT_REQUIRED' })
+                        .where(eq(inventoryLayers.batchNumber, inspection.batchNumber));
+
+                    // Also sync inventory fields since they might be used for availability checks
+                    await updateItemInventoryFields(inspection.itemId, db as any);
+                }
             }
         }
 
         revalidatePath('/purchasing/vendors');
-        return { success: true };
+        return {
+            success: true,
+            message: `Bill ${val.refNumber} created successfully`,
+            billId: result.billId
+        };
     } catch (error: any) {
         console.error('❌ Create Vendor Bill Error:', error);
 
@@ -787,14 +812,14 @@ export async function updateVendorBill(billId: number, data: any) {
         await checkPeriodLock(val.transactionDate);
 
         // Calculate totals
-        const totalAmountTiyin = val.items.reduce((sum, item) => {
+        const totalAmountTiyin = val.items.reduce((sum: number, item: any) => {
             const qty = Number(item.quantity);
             const price = Number(item.unitPrice); // Assuming validation returns decimal
             return sum + Math.round(qty * price * 100);
         }, 0);
 
         // Pre-validation: Load all items and validate
-        const itemIds = val.items.map(item => Number(item.itemId));
+        const itemIds = val.items.map((item: any) => Number(item.itemId));
         const itemsData = await db.select({
             id: items.id,
             name: items.name,
@@ -803,7 +828,7 @@ export async function updateVendorBill(billId: number, data: any) {
             valuationMethod: items.valuationMethod,
         }).from(items).where(inArray(items.id, itemIds));
 
-        const itemsMap = new Map(itemsData.map(i => [i.id, i]));
+        const itemsMap = new Map(itemsData.map((i: any) => [i.id, i]));
 
         // Validate all items exist
         for (const item of val.items) {
@@ -812,7 +837,7 @@ export async function updateVendorBill(billId: number, data: any) {
         }
 
         // Update in transaction
-        const result = await db.transaction(async (tx) => {
+        const result = await db.transaction(async (tx: any) => {
             // STEP 1: LOAD & VALIDATE
             const billResults = await tx.select().from(vendorBills).where(eq(vendorBills.id, billId)).limit(1);
             const bill = billResults[0];
@@ -898,7 +923,7 @@ export async function updateVendorBill(billId: number, data: any) {
             console.log('✅ New inventory layers created');
 
             // STEP 4.6: UPDATE DENORMALIZED INVENTORY FIELDS
-            const uniqueItemIds = [...new Set(val.items.map(item => Number(item.itemId)))];
+            const uniqueItemIds = [...new Set(val.items.map((item: any) => Number(item.itemId)))];
             for (const itemId of uniqueItemIds) {
                 try {
                     await updateItemInventoryFields(itemId, tx);
@@ -992,7 +1017,10 @@ export async function updateVendorBill(billId: number, data: any) {
         });
 
         revalidatePath('/purchasing/vendors');
-        return result;
+        return {
+            success: true,
+            message: `Bill ${val.refNumber} updated successfully`
+        };
 
     } catch (error: any) {
         console.error('❌ Update Bill Error:', error);
@@ -1008,16 +1036,22 @@ export async function deleteVendorBill(billId: number) {
     try {
         console.log('🗑️ Deleting vendor bill:', billId);
 
-        await db.transaction(async (tx) => {
-            // 1. Check Status
+        // Pre-transaction validations
+        const billCheck = await db.select().from(vendorBills).where(eq(vendorBills.id, billId)).limit(1);
+        const billToCheck = billCheck[0];
+
+        if (!billToCheck) throw new Error('Bill not found');
+
+        // Check period lock - cannot delete bills in closed periods (GAAP/IFRS compliance)
+        await checkPeriodLock(billToCheck.billDate);
+        if (billToCheck.status === 'PAID') throw new Error('Cannot delete a paid bill. Delete payment first.');
+
+        return await db.transaction(async (tx: any) => {
+            // 1. Get bill again inside transaction for consistency
             const billResults = await tx.select().from(vendorBills).where(eq(vendorBills.id, billId)).limit(1);
             const bill = billResults[0];
 
             if (!bill) throw new Error('Bill not found');
-
-            // Check period lock - cannot delete bills in closed periods (GAAP/IFRS compliance)
-            await checkPeriodLock(bill.billDate);
-            if (bill.status === 'PAID') throw new Error('Cannot delete a paid bill. Delete payment first.');
 
             // 2. Delete GL Entries (Reverse Balances first)
             const glEntries = await tx.select().from(journalEntries).where(eq(journalEntries.transactionId, `bill-${billId}`));
@@ -1040,7 +1074,7 @@ export async function deleteVendorBill(billId: number) {
             }).from(inventoryLayers).where(
                 sql`${inventoryLayers.batchNumber} LIKE ${'BILL-' + billId + '-%'}`
             );
-            const uniqueItemIds = [...new Set(affectedLayers.map(l => l.itemId))];
+            const uniqueItemIds = [...new Set(affectedLayers.map((l: any) => l.itemId))];
 
             // 5. Delete Inventory Layers (CRITICAL FIX)
             await tx.run(sql`
@@ -1064,10 +1098,12 @@ export async function deleteVendorBill(billId: number) {
 
             // 6. Delete Bill
             await tx.delete(vendorBills).where(eq(vendorBills.id, billId));
-        });
 
-        revalidatePath('/purchasing/vendors');
-        return { success: true };
+            try {
+                revalidatePath('/purchasing/vendors');
+            } catch (e) { }
+            return { success: true };
+        });
 
     } catch (error: any) {
         console.error('Delete Bill Error:', error);
@@ -1237,13 +1273,13 @@ export async function updatePurchaseOrder(poId: number, data: any) {
         const val = purchasingDocumentSchema.parse(data);
 
         // Calculate total amount in Tiyin
-        const totalAmountTiyin = val.items.reduce((sum, item) => {
+        const totalAmountTiyin = val.items.reduce((sum: number, item: any) => {
             const qty = Number(item.quantity);
             const price = Number(item.unitPrice);
             return sum + Math.round(qty * price * 100);
         }, 0);
 
-        const result = await db.transaction(async (tx) => {
+        const result = await db.transaction(async (tx: any) => {
             // STEP 1: LOAD & VALIDATE
             const poResults = await tx.select().from(purchaseOrders).where(eq(purchaseOrders.id, poId)).limit(1);
             const po = poResults[0];
@@ -1336,7 +1372,7 @@ export async function deletePurchaseOrder(poId: number) {
         }
 
         // 2. Perform deletion in transaction
-        await db.transaction(async (tx) => {
+        return await db.transaction(async (tx: any) => {
             // 2a. Find the journal entry associated with this PO
             const jeResults = await tx.select().from(journalEntries).where(eq(journalEntries.reference, po.orderNumber || '')).limit(1);
             const je = jeResults[0];
@@ -1385,16 +1421,20 @@ export async function deletePurchaseOrder(poId: number) {
             await tx.delete(purchaseOrders).where(eq(purchaseOrders.id, poId));
 
             console.log(`🗑️ Purchase Order Deleted: ${po.orderNumber} (ID: ${poId})`);
+
+            // 3. Revalidate paths to refresh UI
+            try {
+                revalidatePath('/purchasing/vendors');
+                revalidatePath('/purchasing/purchase-orders');
+            } catch (e) {
+                console.warn('⚠️ Path revalidation failed:', e);
+            }
+
+            return {
+                success: true,
+                message: `Purchase order ${po.orderNumber} deleted successfully. GL entries have been reversed.`
+            };
         });
-
-        // 3. Revalidate paths to refresh UI
-        revalidatePath('/purchasing/vendors');
-        revalidatePath('/purchasing/purchase-orders');
-
-        return {
-            success: true,
-            message: `Purchase order ${po.orderNumber} deleted successfully. GL entries have been reversed.`
-        };
 
     } catch (error: any) {
         console.error('❌ Delete PO Error:', error);
@@ -1432,7 +1472,10 @@ export async function payVendorBill(data: z.infer<typeof payBillSchema>) {
     try {
         const val = payBillSchema.parse(data);
 
-        return await db.transaction(async (tx) => {
+        // Check period lock (GAAP/IFRS compliance)
+        await checkPeriodLock(val.date);
+
+        return await db.transaction(async (tx: any) => {
             // 1. Find Open Bills (FIFO)
             const openBills = await tx.select().from(vendorBills)
                 .where(
@@ -1440,7 +1483,7 @@ export async function payVendorBill(data: z.infer<typeof payBillSchema>) {
                 )
                 .orderBy(vendorBills.billDate); // Oldest first
 
-            const vendorOpenBills = openBills.filter(b => b.vendorId === val.vendorId);
+            const vendorOpenBills = openBills.filter((b: any) => b.vendorId === val.vendorId);
 
             let remainingToPay = val.amount;
 
@@ -1455,7 +1498,7 @@ export async function payVendorBill(data: z.infer<typeof payBillSchema>) {
                     const allReceived = poLines.every(pl => pl.qtyReceived >= pl.qtyOrdered);
 
                     if (!allReceived) {
-                        const unreceived = poLines.filter(pl => pl.qtyReceived < pl.qtyOrdered);
+                        const unreceived = poLines.filter((pl: any) => pl.qtyReceived < pl.qtyOrdered);
                         console.warn(
                             `⚠️ PAYMENT BLOCKED: Bill #${bill.id} linked to PO #${bill.poId} has ${unreceived.length} unreceived line items. ` +
                             `Three-way match control prevents payment.`
@@ -1520,7 +1563,7 @@ export async function payVendorBill(data: z.infer<typeof payBillSchema>) {
 
 export async function receiveItems(poId: number, items: { lineId: number; qtyReceived: number }[]) {
     try {
-        await db.transaction(async (tx) => {
+        return await db.transaction(async (tx: any) => {
             for (const item of items) {
                 // Update PO line
                 await tx.update(purchaseOrderLines)
@@ -1545,11 +1588,13 @@ export async function receiveItems(poId: number, items: { lineId: number; qtyRec
             await tx.update(purchaseOrders)
                 .set({ status: 'PARTIAL' })
                 .where(eq(purchaseOrders.id, poId));
-        });
 
-        revalidatePath('/purchasing/vendors');
-        revalidatePath('/inventory/items');
-        return { success: true };
+            try {
+                revalidatePath('/purchasing/vendors');
+                revalidatePath('/inventory/items');
+            } catch (e) { }
+            return { success: true };
+        });
     } catch (error: any) {
         console.error('Receive Items Error:', error);
         return { success: false, error: error.message || 'Failed to receive items' };
@@ -1571,7 +1616,7 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
         console.log(`📋 Processing bill ${action.toLowerCase()}: ${billId}`);
 
         // Variables to capture for post-transaction QC inspection generation
-        const inspectionsToGenerate: Array<{itemId: number; batchNumber: string; quantity: number}> = [];
+        const inspectionsToGenerate: Array<{ itemId: number; batchNumber: string; quantity: number }> = [];
 
         // 1. Require ADMIN role
         const session = await auth();
@@ -1590,9 +1635,27 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
             return { success: false, error: 'User ID not found in session' };
         }
 
-        // 3. Process in transaction
-        const result = await db.transaction(async (tx) => {
-            // 4. Load bill and verify exists
+        // 3. Pre-transaction: Load bill and validate
+        const billCheck = await db.select().from(vendorBills).where(eq(vendorBills.id, billId)).limit(1);
+        const billToValidate = billCheck[0];
+
+        if (!billToValidate) {
+            return { success: false, error: 'Bill not found' };
+        }
+
+        // 4. Verify bill is in PENDING status (before transaction)
+        if (billToValidate.approvalStatus !== 'PENDING') {
+            return { success: false, error: `Cannot ${action.toLowerCase()} bill with approval status: ${billToValidate.approvalStatus}` };
+        }
+
+        // 5. Check period lock BEFORE transaction (GAAP/IFRS compliance)
+        if (action === 'APPROVE') {
+            await checkPeriodLock(billToValidate.billDate);
+        }
+
+        // 6. Process in transaction (mutations only)
+        const result = await db.transaction(async (tx: any) => {
+            // Re-fetch bill for consistency within transaction
             const billResults = await tx.select().from(vendorBills).where(eq(vendorBills.id, billId)).limit(1);
             const bill = billResults[0];
 
@@ -1600,15 +1663,13 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
                 throw new Error('Bill not found');
             }
 
-            // 5. Verify bill is in PENDING status
+            // Double-check status within transaction (defensive)
             if (bill.approvalStatus !== 'PENDING') {
                 throw new Error(`Cannot ${action.toLowerCase()} bill with approval status: ${bill.approvalStatus}`);
             }
 
-            // 6. Handle APPROVE action
+            // 7. Handle APPROVE action
             if (action === 'APPROVE') {
-                // Check period lock (GAAP/IFRS compliance - prevent posting to closed periods)
-                await checkPeriodLock(bill.billDate);
 
                 // 6a. Update bill status
                 await tx.update(vendorBills)
@@ -1622,45 +1683,23 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
 
                 console.log(`✅ Bill ${billId} approved by user ${userId}`);
 
-                // 6b. Create inventory layers (deferred until approval)
+                console.log(`✅ Bill ${billId} approved by user ${userId}`);
+
+                // 6b. Create Pending GRN (Warehouse Reception Workflow)
+                // This replaces direct inventory layer creation
                 const billLines = await tx.select().from(vendorBillLines).where(eq(vendorBillLines.billId, billId));
 
-                for (const line of billLines) {
-                    const batchNumber = `BILL-${billId}-${line.itemId}`;
-
-                    await tx.insert(inventoryLayers).values({
-                        itemId: line.itemId,
-                        batchNumber: batchNumber,
-                        initialQty: line.quantity,
-                        remainingQty: line.quantity,
-                        unitCost: line.unitPrice,
-                        receiveDate: bill.billDate,
-                        isDepleted: false,
-                        qcStatus: 'PENDING', // Hold until QC approval
-                    });
-
-                    // Capture for QC inspection generation
-                    inspectionsToGenerate.push({
-                        itemId: line.itemId,
-                        batchNumber: batchNumber,
-                        quantity: line.quantity,
-                    });
+                const grnResult = await createPendingGRN(billId);
+                if (!grnResult.success) {
+                    throw new Error(`Failed to create GRN: ${grnResult.error}`);
                 }
 
-                // Update denormalized inventory fields
-                const uniqueItemIds = [...new Set(billLines.map(l => l.itemId))];
-                for (const itemId of uniqueItemIds) {
-                    try {
-                        await updateItemInventoryFields(itemId, tx);
-                    } catch (syncError) {
-                        console.error(`[CRITICAL] Failed to sync denormalized fields for item ${itemId}:`, syncError);
-                    }
-                }
+                console.log(`✅ Pending GRN created for approved bill ${billId}`);
 
-                console.log(`✅ Inventory layers created for approved bill ${billId}`);
+                // Note: QC inspections and Inventory layers are now deferred until GRN confirmation
 
                 // 6c. Load items for asset account mapping
-                const itemIds = billLines.map(line => line.itemId);
+                const itemIds = billLines.map((line: any) => line.itemId);
                 const itemsData = await tx.select({
                     id: items.id,
                     name: items.name,
@@ -1668,7 +1707,7 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
                     itemClass: items.itemClass,
                 }).from(items).where(inArray(items.id, itemIds));
 
-                const itemsMap = new Map(itemsData.map(i => [i.id, i]));
+                const itemsMap = new Map(itemsData.map((i: any) => [i.id, i]));
 
                 // 6d. Group line amounts by asset account
                 const accountTotals = new Map<string, number>();

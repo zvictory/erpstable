@@ -161,7 +161,7 @@ export default function ResyncInventoryFieldsButton() {
                                         {t('items_need_resync', { count: auditResult.itemsOutOfSync })}
                                     </p>
                                     <p>
-                                        {t('discrepancy', { value: (auditResult.totalDiscrepancy / 100).toLocaleString() + ' UZS' })}
+                                        {t('discrepancy', { value: (auditResult.totalDiscrepancy / 100).toLocaleString() + ' сўм' })}
                                     </p>
                                     <details className="mt-2">
                                         <summary className="cursor-pointer font-medium hover:underline">
@@ -176,10 +176,10 @@ export default function ResyncInventoryFieldsButton() {
                                                     <div className="font-medium">{item.itemName}</div>
                                                     {item.sku && <div className="text-amber-600">SKU: {item.sku}</div>}
                                                     <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-1">
-                                                        <div>{t('denormalized', { value: `${item.denormalizedQty} @ ${(item.denormalizedCost / 100).toFixed(2)} UZS` })}</div>
-                                                        <div>{t('layers', { value: `${item.layerQty} @ ${(item.layerAvgCost / 100).toFixed(2)} UZS` })}</div>
+                                                        <div>{t('denormalized', { value: `${item.denormalizedQty} @ ${(item.denormalizedCost / 100).toFixed(2)} сўм` })}</div>
+                                                        <div>{t('layers', { value: `${item.layerQty} @ ${(item.layerAvgCost / 100).toFixed(2)} сўм` })}</div>
                                                         <div className="col-span-2 font-medium text-amber-800">
-                                                            {t('discrepancy', { value: (Math.abs(item.valueDiscrepancy) / 100).toLocaleString() + ' UZS' })}
+                                                            {t('discrepancy', { value: (Math.abs(item.valueDiscrepancy) / 100).toLocaleString() + ' сўм' })}
                                                         </div>
                                                     </div>
                                                 </div>

@@ -58,7 +58,7 @@ export default function PurchaseOrdersTable({ orders }: POTableProps) {
                                     </span>
                                 </td>
                                 <td className="px-6 py-3 text-right font-medium">
-                                    {(po.totalAmount || 0).toLocaleString()} UZS
+                                    {(po.totalAmount || 0).toLocaleString()} сўм
                                 </td>
                                 <td className="px-6 py-3 text-right">
                                     <Link

@@ -156,7 +156,7 @@ export default function DeletePOModal({ isOpen, onClose, onConfirm, po }: Delete
               <div className="flex justify-between items-center">
                 <span className="text-sm text-slate-600">{t('details.amount')}</span>
                 <span className="text-sm font-bold text-slate-900">
-                  {(po.totalAmount / 100).toLocaleString()} UZS
+                  {(po.totalAmount / 100).toLocaleString()} сўм
                 </span>
               </div>
               <div className="flex justify-between items-center">

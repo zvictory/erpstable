@@ -94,7 +94,7 @@ export async function resetTransactionalData(
 
   try {
     // 4. Execute deletion in transaction
-    const result = await db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx: any) => {
       const deletionCounts: Record<string, number> = {};
       const resetCounts: Record<string, number> = {};
 

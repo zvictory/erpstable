@@ -33,7 +33,7 @@ export async function clockIn(input: unknown) {
             return { success: false, error: 'User account is inactive' };
         }
 
-        return await db.transaction(async (tx) => {
+        return await db.transaction(async (tx: any) => {
             // Check run exists and is IN_PROGRESS
             const [run] = await tx
                 .select()
@@ -118,7 +118,7 @@ export async function clockOut(input: unknown) {
             return { success: false, error: 'User not found' };
         }
 
-        return await db.transaction(async (tx) => {
+        return await db.transaction(async (tx: any) => {
             const [laborLog] = await tx
                 .select()
                 .from(productionLaborLogs)
@@ -222,7 +222,7 @@ export async function addManualLaborLog(input: unknown) {
             return { success: false, error: 'Clock out time must be after clock in time' };
         }
 
-        return await db.transaction(async (tx) => {
+        return await db.transaction(async (tx: any) => {
             const [run] = await tx
                 .select()
                 .from(productionRuns)
@@ -305,11 +305,11 @@ export async function getProductionRunLabor(runId: number) {
             .where(eq(productionLaborLogs.runId, runId))
             .orderBy(productionLaborLogs.clockInAt);
 
-        const activeLogs = laborLogs.filter(log => log.clockOutAt === null);
-        const completedLogs = laborLogs.filter(log => log.clockOutAt !== null);
+        const activeLogs = laborLogs.filter((log: any) => log.clockOutAt === null);
+        const completedLogs = laborLogs.filter((log: any) => log.clockOutAt !== null);
 
-        const totalLaborCost = completedLogs.reduce((sum, log) => sum + (log.totalCost || 0), 0);
-        const totalLaborMinutes = completedLogs.reduce((sum, log) => sum + (log.durationMinutes || 0), 0);
+        const totalLaborCost = completedLogs.reduce((sum: number, log: any) => sum + (log.totalCost || 0), 0);
+        const totalLaborMinutes = completedLogs.reduce((sum: number, log: any) => sum + (log.durationMinutes || 0), 0);
 
         return {
             success: true,

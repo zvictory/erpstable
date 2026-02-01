@@ -11,14 +11,15 @@ import { Button } from '@/components/ui/button';
 import { createLead, updateLead } from '@/app/actions/crm';
 
 const leadFormSchema = z.object({
-  fullName: z.string().min(1, 'Full name is required'),
-  company: z.string().optional(),
+  contact_name: z.string().min(1, 'Contact name is required'),
+  company_name: z.string().optional(),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   phone: z.string().optional(),
-  source: z.enum(['WEBSITE', 'REFERRAL', 'TRADE_SHOW', 'COLD_CALL', 'PARTNER', 'OTHER']),
-  estimatedValue: z.number().int().min(0).default(0),
+  job_title: z.string().optional(),
+  source: z.enum(['WEBSITE', 'REFERRAL', 'TRADE_SHOW', 'COLD_CALL', 'EXHIBITION', 'PARTNER', 'OTHER']),
+  estimated_value: z.number().int().min(0).optional(),
   notes: z.string().optional(),
-  assignedToUserId: z.number().int().positive().optional(),
+  owner_id: z.number().int().positive().optional(),
 });
 
 type LeadFormData = z.infer<typeof leadFormSchema>;
@@ -42,28 +43,29 @@ export function LeadForm({ lead, users = [] }: LeadFormProps) {
     resolver: zodResolver(leadFormSchema),
     defaultValues: lead
       ? {
-          fullName: lead.fullName,
-          company: lead.company || '',
+          contact_name: lead.contact_name,
+          company_name: lead.company_name || '',
           email: lead.email || '',
           phone: lead.phone || '',
+          job_title: lead.job_title || '',
           source: lead.source,
-          estimatedValue: lead.estimatedValue,
+          estimated_value: lead.estimated_value,
           notes: lead.notes || '',
-          assignedToUserId: lead.assignedToUserId || undefined,
+          owner_id: lead.owner_id || undefined,
         }
       : {
           source: 'OTHER',
-          estimatedValue: 0,
+          estimated_value: 0,
         },
   });
 
   const onSubmit = async (data: LeadFormData) => {
     setIsSubmitting(true);
     try {
-      // Convert estimatedValue from UZS to Tiyin
+      // Convert estimated_value from сўм to Tiyin
       const submitData = {
         ...data,
-        estimatedValue: Math.round(data.estimatedValue * 100),
+        estimated_value: Math.round((data.estimated_value ?? 0) * 100),
       };
 
       const result = lead
@@ -95,31 +97,31 @@ export function LeadForm({ lead, users = [] }: LeadFormProps) {
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Full Name */}
+          {/* Contact Name */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              {t('fields.full_name')} *
+              {t('fields.contact_name')} *
             </label>
             <input
               type="text"
-              {...register('fullName')}
+              {...register('contact_name')}
               className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            {errors.fullName && (
+            {errors.contact_name && (
               <p className="text-red-600 text-sm mt-1">
-                {errors.fullName.message}
+                {errors.contact_name.message}
               </p>
             )}
           </div>
 
-          {/* Company */}
+          {/* Company Name */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              {t('fields.company')}
+              {t('fields.company_name')}
             </label>
             <input
               type="text"
-              {...register('company')}
+              {...register('company_name')}
               className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -151,6 +153,18 @@ export function LeadForm({ lead, users = [] }: LeadFormProps) {
             />
           </div>
 
+          {/* Job Title */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              {t('fields.job_title')}
+            </label>
+            <input
+              type="text"
+              {...register('job_title')}
+              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
           {/* Source */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -164,6 +178,7 @@ export function LeadForm({ lead, users = [] }: LeadFormProps) {
               <option value="REFERRAL">{t('source.referral')}</option>
               <option value="TRADE_SHOW">{t('source.trade_show')}</option>
               <option value="COLD_CALL">{t('source.cold_call')}</option>
+              <option value="EXHIBITION">{t('source.exhibition')}</option>
               <option value="PARTNER">{t('source.partner')}</option>
               <option value="OTHER">{t('source.other')}</option>
             </select>
@@ -176,19 +191,19 @@ export function LeadForm({ lead, users = [] }: LeadFormProps) {
             </label>
             <input
               type="number"
-              {...register('estimatedValue', { valueAsNumber: true })}
+              {...register('estimated_value', { valueAsNumber: true })}
               className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          {/* Assigned To */}
+          {/* Owner */}
           {users.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                {t('fields.assigned_to')}
+                {t('fields.owner')}
               </label>
               <select
-                {...register('assignedToUserId', { valueAsNumber: true })}
+                {...register('owner_id', { valueAsNumber: true })}
                 className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Unassigned</option>

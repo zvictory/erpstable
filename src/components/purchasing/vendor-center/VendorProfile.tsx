@@ -36,7 +36,14 @@ interface VendorProfileProps {
     onDeleteTransaction?: (id: string, type: string, status: string) => void;
 }
 
+import { useTranslations, useLocale } from 'next-intl';
+
 export function VendorProfile({ vendor, onEdit, onDeleteSuccess, onNewBill, onNewPO, onViewTransaction, onEditTransaction, onDeleteTransaction }: VendorProfileProps) {
+    const t = useTranslations('purchasing.vendors.profile');
+    const tf = useTranslations('purchasing.documents.fields');
+    const ts = useTranslations('purchasing.vendors.statuses');
+    const tt = useTranslations('purchasing.vendors.transaction_types');
+    const locale = useLocale();
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const handleDelete = async () => {
@@ -47,11 +54,11 @@ export function VendorProfile({ vendor, onEdit, onDeleteSuccess, onNewBill, onNe
                 alert(result.message);
                 onDeleteSuccess?.();
             } else {
-                alert(result.message || 'Failed to delete vendor');
+                alert(result.message || t('errors.failed_to_delete'));
             }
         } catch (error) {
             console.error('Delete vendor error:', error);
-            alert('An unexpected error occurred');
+            alert(t('errors.unexpected'));
         } finally {
             setShowDeleteDialog(false);
         }
@@ -63,16 +70,16 @@ export function VendorProfile({ vendor, onEdit, onDeleteSuccess, onNewBill, onNe
                 <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mb-4">
                     <FileText className="text-slate-400 h-8 w-8" />
                 </div>
-                <h3 className="text-lg font-semibold text-slate-900">No vendor selected</h3>
+                <h3 className="text-lg font-semibold text-slate-900">{t('no_vendor_selected')}</h3>
                 <p className="text-[13px] text-slate-500 max-w-xs text-center">
-                    Select a vendor from the list to view their transaction history and contact information.
+                    {t('select_vendor_hint')}
                 </p>
             </div>
         );
     }
 
     const formatDate = (date: string | Date) => {
-        return new Date(date).toLocaleDateString('en-US', {
+        return new Date(date).toLocaleDateString(locale === 'ru' ? 'ru' : (locale === 'tr' ? 'tr' : (locale === 'uz' ? 'uz' : 'en-US')), {
             month: 'short',
             day: 'numeric',
             year: 'numeric'
@@ -80,7 +87,7 @@ export function VendorProfile({ vendor, onEdit, onDeleteSuccess, onNewBill, onNe
     };
 
     return (
-        <div className="flex-1 flex flex-col h-full overflow-y-auto bg-slate-50">
+        <div className="flex flex-col relative">
             {/* Profile Header Card */}
             <div className="bg-white border-b border-slate-200 p-6">
                 <div className="flex justify-between items-start mb-6">
@@ -90,20 +97,20 @@ export function VendorProfile({ vendor, onEdit, onDeleteSuccess, onNewBill, onNe
                             onClick={() => onEdit?.(vendor.id)}
                             className="px-4 py-1.5 border border-slate-300 rounded-full text-[13px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
                         >
-                            Edit
+                            {t('edit')}
                         </button>
                         <button
                             onClick={() => setShowDeleteDialog(true)}
                             className="px-4 py-1.5 border border-red-300 rounded-full text-[13px] font-semibold text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
                         >
-                            <Trash2 className="h-4 w-4" /> Delete
+                            <Trash2 className="h-4 w-4" /> {t('delete')}
                         </button>
                         <div className="flex">
                             <button
                                 onClick={() => onNewBill?.(vendor.id)}
                                 className="px-4 py-1.5 bg-green-700 text-white rounded-l-full text-[13px] font-semibold hover:bg-green-800 transition-colors flex items-center gap-2"
                             >
-                                <Plus className="h-4 w-4" /> New transaction
+                                <Plus className="h-4 w-4" /> {t('new_transaction')}
                             </button>
                             <button className="px-2 py-1.5 bg-green-700 text-white rounded-r-full border-l border-green-600 hover:bg-green-800 transition-colors mt-[1px]">
                                 <ChevronDown className="h-4 w-4" />
@@ -116,23 +123,23 @@ export function VendorProfile({ vendor, onEdit, onDeleteSuccess, onNewBill, onNe
                     <div className="space-y-3">
                         <div className="flex items-center gap-3 text-slate-600">
                             <Mail className="h-4 w-4 text-slate-400" />
-                            <span className="text-[13px] font-semibold truncate">{vendor.email || 'No email added'}</span>
+                            <span className="text-[13px] font-semibold truncate">{vendor.email || t('no_email')}</span>
                         </div>
                         <div className="flex items-center gap-3 text-slate-600">
                             <Phone className="h-4 w-4 text-slate-400" />
-                            <span className="text-[13px] font-semibold">{vendor.phone || 'No phone added'}</span>
+                            <span className="text-[13px] font-semibold">{vendor.phone || t('no_phone')}</span>
                         </div>
                     </div>
                     <div className="space-y-3">
                         <div className="flex items-center gap-3 text-slate-600">
                             <Clock className="h-4 w-4 text-slate-400" />
                             <span className="text-[13px] border-b border-dotted border-slate-300 pb-0.5">
-                                Terms: <span className="font-semibold text-slate-900">{vendor.paymentTerms || 'Net 30'}</span>
+                                {t('terms_label')} <span className="font-semibold text-slate-900">{vendor.paymentTerms || 'Net 30'}</span>
                             </span>
                         </div>
                     </div>
                     <div className="bg-slate-50 p-4 rounded border border-slate-200 flex flex-col justify-center">
-                        <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Open Balance</div>
+                        <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">{t('open_balance')}</div>
                         <div className="text-2xl font-bold font-numbers text-slate-900">
                             {formatCurrency(vendor.openBalance)}
                         </div>
@@ -144,30 +151,35 @@ export function VendorProfile({ vendor, onEdit, onDeleteSuccess, onNewBill, onNe
             <div className="p-6">
                 <div className="bg-white border border-slate-300 rounded-sm shadow-sm overflow-hidden">
                     <div className="border-b border-slate-200 px-4 py-3 bg-white">
-                        <h3 className="text-[15px] font-bold text-slate-900 m-0">Transactions</h3>
+                        <h3 className="text-[15px] font-bold text-slate-900 m-0">{t('transactions_title')}</h3>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead className="bg-[#f4f5f8] border-b border-slate-200">
                                 <tr>
-                                    <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Date</th>
-                                    <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Type</th>
-                                    <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">No.</th>
-                                    <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Amount</th>
-                                    <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Status</th>
-                                    <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center w-[120px]">Action</th>
+                                    <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">{tf('date')}</th>
+                                    <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">{tf('type')}</th>
+                                    <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider">{tf('no_label')}</th>
+                                    <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">{tf('amount')}</th>
+                                    <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">{tf('status')}</th>
+                                    <th className="px-4 py-2.5 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center w-[120px]">{tf('action')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-200">
                                 {vendor.transactions?.map((tx) => (
                                     <tr key={tx.id} className="hover:bg-slate-50 transition-colors group">
                                         <td className="px-4 py-3 text-[13px] text-slate-600 font-numbers">{formatDate(tx.date)}</td>
-                                        <td className="px-4 py-3 text-[13px] font-semibold text-slate-900">{tx.type}</td>
+                                        <td className="px-4 py-3 text-[13px] font-semibold text-slate-900">
+                                            {tt(tx.type.toLowerCase() === 'bill' ? 'bill' : 'purchase_order')}
+                                        </td>
                                         <td className="px-4 py-3 text-[13px] text-slate-600">{tx.ref}</td>
                                         <td className="px-4 py-3 text-[13px] font-semibold text-slate-900 text-right font-numbers">{formatCurrency(tx.amount)}</td>
                                         <td className="px-4 py-3 text-[13px] text-right">
-                                            <Badge variant={tx.status === 'PAID' || tx.status === 'CLOSED' ? "success" : "warning"} className="rounded-sm px-1.5 py-0">
-                                                {tx.status}
+                                            <Badge
+                                                variant={tx.status === 'PAID' || tx.status === 'CLOSED' ? "default" : "secondary"}
+                                                className={`rounded-sm px-1.5 py-0 ${tx.status === 'PAID' || tx.status === 'CLOSED' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}
+                                            >
+                                                {ts(tx.status.toLowerCase() as any)}
                                             </Badge>
                                         </td>
                                         <td className="px-4 py-3 text-[13px] text-center">
@@ -177,7 +189,7 @@ export function VendorProfile({ vendor, onEdit, onDeleteSuccess, onNewBill, onNe
                                                     <button
                                                         onClick={() => onEditTransaction?.(tx.id, tx.type)}
                                                         className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                                                        title="Edit"
+                                                        title={tf('edit')}
                                                     >
                                                         <Pencil className="h-4 w-4" />
                                                     </button>
@@ -187,7 +199,7 @@ export function VendorProfile({ vendor, onEdit, onDeleteSuccess, onNewBill, onNe
                                                     <button
                                                         onClick={() => onDeleteTransaction?.(tx.id, tx.type, tx.status)}
                                                         className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                                                        title="Delete"
+                                                        title={tf('delete')}
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </button>
@@ -196,7 +208,7 @@ export function VendorProfile({ vendor, onEdit, onDeleteSuccess, onNewBill, onNe
                                                 <button
                                                     onClick={() => onViewTransaction?.(tx.id, tx.type)}
                                                     className="p-1.5 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
-                                                    title="View"
+                                                    title={tf('view')}
                                                 >
                                                     <Eye className="h-4 w-4" />
                                                 </button>
@@ -206,7 +218,7 @@ export function VendorProfile({ vendor, onEdit, onDeleteSuccess, onNewBill, onNe
                                 )) || (
                                         <tr>
                                             <td colSpan={6} className="px-4 py-8 text-center text-slate-400 text-[13px] italic">
-                                                This vendor has no transaction history.
+                                                {t('no_transactions_italic')}
                                             </td>
                                         </tr>
                                     )}
@@ -215,7 +227,7 @@ export function VendorProfile({ vendor, onEdit, onDeleteSuccess, onNewBill, onNe
                     </div>
                     <div className="bg-[#f4f5f8] px-4 py-2 border-t border-slate-200">
                         <div className="text-[13px] text-slate-500 font-semibold">
-                            Total: {vendor.transactions?.length || 0} transactions
+                            {t('total_transactions', { count: vendor.transactions?.length || 0 })}
                         </div>
                     </div>
                 </div>
@@ -225,8 +237,8 @@ export function VendorProfile({ vendor, onEdit, onDeleteSuccess, onNewBill, onNe
                 open={showDeleteDialog}
                 onOpenChange={setShowDeleteDialog}
                 onConfirm={handleDelete}
-                title="Delete Vendor?"
-                description={`Are you sure you want to delete ${vendor.name}? This action cannot be undone if the vendor has no existing transactions.`}
+                title={t('delete_title')}
+                description={t('delete_desc', { name: vendor.name })}
             />
         </div>
     );

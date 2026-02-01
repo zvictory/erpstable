@@ -326,7 +326,7 @@ export default function ServiceTicketDetail({ ticket, technicians }: ServiceTick
                               {t('part_item_id', { id: part.itemId })} x {part.quantity}
                             </span>
                             <span className="font-medium text-slate-900">
-                              {(part.unitCost / 100).toFixed(2)} UZS
+                              {(part.unitCost / 100).toFixed(2)} сўм
                             </span>
                           </div>
                         ))}

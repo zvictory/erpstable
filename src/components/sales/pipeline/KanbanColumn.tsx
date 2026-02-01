@@ -6,27 +6,27 @@ import { useTranslations } from 'next-intl';
 import { OpportunityCard } from './OpportunityCard';
 import { formatCurrency } from '@/lib/format';
 
-interface Opportunity {
+interface Deal {
   id: number;
   title: string;
-  estimatedValue: number;
+  value: number;
   probability: number;
   stage: string;
   customer: {
     id: number;
     name: string;
   };
-  assignedToUser?: {
+  owner?: {
     id: number;
     name: string;
   } | null;
-  expectedCloseDate?: Date | null;
+  expected_close_date?: Date | null;
 }
 
 interface KanbanColumnProps {
   stage: string;
   title: string;
-  opportunities: Opportunity[];
+  opportunities: Deal[];
 }
 
 export function KanbanColumn({ stage, title, opportunities }: KanbanColumnProps) {
@@ -36,14 +36,12 @@ export function KanbanColumn({ stage, title, opportunities }: KanbanColumnProps)
   });
 
   // Calculate column total
-  const totalValue = opportunities.reduce((sum, opp) => sum + opp.estimatedValue, 0);
+  const totalValue = opportunities.reduce((sum, opp) => sum + opp.value, 0);
 
   // Get stage color
   const getStageColor = (stageName: string) => {
     switch (stageName) {
-      case 'LEAD':
-        return 'bg-slate-100 border-slate-300';
-      case 'QUALIFIED':
+      case 'DISCOVERY':
         return 'bg-blue-50 border-blue-300';
       case 'PROPOSAL':
         return 'bg-purple-50 border-purple-300';

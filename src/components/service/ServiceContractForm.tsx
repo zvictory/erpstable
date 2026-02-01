@@ -11,17 +11,16 @@ import { Input } from '@/components/ui/input';
 import { createServiceContract } from '@/app/actions/service';
 import { ContractRefillItemsEditor } from './ContractRefillItemsEditor';
 
-const contractFormSchema = z.object({
-  customerId: z.number().min(1, 'Customer is required'),
+// Schema is created inside component to access translations
+const createContractFormSchema = (t: any) => z.object({
+  customerId: z.number().min(1, t('validation.customer_required')),
   contractType: z.enum(['WARRANTY', 'MAINTENANCE', 'FULL_SERVICE', 'SUPPLIES_ONLY']),
-  startDate: z.string().min(1, 'Start date is required'),
-  endDate: z.string().min(1, 'End date is required'),
+  startDate: z.string().min(1, t('validation.start_date_required')),
+  endDate: z.string().min(1, t('validation.end_date_required')),
   billingFrequencyMonths: z.number().min(1).max(12),
   monthlyValue: z.number().min(0),
   sourceInvoiceId: z.number().optional(),
 });
-
-type FormData = z.infer<typeof contractFormSchema>;
 
 interface RefillItem {
   itemId: number;
@@ -32,7 +31,7 @@ interface RefillItem {
 interface ServiceContractFormProps {
   onClose: () => void;
   onSuccess: () => void;
-  initialData?: Partial<FormData>;
+  initialData?: Partial<any>;
 }
 
 export function ServiceContractForm({ onClose, onSuccess, initialData }: ServiceContractFormProps) {
@@ -40,6 +39,9 @@ export function ServiceContractForm({ onClose, onSuccess, initialData }: Service
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refillItems, setRefillItems] = useState<RefillItem[]>([]);
+
+  const contractFormSchema = createContractFormSchema(t);
+  type FormData = z.infer<typeof contractFormSchema>;
 
   const {
     register,
@@ -126,7 +128,7 @@ export function ServiceContractForm({ onClose, onSuccess, initialData }: Service
               <Input
                 type="number"
                 {...register('customerId', { valueAsNumber: true })}
-                placeholder="Customer ID (TODO: Add customer combobox)"
+                placeholder={t('customer_id_placeholder')}
               />
               {errors.customerId && (
                 <p className="text-red-500 text-xs mt-1">{errors.customerId.message}</p>

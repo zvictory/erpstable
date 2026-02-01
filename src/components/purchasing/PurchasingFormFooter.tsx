@@ -35,13 +35,13 @@ export default function PurchasingFormFooter({
           <div className="flex justify-between text-sm">
             <span className="text-slate-500 font-medium">Subtotal</span>
             <span className="font-mono font-bold text-slate-900">
-              {formatNumber(subtotal, { decimals: 2 })} UZS
+              {formatNumber(subtotal, { decimals: 2 })} сўм
             </span>
           </div>
           <div className="pt-3 border-t border-slate-200 flex justify-between">
             <span className="font-black text-slate-900">Total</span>
             <span className={`text-xl font-black ${colorMap[type]}`}>
-              {formatNumber(total, { decimals: 2 })} UZS
+              {formatNumber(total, { decimals: 2 })} сўм
             </span>
           </div>
         </div>

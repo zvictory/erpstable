@@ -8,7 +8,7 @@ interface PipelineStatsCardsProps {
   stats: {
     totalValue: number;
     weightedValue: number;
-    opportunityCount: number;
+    dealCount: number;
     winRate: number;
     wonCount: number;
     lostCount: number;
@@ -32,8 +32,8 @@ export function PipelineStatsCards({ stats }: PipelineStatsCardsProps) {
       color: 'text-purple-600 bg-purple-50',
     },
     {
-      title: t('opportunity_count'),
-      value: stats.opportunityCount.toString(),
+      title: t('deal_count'),
+      value: stats.dealCount.toString(),
       icon: Target,
       color: 'text-orange-600 bg-orange-50',
     },

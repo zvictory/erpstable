@@ -9,26 +9,29 @@ declare global {
   var dbInstance: any;
 }
 
+// Use libsql for both local and remote to support async transactions everywhere
+const { drizzle } = require('drizzle-orm/libsql');
+const { createClient } = require('@libsql/client');
+
 if (!globalThis.dbInstance) {
-  // Use better-sqlite3 for local file: URLs, libsql for remote URLs
+  const client = createClient({ url, authToken });
+
+  // ✅ Enable foreign key constraints
   if (url.startsWith('file:')) {
-    // Local SQLite database using better-sqlite3
-    const { drizzle } = require('drizzle-orm/better-sqlite3');
-    const Database = require('better-sqlite3');
-
-    const dbPath = url.replace('file:', '');
-    const sqlite = new Database(dbPath);
-    globalThis.dbInstance = drizzle(sqlite, { schema });
-    console.log('Database initialized with better-sqlite3 at:', dbPath);
+    // Local SQLite requires a direct command
+    client.execute('PRAGMA foreign_keys = ON;').catch((e: any) => {
+      console.warn('Failed to enable foreign keys on local SQLite:', e);
+    });
+    console.log('Database initialized with libsql (local) at:', url);
   } else {
-    // Remote database using libsql (Turso)
-    const { drizzle } = require('drizzle-orm/libsql');
-    const { createClient } = require('@libsql/client');
-
-    const client = createClient({ url, authToken });
-    globalThis.dbInstance = drizzle(client, { schema });
-    console.log('Database initialized with libsql at:', url);
+    // Remote database
+    client.execute('PRAGMA foreign_keys = ON;').catch(() => {
+      // Remote databases may not support PRAGMA, continue silently
+    });
+    console.log('Database initialized with libsql (remote) at:', url);
   }
+
+  globalThis.dbInstance = drizzle(client, { schema });
 }
 
 export const db = globalThis.dbInstance!;

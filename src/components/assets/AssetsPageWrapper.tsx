@@ -86,16 +86,16 @@ export default function AssetsPageWrapper({ assets }: AssetsPageWrapperProps) {
                                 <div className="flex gap-12 text-right">
                                     <div>
                                         <div className="text-xs text-slate-400 uppercase font-bold tracking-wider">Original Cost</div>
-                                        <div className="font-bold text-slate-900">{(asset.cost / 100).toLocaleString()} UZS</div>
+                                        <div className="font-bold text-slate-900">{(asset.cost / 100).toLocaleString()} сўм</div>
                                     </div>
                                     <div>
                                         <div className="text-xs text-slate-400 uppercase font-bold tracking-wider">Book Value</div>
-                                        <div className="font-bold text-blue-600">{(asset.bookValue / 100).toLocaleString()} UZS</div>
+                                        <div className="font-bold text-blue-600">{(asset.bookValue / 100).toLocaleString()} сўм</div>
                                     </div>
                                     <div>
                                         <div className="text-xs text-slate-400 uppercase font-bold tracking-wider">Accumulated Depreciation</div>
                                         <div className="font-bold text-slate-900">
-                                            {(asset.accumulatedDepreciation / 100).toLocaleString()} UZS
+                                            {(asset.accumulatedDepreciation / 100).toLocaleString()} сўм
                                         </div>
                                     </div>
                                 </div>

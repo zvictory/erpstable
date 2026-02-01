@@ -15,6 +15,8 @@ import DeleteBillModal from '@/components/purchasing/DeleteBillModal';
 import DeletePOModal from '@/components/purchasing/DeletePOModal';
 import { LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 
 interface Vendor {
     id: number;
@@ -119,8 +121,11 @@ export function VendorCenterLayout({
         }
 
         if (!result.success) {
-            throw new Error(result.error || 'Failed to delete');
+            toast.error(result.error || 'Failed to delete');
+            return;
         }
+
+        toast.success(result.message || 'Deleted successfully');
 
         setDeleteTarget(null);
         router.refresh();
@@ -156,51 +161,72 @@ export function VendorCenterLayout({
         paidLast30: { count: 0, total: 0 }
     };
 
-    return (
-        <div className="flex flex-col h-screen max-h-screen pt-4 overflow-hidden relative">
-            <div className="px-6 mb-2">
-                <Button variant="ghost" size="sm" onClick={() => router.push('/')} className="gap-2 text-muted-foreground pl-0 hover:pl-2 transition-all">
-                    <LayoutDashboard className="h-4 w-4" />
-                    <span>Dashboard</span>
-                </Button>
-            </div>
-            {/* Top Section: Money Bar */}
-            <div className="px-6 mb-4">
-                <VendorMoneyBar
-                    openPOs={scoreboardStats.openPOs}
-                    overdueBills={scoreboardStats.overdueBills}
-                    openBills={scoreboardStats.openBills}
-                    paidLast30={scoreboardStats.paidLast30}
-                />
-            </div>
+    const t = useTranslations('dashboard.page');
 
-            {/* Bottom Section: Split Pane */}
-            <div className="flex flex-1 overflow-hidden border-t border-slate-200">
+    return (
+        <div className="flex h-screen bg-slate-50 overflow-hidden relative">
+            {/* Left Column: Vendor List (Full Height) */}
+            <div className="w-[380px] border-r border-slate-200 flex flex-col bg-white overflow-hidden shrink-0">
                 <VendorList
                     vendors={vendors}
                     selectedId={selectedId}
                     onSelect={handleSelectVendor}
                     onNewVendor={() => updateUrl({ action: 'new' })}
                 />
+            </div>
 
-                <VendorProfile
-                    vendor={selectedVendor}
-                    onEdit={() => updateUrl({ action: 'edit' })}
-                    onDeleteSuccess={() => {
-                        updateUrl({ vendorId: null });
-                        router.refresh();
-                    }}
-                    onNewBill={() => updateUrl({ billId: 'new' })}
-                    onNewPO={() => updateUrl({ poId: 'new' })}
-                    onViewTransaction={(id, type) => {
-                        // Strip prefix (e.g., 'bill-123' → '123') for editors that expect numeric IDs
-                        const numericId = id.replace(/^(bill|po)-/, '');
-                        if (type === 'Bill') updateUrl({ billId: numericId });
-                        else if (type === 'Purchase Order') updateUrl({ poId: numericId });
-                    }}
-                    onEditTransaction={handleEditTransaction}
-                    onDeleteTransaction={handleDeleteTransaction}
-                />
+            {/* Right Column: Details & Stats */}
+            <div className="flex-1 flex flex-col overflow-hidden">
+                {/* Fixed Header */}
+                <div className="h-14 border-b border-slate-200 bg-white flex items-center px-6 shrink-0 z-10">
+                    <Button variant="ghost" size="sm" onClick={() => router.push('/')} className="gap-2 text-muted-foreground pl-0 hover:pl-2 transition-all">
+                        <LayoutDashboard className="h-4 w-4" />
+                        <span>{t('title')}</span>
+                    </Button>
+                </div>
+
+                {/* Main Content Area - Scrollable */}
+                <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6">
+                    <div className="max-w-6xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        {/* Scoreboards start from this pane */}
+                        <VendorMoneyBar
+                            openPOs={scoreboardStats.openPOs}
+                            overdueBills={scoreboardStats.overdueBills}
+                            openBills={scoreboardStats.openBills}
+                            paidLast30={scoreboardStats.paidLast30}
+                        />
+
+                        {selectedVendor ? (
+                            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden min-h-[600px]">
+                                <VendorProfile
+                                    vendor={selectedVendor}
+                                    onEdit={() => updateUrl({ action: 'edit' })}
+                                    onDeleteSuccess={() => {
+                                        updateUrl({ vendorId: null });
+                                        router.refresh();
+                                    }}
+                                    onNewBill={() => updateUrl({ billId: 'new' })}
+                                    onNewPO={() => updateUrl({ poId: 'new' })}
+                                    onViewTransaction={(id, type) => {
+                                        const numericId = id.replace(/^(bill|po)-/, '');
+                                        if (type === 'Bill') updateUrl({ billId: numericId });
+                                        else if (type === 'Purchase Order') updateUrl({ poId: numericId });
+                                    }}
+                                    onEditTransaction={handleEditTransaction}
+                                    onDeleteTransaction={handleDeleteTransaction}
+                                />
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center h-[500px] text-slate-400 bg-white rounded-xl border-2 border-dashed border-slate-200">
+                                <div className="bg-slate-50 p-6 rounded-full mb-4">
+                                    <LayoutDashboard className="h-16 w-16 opacity-10" />
+                                </div>
+                                <h3 className="text-lg font-medium text-slate-900 mb-1">{t('select_detail' as any) || 'Выберите поставщика'}</h3>
+                                <p className="text-sm max-w-xs text-center">{t('select_vendor_hint' as any) || 'Выберите поставщика из списка слева, чтобы увидеть историю транзакций и детали профиля.'}</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* Slide-Over Drawers */}
@@ -227,9 +253,10 @@ export function VendorCenterLayout({
                                 onSave={async (data) => {
                                     const result = await createVendorBill(data);
                                     if (!result.success) {
-                                        alert(result.error || 'Failed to save bill');
+                                        toast.error(result.error || 'Failed to save bill');
                                         return;
                                     }
+                                    toast.success('Bill saved successfully');
                                     if (isGlobalBillMode) {
                                         // After saving in global mode, navigate to the vendor's page
                                         updateUrl({ billId: null, vendorId: data.vendorId.toString() });

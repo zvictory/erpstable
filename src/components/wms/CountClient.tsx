@@ -47,7 +47,7 @@ export function CountClient() {
 
       if (result.type === 'LOCATION') {
         setLocation({
-          id: result.data.id,
+          id: String(result.data.id),
           code: result.data.code,
           name: result.data.name,
           warehouseName: result.data.warehouseName || '',
@@ -72,7 +72,7 @@ export function CountClient() {
       const result = await scanBarcode(code);
 
       if (result.type === 'ITEM') {
-        const itemId = result.data.id;
+        const itemId = String(result.data.id);
         const existingCount = counts.get(itemId);
 
         if (existingCount) {
@@ -90,9 +90,9 @@ export function CountClient() {
           setCounts(
             new Map(
               counts.set(itemId, {
-                itemId: result.data.id,
+                itemId: String(result.data.id),
                 itemName: result.data.name,
-                itemSku: result.data.sku,
+                itemSku: result.data.sku || '',
                 unit: result.data.unit || '',
                 count: 1,
               })
@@ -145,16 +145,12 @@ export function CountClient() {
     try {
       // Convert counts to format expected by performStockCount
       const countData = Array.from(counts.values()).map((item) => ({
-        itemId: item.itemId,
-        locationId: location.id,
-        physicalCount: item.count,
+        itemId: Number(item.itemId),
+        batchNumber: `WMS-COUNT-${Date.now()}`,
+        countedQty: item.count,
       }));
 
-      await performStockCount({
-        locationId: location.id,
-        counts: countData,
-        notes: 'WMS Scanner Count',
-      });
+      await performStockCount(Number(location.id), countData);
 
       setStep(3); // Success
     } catch (err) {

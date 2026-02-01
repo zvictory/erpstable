@@ -9,11 +9,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { cn } from '@/lib/utils';
 
+import { useTranslations } from 'next-intl';
+
 interface PurchasingGridProps {
     items: { id: number; name: string; sku: string | null; standardCost: number; status?: string }[];
 }
 
 export default function PurchasingGrid({ items: availableItems }: PurchasingGridProps) {
+    const t = useTranslations('purchasing.documents');
     const { register, control, setValue, setFocus, getValues } = useFormContext<PurchasingDocument>();
 
     const { fields, append, remove } = useFieldArray({
@@ -62,7 +65,7 @@ export default function PurchasingGrid({ items: availableItems }: PurchasingGrid
         const item = availableItems.find(i => String(i.id) === itemId);
         if (item) {
             setValue(`items.${index}.description`, item.name);
-            setValue(`items.${index}.unitPrice`, item.standardCost / 100);
+            setValue(`items.${index}.unitPrice`, (item.standardCost || 0) / 100);
             if (index === fields.length - 1) {
                 append({ itemId: 0, description: '', quantity: 1, unitPrice: 0, amount: 0 });
             }
@@ -75,10 +78,10 @@ export default function PurchasingGrid({ items: availableItems }: PurchasingGrid
                 <TableHeader className="bg-slate-50/50">
                     <TableRow className="hover:bg-transparent border-b border-slate-200">
                         <TableHead className="w-[50px] text-center text-[11px] font-bold text-slate-500 uppercase tracking-wider">#</TableHead>
-                        <TableHead className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Product / Item</TableHead>
-                        <TableHead className="w-[100px] text-right text-[11px] font-bold text-slate-500 uppercase tracking-wider">Qty</TableHead>
-                        <TableHead className="w-[130px] text-right text-[11px] font-bold text-slate-500 uppercase tracking-wider">Rate</TableHead>
-                        <TableHead className="w-[150px] text-right text-[11px] font-bold text-slate-500 uppercase tracking-wider">Amount</TableHead>
+                        <TableHead className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{t('fields.item')}</TableHead>
+                        <TableHead className="w-[100px] text-right text-[11px] font-bold text-slate-500 uppercase tracking-wider">{t('fields.qty')}</TableHead>
+                        <TableHead className="w-[130px] text-right text-[11px] font-bold text-slate-500 uppercase tracking-wider">{t('fields.rate')}</TableHead>
+                        <TableHead className="w-[150px] text-right text-[11px] font-bold text-slate-500 uppercase tracking-wider">{t('fields.amount')}</TableHead>
                         <TableHead className="w-[50px]"></TableHead>
                     </TableRow>
                 </TableHeader>
@@ -94,7 +97,7 @@ export default function PurchasingGrid({ items: availableItems }: PurchasingGrid
                                     onChange={(e) => handleItemChange(index, e.target.value)}
                                     className="w-full bg-transparent border-0 border-b border-transparent group-hover:border-slate-200 focus:border-green-600 py-1 text-[13px] font-semibold outline-none transition-all appearance-none cursor-pointer"
                                 >
-                                    <option value="">Select Item...</option>
+                                    <option value="">{t('fields.select_item')}</option>
                                     {availableItems.map(i => (
                                         <option key={i.id} value={i.id}>{i.name}</option>
                                     ))}
@@ -144,17 +147,17 @@ export default function PurchasingGrid({ items: availableItems }: PurchasingGrid
                     className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-bold text-green-700 hover:text-green-800 bg-green-50 hover:bg-green-100 rounded border border-green-100 transition-all shadow-sm uppercase tracking-wide"
                 >
                     <Plus size={14} className="stroke-[3px]" />
-                    Add Line
+                    {t('fields.add_line')}
                 </button>
 
                 <div className="w-[300px] space-y-3">
                     <div className="flex justify-between items-center text-[13px] text-slate-600">
-                        <span className="font-semibold uppercase text-[11px] tracking-wider opacity-60">Subtotal</span>
+                        <span className="font-semibold uppercase text-[11px] tracking-wider opacity-60">{t('fields.subtotal')}</span>
                         <span className="font-numbers font-semibold">{formatNumber(subtotal)}</span>
                     </div>
                     <div className="h-px bg-slate-100" />
                     <div className="flex justify-between items-center pt-1">
-                        <span className="text-[13px] font-bold text-slate-900 uppercase tracking-widest">Total Amount</span>
+                        <span className="text-[13px] font-bold text-slate-900 uppercase tracking-widest">{t('fields.total_amount')}</span>
                         <span className="text-xl font-bold font-numbers text-slate-900">{formatNumber(totalAmount)}</span>
                     </div>
                 </div>

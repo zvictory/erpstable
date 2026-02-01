@@ -191,7 +191,7 @@ export function ExpenseDataGrid({ expenses, userRole }: ExpenseDataGridProps) {
                                     {getTypeBadge(expense.type)}
                                 </td>
                                 <td className="px-4 py-3 text-sm font-medium text-slate-900 text-right whitespace-nowrap">
-                                    {(expense.amount / 100).toLocaleString()} UZS
+                                    {(expense.amount / 100).toLocaleString()} сўм
                                 </td>
                                 <td className="px-4 py-3 whitespace-nowrap">
                                     {getStatusBadge(expense.status)}

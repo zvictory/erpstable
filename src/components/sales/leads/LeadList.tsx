@@ -9,14 +9,14 @@ import { Plus, User, Mail, Phone, Building2 } from 'lucide-react';
 
 interface Lead {
   id: number;
-  fullName: string;
-  company: string | null;
+  contact_name: string;
+  company_name: string | null;
   email: string | null;
   phone: string | null;
   source: string;
   status: string;
-  estimatedValue: number;
-  assignedToUser?: {
+  estimated_value: number | null;
+  owner?: {
     id: number;
     name: string;
   } | null;
@@ -133,12 +133,12 @@ export function LeadList({ leads: initialLeads }: LeadListProps) {
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-slate-900 truncate">
-                      {lead.fullName}
+                      {lead.contact_name}
                     </h3>
-                    {lead.company && (
+                    {lead.company_name && (
                       <p className="text-sm text-slate-600 truncate flex items-center gap-1 mt-1">
                         <Building2 size={14} />
-                        {lead.company}
+                        {lead.company_name}
                       </p>
                     )}
                   </div>
@@ -172,14 +172,14 @@ export function LeadList({ leads: initialLeads }: LeadListProps) {
                   <div>
                     <p className="text-xs text-slate-500">{t('fields.estimated_value')}</p>
                     <p className="text-sm font-semibold text-slate-900">
-                      {formatCurrency(lead.estimatedValue)}
+                      {formatCurrency(lead.estimated_value || 0)}
                     </p>
                   </div>
-                  {lead.assignedToUser && (
+                  {lead.owner && (
                     <div className="flex items-center gap-1 text-xs text-slate-500">
                       <User size={12} />
                       <span className="truncate max-w-[100px]">
-                        {lead.assignedToUser.name}
+                        {lead.owner.name}
                       </span>
                     </div>
                   )}

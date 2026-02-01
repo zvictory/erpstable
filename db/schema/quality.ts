@@ -137,32 +137,7 @@ export const inspectionResults = sqliteTable(
 // ============================================================================
 // RELATIONS
 // ============================================================================
-export const qualityTestsRelations = relations(qualityTests, ({ many }) => ({
-  inspectionResults: many(inspectionResults),
-}));
 
-export const inspectionOrdersRelations = relations(inspectionOrders, ({ one, many }) => ({
-  item: one(items, {
-    fields: [inspectionOrders.itemId],
-    references: [items.id],
-  }),
-  inspector: one(users, {
-    fields: [inspectionOrders.inspectorId],
-    references: [users.id],
-  }),
-  results: many(inspectionResults),
-}));
-
-export const inspectionResultsRelations = relations(inspectionResults, ({ one }) => ({
-  inspection: one(inspectionOrders, {
-    fields: [inspectionResults.inspectionId],
-    references: [inspectionOrders.id],
-  }),
-  test: one(qualityTests, {
-    fields: [inspectionResults.testId],
-    references: [qualityTests.id],
-  }),
-}));
 
 // ============================================================================
 // ZOD SCHEMAS & TYPES

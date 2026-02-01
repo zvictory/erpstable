@@ -1,0 +1,23 @@
+export async function checkPeriodLock(date: Date) {
+export type JournalLineInput = {
+export async function createJournalEntry(
+export async function closeFiscalPeriod(closingDate: Date) {
+export async function getGlAccounts() {
+export async function createInternalTransfer(input: unknown): Promise<{
+export async function getTransferHistory(filters?: {
+export interface GLFilters {
+export async function getGeneralLedger(filters: GLFilters = {}) {
+export async function getChartOfAccounts() {
+export async function getGLImpact(transactionId: string | number) {
+export async function getAccountRegister(
+export async function getAccountDetails(accountCode: string) {
+export async function updateAccountDetails(
+export async function createAnalyticAccount(data: z.infer<typeof analyticAccountSchema>) {
+export async function getAnalyticAccounts() {
+export async function importBankStatement(data: z.infer<typeof importBankStatementSchema>) {
+export async function getBankStatement(id: number) {
+export async function reconcileLine(statementLineId: number, journalEntryId: number) {
+export async function getJournalEntryById(jeId: number) {
+export async function updateJournalEntry(
+export async function deleteJournalEntry(jeId: number) {
+export async function createOpeningBalanceEntry(data: {

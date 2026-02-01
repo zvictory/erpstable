@@ -10,7 +10,7 @@ import {
 import { eq, and, gt } from 'drizzle-orm';
 
 export async function migrateInventoryToLayers() {
-  return await db.transaction(async (tx) => {
+  return await db.transaction(async (tx: any) => {
     // 1. Ensure MAIN warehouse exists
     let mainWarehouse = await tx
       .select()
@@ -93,7 +93,7 @@ export async function migrateInventoryToLayers() {
     return {
       success: true,
       migratedItems: layersToInsert.length,
-      totalQuantity: itemsWithStock.reduce((sum, i) => sum + i.quantityOnHand, 0),
+      totalQuantity: itemsWithStock.reduce((sum: number, i: any) => sum + i.quantityOnHand, 0),
       mainWarehouseId,
       unassignedLocationId,
     };

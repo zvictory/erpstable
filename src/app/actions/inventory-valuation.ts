@@ -101,7 +101,7 @@ export async function applyLowerOfCostOrNRV(): Promise<{
         }
 
         // Apply write-downs in a transaction
-        await db.transaction(async (tx) => {
+        await db.transaction(async (tx: any) => {
             const effectiveDate = new Date();
 
             for (const writeDown of writeDowns) {
@@ -182,7 +182,7 @@ export async function getInventoryReserveSummary() {
     .leftJoin(items, eq(inventoryReserves.itemId, items.id))
     .where(eq(inventoryReserves.status, 'ACTIVE'));
 
-    const totalReserve = reserves.reduce((sum, r) => sum + r.reserveAmount, 0);
+    const totalReserve = reserves.reduce((sum: number, r: any) => sum + r.reserveAmount, 0);
 
     return {
         reserves,
@@ -199,7 +199,7 @@ export async function reverseInventoryReserve(reserveId: number): Promise<{
     message: string;
 }> {
     try {
-        await db.transaction(async (tx) => {
+        await db.transaction(async (tx: any) => {
             const reserveResults = await tx.select()
                 .from(inventoryReserves)
                 .where(eq(inventoryReserves.id, reserveId))

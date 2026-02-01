@@ -1,41 +1,11 @@
-'use client';
+import React from 'react';
+import ShellClient from './ShellClient';
+import { UserRole } from '@/auth.config';
+import { auth } from '@/auth';
 
-import React, { useState } from 'react';
-import Sidebar from './Sidebar';
-import Header from './Header';
-import ChangePasswordModal from '@/components/auth/ChangePasswordModal';
-import { cn } from '@/lib/utils';
+export default async function Shell({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+  const userRole = session?.user?.role as UserRole | undefined;
 
-export default function Shell({ children }: { children: React.ReactNode }) {
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-
-    return (
-        <div className="flex min-h-screen bg-slate-50">
-            {/* Sidebar */}
-            <Sidebar
-                isCollapsed={isSidebarCollapsed}
-                toggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            />
-
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col min-w-0 transition-all duration-300 ml-0 relative">
-                <Header
-                    toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                    setIsPasswordModalOpen={setIsPasswordModalOpen}
-                />
-
-                <main className="flex-1 p-6 md:p-8 overflow-x-hidden bg-slate-50">
-                    <div className="max-w-[1600px] mx-auto w-full">
-                        {children}
-                    </div>
-                </main>
-            </div>
-
-            <ChangePasswordModal
-                isOpen={isPasswordModalOpen}
-                onClose={() => setIsPasswordModalOpen(false)}
-            />
-        </div>
-    );
+  return <ShellClient userRole={userRole}>{children}</ShellClient>;
 }

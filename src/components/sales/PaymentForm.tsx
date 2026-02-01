@@ -119,7 +119,7 @@ export default function PaymentForm({ customerId, customerName, openInvoices, on
                     </div>
                     <div className="text-right">
                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Open Balance</div>
-                        <div className="text-2xl font-black text-slate-900 tracking-tight">{(totalOpenBalance / 100).toLocaleString('en-US')} UZS</div>
+                        <div className="text-2xl font-black text-slate-900 tracking-tight">{(totalOpenBalance / 100).toLocaleString('en-US')} сўм</div>
                     </div>
                 </div>
             </div>

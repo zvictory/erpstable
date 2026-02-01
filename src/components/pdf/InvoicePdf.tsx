@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   },
 });
 
-// Helper function to format currency from Tiyin to UZS
+// Helper function to format currency from Tiyin to сўм
 function formatCurrency(tiyin: number): string {
   const uzs = tiyin / 100;
   return new Intl.NumberFormat('ru-RU', {
@@ -392,12 +392,12 @@ export function InvoicePdf({ invoice, customer, items, labels }: InvoicePdfProps
         <View style={styles.totals}>
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>{labels.subtotal}:</Text>
-            <Text style={styles.totalValue}>{formatCurrency(invoice.subtotal)} UZS</Text>
+            <Text style={styles.totalValue}>{formatCurrency(invoice.subtotal)} сўм</Text>
           </View>
           <View style={styles.grandTotalRow}>
             <Text style={styles.grandTotalLabel}>{labels.total}:</Text>
             <Text style={styles.grandTotalValue}>
-              {formatCurrency(invoice.totalAmount)} UZS
+              {formatCurrency(invoice.totalAmount)} сўм
             </Text>
           </View>
         </View>

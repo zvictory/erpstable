@@ -1,0 +1,61 @@
+🔍 Service Module Translation Verification
+
+============================================================
+
+📁 Loading translation files...
+✅ Loaded 4 language files
+
+📊 Checking translation coverage...
+   Total service keys: 325
+   ✅ en: All keys present
+   ✅ uz: All keys present
+   ✅ ru: All keys present
+   ✅ tr: All keys present
+   ⚠️  Found 5 potentially untranslated values
+
+🔎 Checking for hardcoded strings...
+   ✅ No hardcoded strings found
+
+============================================================
+📋 DETAILED RESULTS
+
+⚠️  POTENTIALLY UNTRANSLATED VALUES:
+
+  - service.ticket_detail.email (uz: "Email")
+  - service.ticket_detail.email (ru: "Email")
+  - service.assets_card.serial (uz: "S/N")
+  - service.assets_card.serial (tr: "S/N")
+  - service.asset_detail.email (uz: "Email")
+
+============================================================
+
+📈 SUMMARY
+
+Total service translation keys: 325
+Languages checked: en, uz, ru, tr
+Errors found: 0
+Warnings: 1
+
+✅ All translation checks PASSED!
+
+📋 MANUAL TESTING CHECKLIST:
+
+For each language (en, uz, ru, tr):
+  1. Switch locale in UI
+  2. Navigate to /service/dashboard
+     - Verify KPI cards display with translated labels
+     - Verify recent tickets list shows translated statuses
+  3. Navigate to /service/contracts
+     - Verify contract type labels translated
+     - Verify status badges translated
+     - Create new contract, verify form labels translated
+  4. Navigate to /service/tickets
+     - Verify ticket type labels translated
+     - Verify priority labels translated
+     - Create new ticket, verify form translated
+     - Complete a ticket, verify completion form translated
+  5. Navigate to /service/assets
+     - Verify asset status labels translated
+     - Verify warranty status translated
+
+📄 Detailed report saved to: /Users/zafar/Documents/Stable_next/SERVICE_TRANSLATION_VERIFICATION.md

@@ -213,7 +213,7 @@ export function WriteCheckModal({
                                     {assetAccounts.map((account) => (
                                         <option key={account.code} value={account.code}>
                                             {account.code} - {account.name} ({(account.balance / 100).toLocaleString()}{' '}
-                                            UZS)
+                                            сўм)
                                         </option>
                                     ))}
                                 </select>
@@ -221,7 +221,7 @@ export function WriteCheckModal({
                                     <p className="text-sm text-slate-600 mt-1">
                                         {tCommon('balance')}:{' '}
                                         <span className="font-semibold">
-                                            {(selectedAccount.balance / 100).toLocaleString()} UZS
+                                            {(selectedAccount.balance / 100).toLocaleString()} сўм
                                         </span>
                                     </p>
                                 )}

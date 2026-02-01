@@ -70,9 +70,9 @@ export function CustomerProfile({
 
     if (!customer) {
         return (
-            <div className="flex-1 flex flex-col items-center justify-center p-12 bg-slate-50">
-                <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mb-4">
-                    <FileText className="text-slate-400 h-8 w-8" />
+            <div className="flex flex-col items-center justify-center p-12">
+                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                    <FileText className="text-slate-300 h-8 w-8" />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900">No customer selected</h3>
                 <p className="text-[13px] text-slate-500 max-w-xs text-center">
@@ -107,7 +107,7 @@ export function CustomerProfile({
     };
 
     return (
-        <div className="flex-1 flex flex-col h-full overflow-y-auto bg-slate-50">
+        <div className="flex flex-col relative">
             {/* Profile Header Card */}
             <div className="bg-white border-b border-slate-200 p-6">
                 <div className="flex justify-between items-start mb-6">

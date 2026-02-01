@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getMaintenanceCalendar } from '@/app/actions/maintenance';
-import { formatDate } from '@/lib/format';
 
 interface CalendarEvent {
   id: number;

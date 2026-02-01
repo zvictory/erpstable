@@ -12,8 +12,8 @@ export default async function NewOrderPage() {
     return (
         <div className="p-8 bg-slate-50 min-h-screen">
             <PurchaseOrderForm
-                vendors={vendors.map(v => ({ id: v.id, name: v.name }))}
-                items={items.map(i => ({
+                vendors={vendors.map((v: { id: number; name: string }) => ({ id: v.id, name: v.name }))}
+                items={items.map((i: { id: number; name: string; sku: string | null; standardCost: number | null }) => ({
                     id: i.id,
                     name: i.name,
                     sku: i.sku,

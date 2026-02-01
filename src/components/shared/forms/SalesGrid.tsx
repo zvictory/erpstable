@@ -20,30 +20,67 @@ interface FormDataWithItems {
     uom?: string;
     unitPrice: number;
     amount: number;
-    warehouseId?: number; // NEW - optional for backward compatibility
+    warehouseId?: number;
+    discountPercent?: number; // Basis points (1250 = 12.5%)
+    discountAmount?: number; // Tiyin (fixed discount)
+    taxRateId?: number; // Tax rate ID
   }>;
 }
 
 /**
- * Custom Hook for Grid Calculations
+ * Custom Hook for Grid Calculations with Discounts and Tax
  */
-export function useSalesGridMath(control: Control<any>) {
+export function useSalesGridMath(control: Control<any>, taxRates: Array<{ id: number; rateMultiplier: number }> = []) {
     const items = useWatch({
         control,
         name: "items",
     }) || [];
 
-    const subtotal = items.reduce((acc: number, item: any) => {
+    let grossSubtotal = 0;
+    let totalDiscount = 0;
+    let totalTax = 0;
+
+    items.forEach((item: any) => {
         const qty = parseFloat(item?.quantity as any) || 0;
         const rate = parseFloat(item?.unitPrice as any) || 0;
-        return acc + (qty * rate);
-    }, 0);
+        const discountPct = parseInt(item?.discountPercent as any) || 0;
+        const discountAmt = parseInt(item?.discountAmount as any) || 0;
 
-    const grandTotal = subtotal;
+        // Calculate gross amount
+        const gross = Math.round(qty * rate);
+        grossSubtotal += gross;
+
+        // Calculate discount (fixed amount takes precedence)
+        let discount = 0;
+        if (discountAmt > 0) {
+            discount = discountAmt;
+        } else if (discountPct > 0) {
+            discount = Math.round((gross * discountPct) / 10000);
+        }
+        totalDiscount += discount;
+
+        // Calculate net amount (post-discount)
+        const net = gross - discount;
+
+        // Calculate tax on net amount
+        const taxRateId = parseInt(item?.taxRateId as any) || 0;
+        if (taxRateId > 0) {
+            const taxRate = taxRates.find(tr => tr.id === taxRateId);
+            if (taxRate) {
+                const tax = Math.round((net * taxRate.rateMultiplier) / 10000);
+                totalTax += tax;
+            }
+        }
+    });
+
+    const netSubtotal = grossSubtotal - totalDiscount;
+    const grandTotal = netSubtotal + totalTax;
 
     return {
-        subtotal: subtotal || 0,
-        taxAmount: 0,
+        grossSubtotal: grossSubtotal || 0,
+        totalDiscount: totalDiscount || 0,
+        netSubtotal: netSubtotal || 0,
+        taxAmount: totalTax || 0,
         grandTotal: grandTotal || 0,
         items,
     };
@@ -60,11 +97,22 @@ interface SalesGridProps {
         qtyOnHand?: number;
         itemClass?: string;
     }[];
-    warehouses?: { id: number; name: string; code: string }[]; // NEW
+    warehouses?: { id: number; name: string; code: string }[];
+    taxRates?: {
+        id: number;
+        name: string;
+        rateMultiplier: number;
+        isActive: boolean;
+    }[];
     enableStockValidation?: boolean;
 }
 
-export default function SalesGrid({ items: availableItems, warehouses = [], enableStockValidation = false }: SalesGridProps) {
+export default function SalesGrid({
+    items: availableItems,
+    warehouses = [],
+    taxRates = [],
+    enableStockValidation = false
+}: SalesGridProps) {
     const t = useTranslations('sales.grid');
     const tHeaders = useTranslations('sales.grid.headers');
     const tPlaceholders = useTranslations('sales.grid.placeholders');
@@ -77,7 +125,7 @@ export default function SalesGrid({ items: availableItems, warehouses = [], enab
         name: "items",
     });
 
-    const { subtotal, taxAmount, grandTotal, items: watchedItems } = useSalesGridMath(control);
+    const { grossSubtotal, totalDiscount, netSubtotal, taxAmount, grandTotal, items: watchedItems } = useSalesGridMath(control, taxRates);
 
     // State for delete confirmation
     const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
@@ -105,7 +153,7 @@ export default function SalesGrid({ items: availableItems, warehouses = [], enab
      */
     const handleRowInteraction = (index: number) => {
         if (index === fields.length - 1) {
-            append({ itemId: '', description: '', quantity: 0, unitPrice: 0, amount: 0 }, { shouldFocus: false });
+            append({ itemId: '', description: '', quantity: 0, unitPrice: 0, amount: 0, discountPercent: 0, discountAmount: 0, taxRateId: undefined }, { shouldFocus: false });
         }
     };
 
@@ -121,7 +169,7 @@ export default function SalesGrid({ items: availableItems, warehouses = [], enab
                 setFocus(`items.${index}.unitPrice`);
             } else if (field === 'unitPrice') {
                 if (index === fields.length - 1) {
-                    append({ itemId: '', description: '', quantity: 0, unitPrice: 0, amount: 0 }, { shouldFocus: false });
+                    append({ itemId: '', description: '', quantity: 0, unitPrice: 0, amount: 0, discountPercent: 0, discountAmount: 0, taxRateId: undefined }, { shouldFocus: false });
                 }
                 // Delay focus to ensure row is rendered
                 setTimeout(() => setFocus(`items.${index + 1}.itemId`), 10);
@@ -139,7 +187,7 @@ export default function SalesGrid({ items: availableItems, warehouses = [], enab
 
             // If it's the last row, append a new one
             if (index === fields.length - 1) {
-                append({ itemId: '', description: '', quantity: 0, unitPrice: 0, amount: 0 }, { shouldFocus: false });
+                append({ itemId: '', description: '', quantity: 0, unitPrice: 0, amount: 0, discountPercent: 0, discountAmount: 0, taxRateId: undefined }, { shouldFocus: false });
             }
         }
     };
@@ -158,6 +206,8 @@ export default function SalesGrid({ items: availableItems, warehouses = [], enab
                             )}
                             <th className="w-28 px-4 py-3 text-right text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">{tHeaders('quantity')}</th>
                             <th className="w-36 px-4 py-3 text-right text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">{tHeaders('unit_price')}</th>
+                            <th className="w-28 px-4 py-3 text-right text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">{tHeaders('discount_percent')}</th>
+                            <th className="w-36 px-4 py-3 text-left text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">{tHeaders('tax_rate')}</th>
                             <th className="w-36 px-4 py-3 text-right text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-200">{tHeaders('amount')}</th>
                             <th className="w-12 px-4 py-3 border-b border-slate-200"></th>
                         </tr>
@@ -273,6 +323,44 @@ export default function SalesGrid({ items: availableItems, warehouses = [], enab
                                             placeholder="0.00"
                                         />
                                     </td>
+                                    {/* Discount Percent Column */}
+                                    <td className="px-4 py-3">
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            max="100"
+                                            {...register(`items.${index}.discountPercent`, {
+                                                valueAsNumber: true,
+                                                onChange: (e) => {
+                                                    const percent = parseFloat(e.target.value) || 0;
+                                                    // Convert percentage to basis points (12.5% = 1250)
+                                                    const basisPoints = Math.round(percent * 100);
+                                                    setValue(`items.${index}.discountPercent`, basisPoints);
+                                                    // Clear fixed discount if percentage is set
+                                                    if (percent > 0) {
+                                                        setValue(`items.${index}.discountAmount`, 0);
+                                                    }
+                                                }
+                                            })}
+                                            placeholder="0.00"
+                                            className="w-full bg-transparent border-0 border-b border-transparent group-hover:border-slate-200 focus:border-green-600 py-1 text-[13px] text-right font-numbers outline-none transition-all"
+                                        />
+                                    </td>
+                                    {/* Tax Rate Column */}
+                                    <td className="px-4 py-3">
+                                        <select
+                                            {...register(`items.${index}.taxRateId`, { valueAsNumber: true })}
+                                            className="w-full bg-transparent border-0 border-b border-transparent group-hover:border-slate-200 focus:border-green-600 py-1 text-[13px] outline-none transition-all appearance-none cursor-pointer"
+                                        >
+                                            <option value="">{tPlaceholders('no_tax')}</option>
+                                            {taxRates.filter(tr => tr.isActive).map(tr => (
+                                                <option key={tr.id} value={tr.id}>
+                                                    {tr.name} ({(tr.rateMultiplier / 100).toFixed(2)}%)
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </td>
                                     <td className="px-4 py-3 text-right">
                                         <span className="text-sm font-black text-slate-900 tracking-tight">
                                             {formatNumber(amount, { decimals: 2 })}
@@ -292,7 +380,7 @@ export default function SalesGrid({ items: availableItems, warehouses = [], enab
                                 {/* Stock Validation Row */}
                                 {shouldShowValidation && (
                                     <tr className="border-t-0">
-                                        <td colSpan={warehouses.length > 0 ? 8 : 7} className="px-4 pb-3 pt-1 bg-slate-50/30">
+                                        <td colSpan={warehouses.length > 0 ? 10 : 9} className="px-4 pb-3 pt-1 bg-slate-50/30">
                                             <StockValidationBadge
                                                 itemId={selectedItem.id}
                                                 requestedQty={qty}
@@ -312,7 +400,7 @@ export default function SalesGrid({ items: availableItems, warehouses = [], enab
                 <div className="p-4 bg-slate-50/50 border-t border-slate-100">
                     <button
                         type="button"
-                        onClick={() => append({ itemId: '', description: '', quantity: 0, unitPrice: 0, amount: 0 })}
+                        onClick={() => append({ itemId: '', description: '', quantity: 0, unitPrice: 0, amount: 0, discountPercent: 0, discountAmount: 0, taxRateId: undefined })}
                         className="flex items-center gap-2 text-xs font-bold text-green-600 hover:text-green-700 transition"
                     >
                         <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
@@ -323,16 +411,61 @@ export default function SalesGrid({ items: availableItems, warehouses = [], enab
                 </div>
             </div>
 
-            {/* Total Only */}
+            {/* Totals Breakdown */}
             <div className="flex justify-end pr-4">
-                <div className="w-80">
-                    <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{tCommon('total')}</span>
-                        <div className="text-right">
-                            <span className="text-xl font-black text-slate-900 tracking-tighter">
-                                {formatNumber(grandTotal)} <span className="text-xs text-slate-400 ml-1">UZS</span>
+                <div className="w-96 space-y-2">
+                    {/* Gross Subtotal */}
+                    <div className="flex justify-between">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">
+                            {tCommon('gross_subtotal')}
+                        </span>
+                        <span className="text-sm font-semibold text-slate-700">
+                            {formatNumber(grossSubtotal)} UZS
+                        </span>
+                    </div>
+
+                    {/* Discount (if any) */}
+                    {totalDiscount > 0 && (
+                        <div className="flex justify-between">
+                            <span className="text-[10px] font-bold text-red-400 uppercase">
+                                {tCommon('discount')}
+                            </span>
+                            <span className="text-sm font-semibold text-red-600">
+                                - {formatNumber(totalDiscount)} UZS
                             </span>
                         </div>
+                    )}
+
+                    {/* Net Subtotal */}
+                    <div className="flex justify-between border-t border-slate-200 pt-2">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">
+                            {tCommon('net_subtotal')}
+                        </span>
+                        <span className="text-sm font-semibold text-slate-700">
+                            {formatNumber(netSubtotal)} UZS
+                        </span>
+                    </div>
+
+                    {/* Tax */}
+                    {taxAmount > 0 && (
+                        <div className="flex justify-between">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase">
+                                {tCommon('tax')}
+                            </span>
+                            <span className="text-sm font-semibold text-slate-700">
+                                {formatNumber(taxAmount)} UZS
+                            </span>
+                        </div>
+                    )}
+
+                    {/* Grand Total */}
+                    <div className="flex justify-between border-t-2 border-slate-300 pt-2">
+                        <span className="text-[10px] font-black text-slate-400 uppercase">
+                            {tCommon('total')}
+                        </span>
+                        <span className="text-xl font-black text-slate-900">
+                            {formatNumber(grandTotal)} UZS
+                        </span>
                     </div>
                 </div>
             </div>

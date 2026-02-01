@@ -92,9 +92,9 @@ export function ProblemItemsTable({ items }: ProblemItemsTableProps) {
   // Get issue type badge
   const getIssueTypeBadge = (issueType: ReconciliationIssue['issueType']) => {
     const variants = {
-      MISSING_LAYERS: { label: 'Missing Layers', variant: 'danger' as const },
-      CACHE_STALE: { label: 'Cache Stale', variant: 'warning' as const },
-      BOTH: { label: 'Both Issues', variant: 'danger' as const },
+      MISSING_LAYERS: { label: 'Missing Layers', variant: 'destructive' as const },
+      CACHE_STALE: { label: 'Cache Stale', variant: 'secondary' as const },
+      BOTH: { label: 'Both Issues', variant: 'destructive' as const },
     };
 
     const config = variants[issueType];

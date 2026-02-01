@@ -24,7 +24,10 @@ const invoiceLineSchema = z.object({
     quantity: z.coerce.number().min(0.001, "Qty required"),
     unitPrice: z.coerce.number().min(0, "Price required"),
     amount: z.coerce.number(),
-    warehouseId: z.coerce.number().optional(), // NEW - optional warehouse selection
+    warehouseId: z.coerce.number().optional(),
+    discountPercent: z.coerce.number().min(0).max(10000),
+    discountAmount: z.coerce.number().min(0),
+    taxRateId: z.coerce.number().optional(),
 });
 
 const invoiceSchema = z.object({
@@ -41,6 +44,7 @@ const invoiceSchema = z.object({
     terms: z.string().optional(),
     items: z.array(invoiceLineSchema).min(1, "At least one item required"),
     memo: z.string().optional(),
+    salesRepId: z.coerce.number().optional(),
 });
 
 type InvoiceFormValues = z.infer<typeof invoiceSchema>;
@@ -61,24 +65,33 @@ interface InvoiceFormProps {
     customerId?: number;
     items: Item[];
     customers: { id: number; name: string }[];
+    taxRates?: {
+        id: number;
+        name: string;
+        rateMultiplier: number;
+        isActive: boolean;
+    }[];
     isGlobalMode?: boolean;
     onSuccess: () => void;
     onCancel: () => void;
     mode?: 'create' | 'edit';
     initialData?: any;
     invoiceId?: number;
+    users?: { id: number; name: string }[];
 }
 
 export default function InvoiceForm({
     customerId = 0,
     items: availableItems,
     customers,
+    taxRates = [],
     isGlobalMode = false,
     onSuccess,
     onCancel,
     mode = 'create',
     initialData,
     invoiceId,
+    users = [],
 }: InvoiceFormProps) {
     const t = useTranslations('sales.invoices');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -94,6 +107,7 @@ export default function InvoiceForm({
             terms: initialData.terms || 'Net 30',
             items: initialData.items || [{ itemId: 0, description: '', quantity: 1, unitPrice: 0, amount: 0 }],
             memo: initialData.memo || '',
+            salesRepId: initialData.salesRepId || undefined,
         } : {
             customerId: customerId || 0,
             invoiceDate: getToday(),
@@ -102,11 +116,12 @@ export default function InvoiceForm({
             terms: 'Net 30',
             items: [{ itemId: 0, description: '', quantity: 1, unitPrice: 0, amount: 0 }],
             memo: '',
+            salesRepId: undefined,
         }
     });
 
     const { handleSubmit, formState: { errors }, setValue, watch, getValues, control } = methods;
-    const { subtotal, grandTotal } = useSalesGridMath(control);
+    const { grossSubtotal, totalDiscount, netSubtotal, taxAmount, grandTotal } = useSalesGridMath(control, taxRates);
 
     // Auto-calculate due date based on terms
     const invoiceDate = watch('invoiceDate');
@@ -164,14 +179,24 @@ export default function InvoiceForm({
                 dueDate: data.dueDate,
                 terms: data.terms,
                 memo: data.memo,
-                items: data.items
+                lines: data.items
                     .filter(i => i.itemId > 0)
                     .map(i => ({
-                        ...i,
-                        warehouseId: i.warehouseId || undefined, // Include warehouse if selected
+                        itemId: Number(i.itemId),
+                        description: i.description,
+                        quantity: i.quantity,
+                        rate: Math.round(i.unitPrice * 100), // Convert to tiyin
+                        warehouseId: i.warehouseId || undefined,
+                        discountPercent: i.discountPercent || 0,
+                        discountAmount: i.discountAmount || 0,
+                        taxRateId: i.taxRateId || undefined,
                     })),
-                subtotal: Math.round(subtotal * 100),
-                total: Math.round(grandTotal * 100),
+                grossSubtotal: Math.round(grossSubtotal * 100), // Convert to tiyin
+                totalDiscount: Math.round(totalDiscount * 100),
+                subtotal: Math.round(netSubtotal * 100), // Net subtotal (post-discount)
+                taxTotal: Math.round(taxAmount * 100),
+                totalAmount: Math.round(grandTotal * 100),
+                salesRepId: data.salesRepId || undefined,
             };
 
             const res = mode === 'edit' && invoiceId
@@ -248,41 +273,22 @@ export default function InvoiceForm({
                                 />
                             </FormField>
 
-                            <FormField label={t('fields.invoice_number')} required error={errors.invoiceNumber?.message}>
-                                <input
-                                    type="text"
-                                    {...methods.register("invoiceNumber")}
-                                    placeholder="INV-1001"
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-semibold focus:ring-2 focus:ring-green-100 focus:border-green-600 outline-none"
-                                />
-                            </FormField>
-                        </DocumentFormCard>
-
-                        {/* Payment Terms Card */}
-                        <DocumentFormCard title={t('cards.payment_terms')}>
-                            <FormField label={t('fields.payment_terms')}>
-                                <select
-                                    {...methods.register("terms")}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-semibold focus:ring-2 focus:ring-green-100 focus:border-green-600 outline-none"
-                                >
-                                    <option value="Net 30">{t('payment_terms_options.net_30')}</option>
-                                    <option value="Net 15">{t('payment_terms_options.net_15')}</option>
-                                    <option value="Due on Receipt">{t('payment_terms_options.due_on_receipt')}</option>
-                                </select>
-                            </FormField>
-
-                            <FormField label={t('fields.due_date')} required error={errors.dueDate?.message}>
+                            <FormField label={t('fields.sales_rep') || 'Sales Representative'}>
                                 <Controller
-                                    name="dueDate"
+                                    name="salesRepId"
                                     control={methods.control}
                                     render={({ field }) => (
-                                        <DatePicker
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            placeholder="дд/мм/гггг"
-                                            error={!!errors.dueDate}
+                                        <select
+                                            {...field}
+                                            value={field.value || ""}
+                                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                                             className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-semibold focus:ring-2 focus:ring-green-100 focus:border-green-600 outline-none"
-                                        />
+                                        >
+                                            <option value="">Select Sales Rep</option>
+                                            {users.map((u: any) => (
+                                                <option key={u.id} value={u.id}>{u.name}</option>
+                                            ))}
+                                        </select>
                                     )}
                                 />
                             </FormField>
@@ -291,7 +297,7 @@ export default function InvoiceForm({
                 }
                 footer={
                     <SalesFormFooter
-                        subtotal={subtotal}
+                        subtotal={netSubtotal}
                         total={grandTotal}
                         type="INVOICE"
                         register={methods.register}
@@ -299,7 +305,12 @@ export default function InvoiceForm({
                 }
             >
                 <div className="space-y-4">
-                    <SalesGrid items={availableItems} warehouses={warehouses} enableStockValidation={true} />
+                    <SalesGrid
+                        items={availableItems}
+                        warehouses={warehouses}
+                        taxRates={taxRates}
+                        enableStockValidation={true}
+                    />
                     <PickingLocationDisplay
                         items={(methods.watch('items') || [])
                             .filter(item => item.itemId && Number(item.itemId) > 0 && item.quantity > 0)

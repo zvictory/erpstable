@@ -90,7 +90,7 @@ export function ExpenseManagementClient({
                                 {stats.total.count}
                             </div>
                             <div className="text-sm text-slate-600 mt-1">
-                                {(stats.total.amount / 100).toLocaleString()} UZS
+                                {(stats.total.amount / 100).toLocaleString()} сўм
                             </div>
                         </div>
 
@@ -103,7 +103,7 @@ export function ExpenseManagementClient({
                                 {stats.pendingApproval.count}
                             </div>
                             <div className="text-sm text-slate-600 mt-1">
-                                {(stats.pendingApproval.amount / 100).toLocaleString()} UZS
+                                {(stats.pendingApproval.amount / 100).toLocaleString()} сўм
                             </div>
                         </div>
 
@@ -116,7 +116,7 @@ export function ExpenseManagementClient({
                                 {stats.pendingPayment.count}
                             </div>
                             <div className="text-sm text-slate-600 mt-1">
-                                {(stats.pendingPayment.amount / 100).toLocaleString()} UZS
+                                {(stats.pendingPayment.amount / 100).toLocaleString()} сўм
                             </div>
                         </div>
 
@@ -129,7 +129,7 @@ export function ExpenseManagementClient({
                                 {stats.thisMonth.count}
                             </div>
                             <div className="text-sm text-slate-600 mt-1">
-                                {(stats.thisMonth.amount / 100).toLocaleString()} UZS
+                                {(stats.thisMonth.amount / 100).toLocaleString()} сўм
                             </div>
                         </div>
                     </div>

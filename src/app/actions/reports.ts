@@ -136,10 +136,10 @@ export async function getProfitAndLoss(
     }
 
     // Calculate totals
-    const revenueTotal = revenue.reduce((sum, item) => sum + item.amount, 0);
-    const cogsTotal = costOfGoodsSold.reduce((sum, item) => sum + item.amount, 0);
+    const revenueTotal = revenue.reduce((sum: number, item: any) => sum + item.amount, 0);
+    const cogsTotal = costOfGoodsSold.reduce((sum: number, item: any) => sum + item.amount, 0);
     const grossProfit = revenueTotal - cogsTotal;
-    const expensesTotal = operatingExpenses.reduce((sum, item) => sum + item.amount, 0);
+    const expensesTotal = operatingExpenses.reduce((sum: number, item: any) => sum + item.amount, 0);
     const netIncome = grossProfit - expensesTotal;
 
     return {
@@ -291,15 +291,15 @@ export async function getBalanceSheet(asOfDate: Date): Promise<BalanceSheetData>
     }
 
     // Calculate totals
-    const currentAssetsTotal = currentAssets.reduce((sum, item) => sum + item.amount, 0);
-    const nonCurrentAssetsTotal = nonCurrentAssets.reduce((sum, item) => sum + item.amount, 0);
+    const currentAssetsTotal = currentAssets.reduce((sum: number, item: any) => sum + item.amount, 0);
+    const nonCurrentAssetsTotal = nonCurrentAssets.reduce((sum: number, item: any) => sum + item.amount, 0);
     const totalAssets = currentAssetsTotal + nonCurrentAssetsTotal;
 
-    const currentLiabilitiesTotal = currentLiabilities.reduce((sum, item) => sum + item.amount, 0);
-    const nonCurrentLiabilitiesTotal = nonCurrentLiabilities.reduce((sum, item) => sum + item.amount, 0);
+    const currentLiabilitiesTotal = currentLiabilities.reduce((sum: number, item: any) => sum + item.amount, 0);
+    const nonCurrentLiabilitiesTotal = nonCurrentLiabilities.reduce((sum: number, item: any) => sum + item.amount, 0);
     const totalLiabilities = currentLiabilitiesTotal + nonCurrentLiabilitiesTotal;
 
-    const totalEquity = equity.reduce((sum, item) => sum + item.amount, 0);
+    const totalEquity = equity.reduce((sum: number, item: any) => sum + item.amount, 0);
     const totalLiabilitiesAndEquity = totalLiabilities + totalEquity;
 
     // Verify accounting equation

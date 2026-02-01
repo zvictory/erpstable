@@ -66,7 +66,7 @@ export function ReconciliationByClass({ byClass }: ReconciliationByClassProps) {
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-slate-500">Discrepancy</span>
                     <Badge
-                      variant={hasDiscrepancy ? 'danger' : 'success'}
+                      variant={hasDiscrepancy ? 'destructive' : 'default'}
                       className={hasDiscrepancy ? '' : 'bg-green-100 text-green-700'}
                     >
                       {formatCurrency(item.data.discrepancy)}

@@ -216,7 +216,7 @@ const formatCurrency = (amount: string | number): string => {
   return new Intl.NumberFormat('ru-RU', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(value) + ' UZS';
+  }).format(value) + ' сўм';
 };
 
 // Helper function to format date

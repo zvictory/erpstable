@@ -46,7 +46,7 @@ function formatUZS(amount: number): string {
         currency: 'UZS',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
-    }).format(amount / 100); // Convert from Tiyin to UZS
+    }).format(amount / 100); // Convert from Tiyin to сўм
 }
 
 export default function StopwatchWidget({

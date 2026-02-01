@@ -6,6 +6,7 @@ export const ACCOUNTS = {
     SALES_TAX: "2200", // Sales Tax Payable (Liability)
     AR: "1200", // Accounts Receivable (Asset)
     SALES_INCOME: "4100", // Sales Revenue
+    SALES_DISCOUNTS: "4200", // Sales Discounts (Contra-Revenue)
     PETTY_CASH: "1010", // Petty Cash (Asset)
     EMPLOYEE_PAYABLES: "2150", // Employee Reimbursements Payable (Liability)
     EXPENSE_TRAVEL: "5100", // Travel Expenses

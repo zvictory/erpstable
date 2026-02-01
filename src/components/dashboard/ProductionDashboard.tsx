@@ -8,9 +8,9 @@ import YieldChart from './YieldChart';
 
 // Helper for formatting currency
 const formatUZS = (tiyin: number) => {
-    // 1 UZS = 100 Tiyin (assuming standard sub-unit, though UZS usually has no fractional part in practice, 
+    // 1 сўм = 100 Tiyin (assuming standard sub-unit, though сўм usually has no fractional part in practice, 
     // but "Tiyin integer storage" was specified).
-    // Actually UZS doesn't use Tiyin much, but we treat it as cent-equivalents.
+    // Actually сўм doesn't use Tiyin much, but we treat it as cent-equivalents.
     return new Intl.NumberFormat('ru-RU', {
         style: 'currency',
         currency: 'UZS',

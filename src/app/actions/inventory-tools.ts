@@ -49,7 +49,12 @@ export async function updateItemInventoryFields(
     }
 
     // 3. Calculate average cost
-    const avgCost = totalQty > 0 ? Math.round(totalValue / totalQty) : 0;
+    let avgCost = totalQty > 0 ? Math.round(totalValue / totalQty) : 0;
+
+    // Ensure avgCost is a finite number to prevent RangeErrors/DB errors
+    if (!isFinite(avgCost) || isNaN(avgCost)) {
+        avgCost = 0;
+    }
 
     // 4. Update items table
     await dbInstance
@@ -75,7 +80,7 @@ export async function updateItemInventoryFields(
  * Use this to fix inventory discrepancies caused by prior bugs.
  */
 export async function resyncInventoryFromHistory() {
-    return await db.transaction(async (tx) => {
+    return await db.transaction(async (tx: any) => {
         // 1. DELETE all existing inventory layers (clean slate)
         await tx.delete(inventoryLayers);
 

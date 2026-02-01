@@ -6,6 +6,7 @@ import { Tabs } from '@/components/common/Tabs';
 import ProductionRunLaborTab from '@/components/production/ProductionRunLaborTab';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface ProductionRunDetailClientProps {
     run: any;
@@ -38,6 +39,15 @@ export default function ProductionRunDetailClient({ run, laborData }: Production
                                 {new Date(run.date).toLocaleDateString()}
                             </p>
                         </div>
+                        {run.destinationLocation && (
+                            <div>
+                                <p className="text-sm text-slate-500">{t('overview.destination_zone')}</p>
+                                <p className="text-base font-medium text-slate-900">
+                                    {run.destinationLocation.locationCode}
+                                    {run.destinationLocation.zone && ` (${run.destinationLocation.zone})`}
+                                </p>
+                            </div>
+                        )}
                         <div>
                             <p className="text-sm text-slate-500">{t('overview.notes')}</p>
                             <p className="text-base font-medium text-slate-900">{run.notes || '-'}</p>
@@ -64,19 +74,37 @@ export default function ProductionRunDetailClient({ run, laborData }: Production
                                 <th className="px-4 py-3 text-right text-sm font-semibold text-slate-700">
                                     {t('inputs.cost')}
                                 </th>
+                                <th className="px-4 py-3 text-left text-sm font-semibold text-slate-700">
+                                    {t('inputs.source_run')}
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             {run.inputs?.map((input: any) => (
                                 <tr key={input.id} className="border-b border-slate-100 last:border-0">
                                     <td className="px-4 py-3 text-sm text-slate-900">
-                                        {input.item?.name || `Item #${input.itemId}`}
+                                        <div className="flex items-center gap-2">
+                                            {input.item?.itemClass === 'WIP' && <span>🏭</span>}
+                                            {input.item?.name || `Item #${input.itemId}`}
+                                        </div>
                                     </td>
                                     <td className="px-4 py-3 text-sm text-right text-slate-600">
                                         {input.qty}
                                     </td>
                                     <td className="px-4 py-3 text-sm text-right font-medium text-slate-900">
                                         {(input.totalCost / 100).toLocaleString()} so'm
+                                    </td>
+                                    <td className="px-4 py-3 text-sm text-slate-600">
+                                        {input.item?.itemClass === 'WIP' && input.sourceRunNumber ? (
+                                            <Link
+                                                href={`/production/${input.sourceRunId}`}
+                                                className="text-blue-600 hover:underline"
+                                            >
+                                                {input.sourceRunNumber}
+                                            </Link>
+                                        ) : (
+                                            '-'
+                                        )}
                                     </td>
                                 </tr>
                             ))}

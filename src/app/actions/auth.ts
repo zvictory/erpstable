@@ -54,3 +54,17 @@ export async function changePassword(data: {
         return { success: false, error: 'Failed to change password' };
     }
 }
+
+export async function getUsers() {
+    try {
+        const results = await db.select({
+            id: users.id,
+            name: users.name,
+            email: users.email
+        }).from(users);
+        return results;
+    } catch (error) {
+        console.error('Get users error:', error);
+        return [];
+    }
+}

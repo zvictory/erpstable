@@ -39,7 +39,7 @@ export default function StockSidebar({ stock, uomName }: StockSidebarProps) {
             <div>
                 <div className="text-slate-400 text-xs mb-1">Total Value</div>
                 <div className="text-xl font-bold text-emerald-400">
-                    {formatNumber(stock.totalValue / 100)} UZS
+                    {formatNumber(stock.totalValue / 100)} сўм
                 </div>
             </div>
 

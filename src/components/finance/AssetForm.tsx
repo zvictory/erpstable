@@ -86,7 +86,7 @@ export function AssetForm({ assetId, initialData, onClose, onSuccess }: AssetFor
         setError(null);
 
         try {
-            // Convert UZS to Tiyin
+            // Convert сўм to Tiyin
             const payload = {
                 ...data,
                 cost: Math.round(data.cost * TIYIN_PER_UZS),

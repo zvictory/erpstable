@@ -191,8 +191,8 @@ export default function BillForm({
     return (
         <FormProvider {...methods}>
             <DocumentShell
-                title={mode === 'edit' ? `Редактировать Счет ${methods.watch('refNumber')}` : (methods.watch('refNumber') || "Новый Счет")}
-                status="Черновик"
+                title={mode === 'edit' ? `${t('edit_bill')} ${methods.watch('refNumber')}` : (methods.watch('refNumber') || t('new_bill'))}
+                status={t('fields.draft')}
                 onSave={handleSubmit(onSubmit)}
                 onCancel={onCancel}
                 isSaving={isSubmitting}
@@ -202,9 +202,9 @@ export default function BillForm({
                     {/* Left: Vendor */}
                     <div className="col-span-12 md:col-span-5 space-y-4">
                         <div>
-                            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Поставщик</label>
+                            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{t('fields.vendor')}</label>
                             <div className="text-lg font-bold text-slate-900">
-                                {vendors.find(v => v.id === vendorId)?.name || 'Unknown Vendor'}
+                                {vendors.find(v => v.id === vendorId)?.name || t('fields.unknown_vendor')}
                             </div>
                         </div>
                     </div>
@@ -212,7 +212,7 @@ export default function BillForm({
                     {/* Right: Document Details */}
                     <div className="col-span-12 md:col-span-7 grid grid-cols-2 lg:grid-cols-3 gap-6">
                         <div>
-                            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Дата</label>
+                            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{t('fields.date')}</label>
                             <Controller
                                 name="transactionDate"
                                 control={methods.control}
@@ -220,7 +220,7 @@ export default function BillForm({
                                     <DatePicker
                                         value={field.value}
                                         onChange={field.onChange}
-                                        placeholder="дд/мм/гггг"
+                                        placeholder="dd/mm/yyyy"
                                         error={!!errors.transactionDate}
                                         className="font-medium"
                                     />
@@ -228,15 +228,15 @@ export default function BillForm({
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">№ Счета</label>
-                            <Input {...methods.register("refNumber")} placeholder="BILL-XXXX" className="font-medium" />
+                            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{t('fields.bill_number')}</label>
+                            <Input {...methods.register("refNumber")} placeholder={t('fields.invoice_placeholder')} className="font-medium" />
                         </div>
                         <div>
-                            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Условия Оплаты</label>
+                            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{t('fields.payment_terms')}</label>
                             <select {...methods.register("terms")} className="w-full text-sm font-medium bg-transparent border-b border-slate-200 py-1.5 outline-none">
                                 <option value="Net 30">Net 30</option>
                                 <option value="Net 15">Net 15</option>
-                                <option value="Due on Receipt">Due on Receipt</option>
+                                <option value="Due on Receipt">{t('payment_terms_options.due_on_receipt')}</option>
                             </select>
                         </div>
                     </div>
@@ -245,9 +245,9 @@ export default function BillForm({
                 {/* Warehouse / Receiving Section */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 p-4 bg-slate-50 rounded-lg border border-slate-200">
                     <div>
-                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Склад Приемки</label>
+                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{t('fields.warehouse_receiving')}</label>
                         {isLoadingWarehouses ? (
-                            <div className="text-sm text-slate-500">Загрузка...</div>
+                            <div className="text-sm text-slate-500">{t('fields.loading_items')}</div>
                         ) : (
                             <select
                                 value={selectedWarehouseId || ''}
@@ -258,7 +258,7 @@ export default function BillForm({
                                 }}
                                 className="w-full text-sm bg-white border border-slate-200 rounded px-2 py-1"
                             >
-                                <option value="">-- Выберите Склад --</option>
+                                <option value="">{t('fields.select_warehouse')}</option>
                                 {warehousesList.map((wh) => (
                                     <option key={wh.id} value={wh.id}>{wh.code} - {wh.name}</option>
                                 ))}
@@ -266,13 +266,13 @@ export default function BillForm({
                         )}
                     </div>
                     <div>
-                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Ячейка (Опционально)</label>
+                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">{t('fields.bay_optional')}</label>
                         <select
                             {...methods.register('locationId')}
                             disabled={!selectedWarehouseId || locationsList.length === 0}
                             className="w-full text-sm bg-white border border-slate-200 rounded px-2 py-1 disabled:opacity-50"
                         >
-                            <option value="">-- Авто-выбор --</option>
+                            <option value="">{t('fields.auto_select')}</option>
                             {locationsList.map((loc) => (
                                 <option key={loc.id} value={loc.id}>{loc.locationCode}</option>
                             ))}
@@ -283,7 +283,7 @@ export default function BillForm({
                 {/* Items Grid */}
                 <div className="mb-8">
                     {isLoadingItems ? (
-                        <div className="h-32 flex items-center justify-center text-slate-400">Loading items...</div>
+                        <div className="h-32 flex items-center justify-center text-slate-400">{t('fields.loading_items')}</div>
                     ) : (
                         <PurchasingGrid items={availableItems} />
                     )}
@@ -292,18 +292,18 @@ export default function BillForm({
                 {/* Footer / Totals */}
                 <div className="flex flex-col md:flex-row justify-between gap-8 pt-4">
                     <div className="w-full md:w-1/2">
-                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Заметки</label>
+                        <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{t('fields.memo')}</label>
                         <textarea
                             {...methods.register("memo")}
                             className="w-full p-3 bg-slate-50 rounded-lg border border-slate-200 text-sm outline-none placeholder:text-slate-400"
                             rows={3}
-                            placeholder="Добавьте заметку..."
+                            placeholder={t('fields.memo_placeholder')}
                         />
                     </div>
 
                     <div className="w-full md:w-1/3 space-y-3">
                         <div className="flex justify-between text-lg font-bold text-slate-900">
-                            <span>Итого:</span>
+                            <span>{t('fields.total')}:</span>
                             <span>{formatNumber(total)} <span className="text-sm font-normal text-slate-400">UZS</span></span>
                         </div>
                     </div>

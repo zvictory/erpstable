@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 
+// Force dynamic rendering for locale changes
+export const dynamic = 'force-dynamic';
+
 export default async function SettingsPage() {
     const t = await getTranslations('settings');
     return (

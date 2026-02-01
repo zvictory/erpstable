@@ -3,8 +3,57 @@
 import { auth } from '../../../src/auth';
 import { db } from '../../../db';
 import { z } from 'zod';
-import { eq, desc, and, or, gte, lte, isNull } from 'drizzle-orm';
-import { leads, opportunities, customers, invoices } from '../../../db/schema';
+import { eq, desc, asc, and, or, gte, lte, isNull, sql } from 'drizzle-orm';
+
+// ... imports ...
+
+export async function updateDealStage(id: number, stage: string, index?: number) {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error('Unauthorized');
+  }
+
+  const validStage = z.enum(['DISCOVERY', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON', 'CLOSED_LOST']).parse(stage);
+
+  // If index is provided, we need to handle reordering
+  if (typeof index === 'number') {
+    // 1. Shift existing items in the target stage down to make space
+    await db.update(deals)
+      .set({ orderIndex: sql`${deals.orderIndex} + 1` })
+      .where(and(
+        eq(deals.stage, validStage),
+        gte(deals.orderIndex, index)
+      ));
+  }
+
+  const updates: any = {
+    stage: validStage,
+    updatedAt: new Date(),
+  };
+
+  if (typeof index === 'number') {
+    updates.orderIndex = index;
+  }
+
+  // Set closed_at timestamp for closed stages
+  if (validStage === 'CLOSED_WON' || validStage === 'CLOSED_LOST') {
+    updates.closed_at = new Date();
+  } else {
+    // Allow reopening deals
+    updates.closed_at = null;
+  }
+
+  const [updated] = await db.update(deals)
+    .set(updates)
+    .where(eq(deals.id, id))
+    .returning();
+
+  revalidatePath('/sales/pipeline');
+  revalidatePath('/sales/deals');
+  revalidatePath(`/sales/deals/${id}`);
+  return { success: true, data: updated };
+}
+import { leads, deals, customers, invoices, activities } from '../../../db/schema';
 import { revalidatePath } from 'next/cache';
 
 // ============================================================================
@@ -12,14 +61,15 @@ import { revalidatePath } from 'next/cache';
 // ============================================================================
 
 const createLeadSchema = z.object({
-  fullName: z.string().min(1, 'Full name is required'),
-  company: z.string().optional(),
+  contact_name: z.string().min(1, 'Contact name is required'),
+  company_name: z.string().optional(),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   phone: z.string().optional(),
-  source: z.enum(['WEBSITE', 'REFERRAL', 'TRADE_SHOW', 'COLD_CALL', 'PARTNER', 'OTHER']).default('OTHER'),
-  estimatedValue: z.number().int().min(0).default(0),
+  job_title: z.string().optional(),
+  source: z.enum(['WEBSITE', 'REFERRAL', 'TRADE_SHOW', 'COLD_CALL', 'EXHIBITION', 'PARTNER', 'OTHER']).default('OTHER'),
+  estimated_value: z.number().int().min(0).default(0),
   notes: z.string().optional(),
-  assignedToUserId: z.number().int().positive().optional(),
+  owner_id: z.number().int().positive().optional(),
 });
 
 const updateLeadSchema = createLeadSchema.partial().extend({
@@ -45,25 +95,26 @@ const convertLeadToCustomerSchema = z.object({
   }).optional(),
 });
 
-const createOpportunitySchema = z.object({
+const createDealSchema = z.object({
   title: z.string().min(1, 'Title is required'),
-  customerId: z.number().int().positive(),
-  estimatedValue: z.number().int().min(0),
+  customer_id: z.number().int().positive(),
+  value: z.number().int().min(0),
+  currency_code: z.string().default('сўм'),
   probability: z.number().int().min(0).max(100).default(50),
-  expectedCloseDate: z.date().optional(),
+  expected_close_date: z.date().optional(),
   description: z.string().optional(),
-  nextAction: z.string().optional(),
-  assignedToUserId: z.number().int().positive().optional(),
-  leadId: z.number().int().positive().optional(),
+  next_action: z.string().optional(),
+  owner_id: z.number().int().positive().optional(),
+  lead_id: z.number().int().positive().optional(),
 });
 
-const updateOpportunitySchema = createOpportunitySchema.partial().extend({
-  stage: z.enum(['LEAD', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON', 'CLOSED_LOST']).optional(),
-  lostReason: z.string().optional(),
+const updateDealSchema = createDealSchema.partial().extend({
+  stage: z.enum(['DISCOVERY', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON', 'CLOSED_LOST']).optional(),
+  lost_reason: z.string().optional(),
 });
 
-const createQuoteFromOpportunitySchema = z.object({
-  opportunityId: z.number().int().positive(),
+const createQuoteFromDealSchema = z.object({
+  dealId: z.number().int().positive(),
   date: z.date().default(() => new Date()),
   dueDate: z.date(),
   validUntil: z.date(),
@@ -73,6 +124,15 @@ const createQuoteFromOpportunitySchema = z.object({
     quantity: z.number().int().positive(),
     rate: z.number().int().min(0),
   })).min(1, 'At least one line item is required'),
+});
+
+const createActivitySchema = z.object({
+  entity_type: z.enum(['LEAD', 'DEAL', 'CUSTOMER']),
+  entity_id: z.number().int().positive(),
+  type: z.enum(['NOTE', 'CALL', 'EMAIL', 'MEETING', 'TASK']),
+  subject: z.string().optional(),
+  description: z.string().min(1, 'Description is required'),
+  due_date: z.date().optional(),
 });
 
 const convertQuoteToSalesOrderSchema = z.object({
@@ -147,7 +207,7 @@ export async function updateLeadStatus(id: number, status: string) {
 
 export async function getLeads(filters?: {
   status?: string;
-  assignedToUserId?: number;
+  owner_id?: number;
   source?: string;
 }) {
   const session = await auth();
@@ -155,13 +215,13 @@ export async function getLeads(filters?: {
     throw new Error('Unauthorized');
   }
 
-  const conditions = [];
+  const conditions: any[] = [];
 
   if (filters?.status) {
     conditions.push(eq(leads.status, filters.status as any));
   }
-  if (filters?.assignedToUserId) {
-    conditions.push(eq(leads.assignedToUserId, filters.assignedToUserId));
+  if (filters?.owner_id) {
+    conditions.push(eq(leads.owner_id, filters.owner_id));
   }
   if (filters?.source) {
     conditions.push(eq(leads.source, filters.source as any));
@@ -170,14 +230,14 @@ export async function getLeads(filters?: {
   const results = await db.query.leads.findMany({
     where: conditions.length > 0 ? and(...conditions) : undefined,
     with: {
-      assignedToUser: {
+      owner: {
         columns: {
           id: true,
           name: true,
           email: true,
         },
       },
-      convertedToCustomer: {
+      convertedCustomer: {
         columns: {
           id: true,
           name: true,
@@ -199,15 +259,15 @@ export async function getLead(id: number) {
   const lead = await db.query.leads.findFirst({
     where: eq(leads.id, id),
     with: {
-      assignedToUser: {
+      owner: {
         columns: {
           id: true,
           name: true,
           email: true,
         },
       },
-      convertedToCustomer: true,
-      opportunities: true,
+      convertedCustomer: true,
+      deals: true,
     },
   });
 
@@ -215,7 +275,27 @@ export async function getLead(id: number) {
     throw new Error('Lead not found');
   }
 
-  return lead;
+  // Fetch activities separately since it's a polymorphic relation
+  const leadActivities = await db.query.activities.findMany({
+    where: and(
+      eq(activities.entity_type, 'LEAD'),
+      eq(activities.entity_id, id)
+    ),
+    with: {
+      performedByUser: {
+        columns: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: desc(activities.performed_at),
+  });
+
+  return {
+    ...lead,
+    activities: leadActivities,
+  };
 }
 
 // ============================================================================
@@ -253,35 +333,49 @@ export async function convertLeadToCustomer(input: unknown) {
   const [updatedLead] = await db.update(leads)
     .set({
       status: 'CONVERTED',
-      convertedToCustomerId: newCustomer.id,
-      convertedAt: new Date(),
+      is_converted: true,
+      converted_customer_id: newCustomer.id,
+      converted_at: new Date(),
       updatedAt: new Date(),
     })
     .where(eq(leads.id, validated.leadId))
     .returning();
 
-  // 3. Optionally create opportunity
-  let newOpportunity = null;
+  // 3. Optionally create deal
+  let newDeal = null;
   if (validated.createOpportunity && validated.opportunityData) {
-    [newOpportunity] = await db.insert(opportunities).values({
+    [newDeal] = await db.insert(deals).values({
       title: validated.opportunityData.title,
-      customerId: newCustomer.id,
-      estimatedValue: validated.opportunityData.estimatedValue,
+      customer_id: newCustomer.id,
+      value: validated.opportunityData.estimatedValue,
+      currency_code: 'сўм',
       probability: validated.opportunityData.probability,
       description: validated.opportunityData.description,
-      stage: 'QUALIFIED',
-      leadId: validated.leadId,
+      stage: 'DISCOVERY',
+      lead_id: validated.leadId,
       createdAt: new Date(),
       updatedAt: new Date(),
     }).returning();
   }
 
+  // 4. Log activity
+  await db.insert(activities).values({
+    entity_type: 'LEAD',
+    entity_id: validated.leadId,
+    type: 'NOTE',
+    description: `Lead converted to customer: ${newCustomer.name}${newDeal ? `. Deal created: ${newDeal.title}` : ''}`,
+    performed_by: parseInt(session.user.id!),
+    performed_at: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
   revalidatePath('/sales/leads');
   revalidatePath(`/sales/leads/${validated.leadId}`);
   revalidatePath('/sales/customers');
-  if (newOpportunity) {
+  if (newDeal) {
     revalidatePath('/sales/pipeline');
-    revalidatePath('/sales/opportunities');
+    revalidatePath('/sales/deals');
   }
 
   return {
@@ -289,26 +383,26 @@ export async function convertLeadToCustomer(input: unknown) {
     data: {
       customer: newCustomer,
       lead: updatedLead,
-      opportunity: newOpportunity,
+      deal: newDeal,
     },
   };
 }
 
-export async function createQuoteFromOpportunity(input: unknown) {
+export async function createQuoteFromDeal(input: unknown) {
   const session = await auth();
   if (!session?.user) {
     throw new Error('Unauthorized');
   }
 
-  const validated = createQuoteFromOpportunitySchema.parse(input);
+  const validated = createQuoteFromDealSchema.parse(input);
 
-  // Get opportunity
-  const opportunity = await db.query.opportunities.findFirst({
-    where: eq(opportunities.id, validated.opportunityId),
+  // Get deal
+  const deal = await db.query.deals.findFirst({
+    where: eq(deals.id, validated.dealId),
   });
 
-  if (!opportunity) {
-    throw new Error('Opportunity not found');
+  if (!deal) {
+    throw new Error('Deal not found');
   }
 
   // Generate quote number
@@ -316,13 +410,13 @@ export async function createQuoteFromOpportunity(input: unknown) {
   const quoteNumber = `QUOTE-${String(quoteCount.length + 1).padStart(5, '0')}`;
 
   // Calculate totals
-  const subtotal = validated.lines.reduce((sum, line) => sum + (line.quantity * line.rate), 0);
+  const subtotal = validated.lines.reduce((sum: number, line: any) => sum + (line.quantity * line.rate), 0);
 
   // Create quote invoice
   const [quote] = await db.insert(invoices).values({
     type: 'QUOTE',
-    customerId: opportunity.customerId,
-    opportunityId: validated.opportunityId,
+    customerId: deal.customer_id,
+    deal_id: validated.dealId,
     invoiceNumber: quoteNumber,
     date: validated.date,
     dueDate: validated.dueDate,
@@ -339,18 +433,18 @@ export async function createQuoteFromOpportunity(input: unknown) {
   // Create quote lines
   // Note: invoiceLines insert would go here - simplified for now
 
-  // Update opportunity
-  await db.update(opportunities)
+  // Update deal
+  await db.update(deals)
     .set({
-      quoteId: quote.id,
+      quote_id: quote.id,
       stage: 'PROPOSAL',
       updatedAt: new Date(),
     })
-    .where(eq(opportunities.id, validated.opportunityId));
+    .where(eq(deals.id, validated.dealId));
 
   revalidatePath('/sales/pipeline');
   revalidatePath('/sales/quotes');
-  revalidatePath(`/sales/opportunities/${validated.opportunityId}`);
+  revalidatePath(`/sales/deals/${validated.dealId}`);
 
   return { success: true, data: quote };
 }
@@ -386,7 +480,7 @@ export async function convertQuoteToSalesOrder(input: unknown) {
   const [salesOrder] = await db.insert(invoices).values({
     type: 'SALES_ORDER',
     customerId: quote.customerId,
-    opportunityId: quote.opportunityId,
+    deal_id: quote.deal_id,
     convertedFromQuoteId: quote.id,
     invoiceNumber: soNumber,
     date: validated.salesOrderDate,
@@ -411,108 +505,149 @@ export async function convertQuoteToSalesOrder(input: unknown) {
     })
     .where(eq(invoices.id, validated.quoteId));
 
-  // Update opportunity
-  if (quote.opportunityId) {
-    await db.update(opportunities)
+  // Update deal
+  if (quote.deal_id) {
+    await db.update(deals)
       .set({
-        salesOrderId: salesOrder.id,
+        sales_order_id: salesOrder.id,
         stage: 'CLOSED_WON',
-        closedAt: new Date(),
+        closed_at: new Date(),
         updatedAt: new Date(),
       })
-      .where(eq(opportunities.id, quote.opportunityId));
+      .where(eq(deals.id, quote.deal_id));
   }
 
   revalidatePath('/sales/pipeline');
   revalidatePath('/sales/quotes');
   revalidatePath(`/sales/quotes/${validated.quoteId}`);
-  if (quote.opportunityId) {
-    revalidatePath(`/sales/opportunities/${quote.opportunityId}`);
+  if (quote.deal_id) {
+    revalidatePath(`/sales/deals/${quote.deal_id}`);
   }
 
   return { success: true, data: salesOrder };
 }
 
 // ============================================================================
-// OPPORTUNITY ACTIONS
+// DEAL ACTIONS
 // ============================================================================
 
-export async function createOpportunity(input: unknown) {
+export async function createDeal(input: unknown) {
   const session = await auth();
   if (!session?.user) {
     throw new Error('Unauthorized');
   }
 
-  const validated = createOpportunitySchema.parse(input);
+  const validated = createDealSchema.parse(input);
 
-  const [newOpportunity] = await db.insert(opportunities).values({
+  const [newDeal] = await db.insert(deals).values({
     ...validated,
-    stage: 'LEAD',
+    stage: 'DISCOVERY',
     createdAt: new Date(),
     updatedAt: new Date(),
   }).returning();
 
   revalidatePath('/sales/pipeline');
-  revalidatePath('/sales/opportunities');
-  return { success: true, data: newOpportunity };
+  revalidatePath('/sales/deals');
+  return { success: true, data: newDeal };
 }
 
-export async function updateOpportunity(id: number, input: unknown) {
+export async function updateDeal(id: number, input: unknown) {
   const session = await auth();
   if (!session?.user) {
     throw new Error('Unauthorized');
   }
 
-  const validated = updateOpportunitySchema.parse(input);
+  const validated = updateDealSchema.parse(input);
 
-  const [updated] = await db.update(opportunities)
+  const [updated] = await db.update(deals)
     .set({
       ...validated,
       updatedAt: new Date(),
     })
-    .where(eq(opportunities.id, id))
+    .where(eq(deals.id, id))
     .returning();
 
   revalidatePath('/sales/pipeline');
-  revalidatePath('/sales/opportunities');
-  revalidatePath(`/sales/opportunities/${id}`);
+  revalidatePath('/sales/deals');
+  revalidatePath(`/sales/deals/${id}`);
   return { success: true, data: updated };
 }
 
-export async function updateOpportunityStage(id: number, stage: string) {
-  const session = await auth();
-  if (!session?.user) {
-    throw new Error('Unauthorized');
-  }
+// Old updateDealStage removed (replaced at top of file)
 
-  const validStage = z.enum(['LEAD', 'QUALIFIED', 'PROPOSAL', 'NEGOTIATION', 'CLOSED_WON', 'CLOSED_LOST']).parse(stage);
-
-  const updates: any = {
-    stage: validStage,
-    updatedAt: new Date(),
-  };
-
-  // Set closedAt timestamp for closed stages
-  if (validStage === 'CLOSED_WON' || validStage === 'CLOSED_LOST') {
-    updates.closedAt = new Date();
-  }
-
-  const [updated] = await db.update(opportunities)
-    .set(updates)
-    .where(eq(opportunities.id, id))
-    .returning();
-
-  revalidatePath('/sales/pipeline');
-  revalidatePath('/sales/opportunities');
-  revalidatePath(`/sales/opportunities/${id}`);
-  return { success: true, data: updated };
-}
-
-export async function getOpportunities(filters?: {
+export async function getDeals(filters?: {
   stage?: string;
-  customerId?: number;
-  assignedToUserId?: number;
-}) {
+  customer_id?: number;
+  owner_id?: number;
+}): Promise<Array<{
+  id: number;
+  title: string;
+  value: number;
+  probability: number;
+  stage: string;
+  customer_id: number;
+  description: string | null;
+  next_action: string | null;
+  expected_close_date: Date | null;
+  closed_at: Date | null;
+  lost_reason: string | null;
+  owner_id: number | null;
+  lead_id: number | null;
+  quote_id: number | null;
+  sales_order_id: number | null;
+  currency_code: string;
+  createdAt: Date;
+  updatedAt: Date;
+  customer: {
+    id: number;
+    name: string;
+    taxId: string | null;
+    email: string | null;
+    phone: string | null;
+    address: string | null;
+    creditLimit: number;
+    paymentTerms: string;
+    currency: string;
+    status: string;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  owner?: {
+    id: number;
+    name: string;
+    email: string;
+  } | null;
+  lead?: {
+    id: number;
+    contact_name: string;
+  } | null;
+  quote?: {
+    id: number;
+    invoiceNumber: string;
+  } | null;
+  salesOrder?: {
+    id: number;
+    invoiceNumber: string;
+  } | null;
+  activities: Array<{
+    id: number;
+    entity_type: string;
+    entity_id: number;
+    type: string;
+    subject: string | null;
+    description: string;
+    performed_at: Date;
+    performed_by: number | null;
+    due_date: Date | null;
+    completed: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    performedByUser?: {
+      id: number;
+      name: string;
+    } | null;
+  }>;
+}>> {
   const session = await auth();
   if (!session?.user) {
     throw new Error('Unauthorized');
@@ -521,20 +656,20 @@ export async function getOpportunities(filters?: {
   const conditions = [];
 
   if (filters?.stage) {
-    conditions.push(eq(opportunities.stage, filters.stage as any));
+    conditions.push(eq(deals.stage, filters.stage as any));
   }
-  if (filters?.customerId) {
-    conditions.push(eq(opportunities.customerId, filters.customerId));
+  if (filters?.customer_id) {
+    conditions.push(eq(deals.customer_id, filters.customer_id));
   }
-  if (filters?.assignedToUserId) {
-    conditions.push(eq(opportunities.assignedToUserId, filters.assignedToUserId));
+  if (filters?.owner_id) {
+    conditions.push(eq(deals.owner_id, filters.owner_id));
   }
 
-  const results = await db.query.opportunities.findMany({
+  const results = await db.query.deals.findMany({
     where: conditions.length > 0 ? and(...conditions) : undefined,
     with: {
       customer: true,
-      assignedToUser: {
+      owner: {
         columns: {
           id: true,
           name: true,
@@ -544,7 +679,7 @@ export async function getOpportunities(filters?: {
       lead: {
         columns: {
           id: true,
-          fullName: true,
+          contact_name: true,
         },
       },
       quote: {
@@ -560,23 +695,25 @@ export async function getOpportunities(filters?: {
         },
       },
     },
-    orderBy: desc(opportunities.createdAt),
+    orderBy: [asc(deals.orderIndex), desc(deals.createdAt)],
   });
 
-  return results;
+  // Note: activities relation is polymorphic and not included here
+  // If needed, fetch separately using entity_type='DEAL' and entity_id
+  return results as any;
 }
 
-export async function getOpportunity(id: number) {
+export async function getDeal(id: number) {
   const session = await auth();
   if (!session?.user) {
     throw new Error('Unauthorized');
   }
 
-  const opportunity = await db.query.opportunities.findFirst({
-    where: eq(opportunities.id, id),
+  const deal = await db.query.deals.findFirst({
+    where: eq(deals.id, id),
     with: {
       customer: true,
-      assignedToUser: {
+      owner: {
         columns: {
           id: true,
           name: true,
@@ -589,11 +726,31 @@ export async function getOpportunity(id: number) {
     },
   });
 
-  if (!opportunity) {
-    throw new Error('Opportunity not found');
+  if (!deal) {
+    throw new Error('Deal not found');
   }
 
-  return opportunity;
+  // Fetch activities separately since it's a polymorphic relation
+  const dealActivities = await db.query.activities.findMany({
+    where: and(
+      eq(activities.entity_type, 'DEAL'),
+      eq(activities.entity_id, id)
+    ),
+    with: {
+      performedByUser: {
+        columns: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: desc(activities.performed_at),
+  });
+
+  return {
+    ...deal,
+    activities: dealActivities,
+  };
 }
 
 export async function getPipelineStats() {
@@ -602,50 +759,161 @@ export async function getPipelineStats() {
     throw new Error('Unauthorized');
   }
 
-  // Get all open opportunities
-  const openOpportunities = await db.query.opportunities.findMany({
+  // Get all open deals
+  const openDeals = await db.query.deals.findMany({
     where: and(
       or(
-        eq(opportunities.stage, 'LEAD'),
-        eq(opportunities.stage, 'QUALIFIED'),
-        eq(opportunities.stage, 'PROPOSAL'),
-        eq(opportunities.stage, 'NEGOTIATION')
+        eq(deals.stage, 'DISCOVERY'),
+        eq(deals.stage, 'PROPOSAL'),
+        eq(deals.stage, 'NEGOTIATION')
       )
     ),
   });
 
   // Calculate stats
-  const totalValue = openOpportunities.reduce((sum, opp) => sum + opp.estimatedValue, 0);
-  const weightedValue = openOpportunities.reduce((sum, opp) => sum + (opp.estimatedValue * opp.probability / 100), 0);
-  const opportunityCount = openOpportunities.length;
+  const totalValue = openDeals.reduce((sum: number, deal: any) => sum + deal.value, 0);
+  const weightedValue = openDeals.reduce((sum: number, deal: any) => sum + (deal.value * deal.probability / 100), 0);
+  const dealCount = openDeals.length;
 
-  // Get closed opportunities for win rate
-  const closedOpportunities = await db.query.opportunities.findMany({
+  // Get closed deals for win rate
+  const closedDeals = await db.query.deals.findMany({
     where: or(
-      eq(opportunities.stage, 'CLOSED_WON'),
-      eq(opportunities.stage, 'CLOSED_LOST')
+      eq(deals.stage, 'CLOSED_WON'),
+      eq(deals.stage, 'CLOSED_LOST')
     ),
   });
 
-  const wonCount = closedOpportunities.filter(opp => opp.stage === 'CLOSED_WON').length;
-  const lostCount = closedOpportunities.filter(opp => opp.stage === 'CLOSED_LOST').length;
-  const winRate = closedOpportunities.length > 0 ? (wonCount / closedOpportunities.length) * 100 : 0;
+  const wonCount = closedDeals.filter((deal: any) => deal.stage === 'CLOSED_WON').length;
+  const lostCount = closedDeals.filter((deal: any) => deal.stage === 'CLOSED_LOST').length;
+  const winRate = closedDeals.length > 0 ? (wonCount / closedDeals.length) * 100 : 0;
 
   // Stage breakdown
   const stageBreakdown = {
-    LEAD: openOpportunities.filter(o => o.stage === 'LEAD').length,
-    QUALIFIED: openOpportunities.filter(o => o.stage === 'QUALIFIED').length,
-    PROPOSAL: openOpportunities.filter(o => o.stage === 'PROPOSAL').length,
-    NEGOTIATION: openOpportunities.filter(o => o.stage === 'NEGOTIATION').length,
+    DISCOVERY: openDeals.filter((d: any) => d.stage === 'DISCOVERY').length,
+    PROPOSAL: openDeals.filter((d: any) => d.stage === 'PROPOSAL').length,
+    NEGOTIATION: openDeals.filter((d: any) => d.stage === 'NEGOTIATION').length,
   };
 
   return {
     totalValue,
     weightedValue,
-    opportunityCount,
+    dealCount,
     winRate,
     wonCount,
     lostCount,
     stageBreakdown,
   };
+}
+
+// ============================================================================
+// ACTIVITY ACTIONS
+// ============================================================================
+
+export async function createActivity(input: unknown) {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error('Unauthorized');
+  }
+
+  const validated = createActivitySchema.parse(input);
+
+  const [newActivity] = await db.insert(activities).values({
+    ...validated,
+    performed_by: parseInt(session.user.id!),
+    performed_at: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }).returning();
+
+  // Revalidate based on entity type
+  if (validated.entity_type === 'LEAD') {
+    revalidatePath(`/sales/leads/${validated.entity_id}`);
+  } else if (validated.entity_type === 'DEAL') {
+    revalidatePath(`/sales/deals/${validated.entity_id}`);
+  } else if (validated.entity_type === 'CUSTOMER') {
+    revalidatePath(`/sales/customers/${validated.entity_id}`);
+  }
+
+  return { success: true, data: newActivity };
+}
+
+export async function getActivities(entityType: string, entityId: number) {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error('Unauthorized');
+  }
+
+  const results = await db.query.activities.findMany({
+    where: and(
+      eq(activities.entity_type, entityType as any),
+      eq(activities.entity_id, entityId)
+    ),
+    with: {
+      performedByUser: {
+        columns: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+    orderBy: desc(activities.performed_at),
+  });
+
+  return results;
+}
+
+export async function completeActivity(id: number) {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error('Unauthorized');
+  }
+
+  const [updated] = await db.update(activities)
+    .set({
+      completed_at: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(activities.id, id))
+    .returning();
+
+  // Revalidate based on entity type
+  if (updated.entity_type === 'LEAD') {
+    revalidatePath(`/sales/leads/${updated.entity_id}`);
+  } else if (updated.entity_type === 'DEAL') {
+    revalidatePath(`/sales/deals/${updated.entity_id}`);
+  } else if (updated.entity_type === 'CUSTOMER') {
+    revalidatePath(`/sales/customers/${updated.entity_id}`);
+  }
+
+  return { success: true, data: updated };
+}
+
+export async function deleteActivity(id: number) {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error('Unauthorized');
+  }
+
+  // Get activity first to know which page to revalidate
+  const activity = await db.query.activities.findFirst({
+    where: eq(activities.id, id),
+  });
+
+  if (!activity) {
+    throw new Error('Activity not found');
+  }
+
+  await db.delete(activities).where(eq(activities.id, id));
+
+  // Revalidate based on entity type
+  if (activity.entity_type === 'LEAD') {
+    revalidatePath(`/sales/leads/${activity.entity_id}`);
+  } else if (activity.entity_type === 'DEAL') {
+    revalidatePath(`/sales/deals/${activity.entity_id}`);
+  } else if (activity.entity_type === 'CUSTOMER') {
+    revalidatePath(`/sales/customers/${activity.entity_id}`);
+  }
+
+  return { success: true };
 }

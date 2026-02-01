@@ -94,12 +94,12 @@ export async function getItems({
             sortOrder === 'asc'
                 ? sortBy === 'name' ? asc(items.name)
                     : sortBy === 'qtyOnHand' ? asc(qtyOnHandSubquery)
-                    : sortBy === 'salesPrice' ? asc(items.salesPrice)
-                    : asc(items.createdAt)
+                        : sortBy === 'salesPrice' ? asc(items.salesPrice)
+                            : asc(items.createdAt)
                 : sortBy === 'name' ? desc(items.name)
                     : sortBy === 'qtyOnHand' ? desc(qtyOnHandSubquery)
-                    : sortBy === 'salesPrice' ? desc(items.salesPrice)
-                    : desc(items.createdAt)
+                        : sortBy === 'salesPrice' ? desc(items.salesPrice)
+                            : desc(items.createdAt)
         );
 
     return data;
@@ -151,20 +151,39 @@ export async function getItem(id: number) {
     };
 }
 
+// Input validation schema for creating items
+const createItemSchema = z.object({
+    name: z.string().min(1, "Item name is required"),
+    categoryId: z.coerce.number().min(1, "Category is required"),
+    baseUomId: z.coerce.number().min(1, "Base unit of measure is required"),
+    type: z.enum(['INVENTORY', 'SERVICE', 'NON_INVENTORY']).default('INVENTORY'),
+    sku: z.string().optional(),
+    description: z.string().optional(),
+    salesPrice: z.coerce.number().min(0).optional(),
+    standardCost: z.coerce.number().min(0).optional(),
+    purchaseUomId: z.coerce.number().optional(),
+    incomeAccountId: z.coerce.number().optional(),
+    expenseAccountId: z.coerce.number().optional(),
+    assetAccountId: z.coerce.number().optional(),
+});
+
 export async function createItem(data: any) {
     try {
+        // Validate input first
+        const validated = createItemSchema.parse(data);
+
         // Auto-generate unique SKU if not provided or empty
-        if (!data.sku || data.sku.trim() === '') {
+        if (!validated.sku || validated.sku.trim() === '') {
             // Generate SKU based on item name and timestamp
-            const skuBase = data.name
+            const skuBase = validated.name
                 .substring(0, 3)
                 .toUpperCase()
                 .replace(/[^A-Z0-9]/g, '');
             const timestamp = Date.now().toString().slice(-6);
-            data.sku = `${skuBase || 'ITM'}-${timestamp}`;
+            validated.sku = `${skuBase || 'ITM'}-${timestamp}`;
         }
 
-        const [newItem] = await db.insert(items).values(data).returning();
+        const [newItem] = await db.insert(items).values(validated).returning();
         try { revalidatePath('/inventory/items'); } catch (e) { }
         return { success: true, item: newItem };
     } catch (error) {
@@ -185,7 +204,7 @@ export async function createAssembly(itemData: any, bomLines: { componentItemId:
             itemData.sku = `${skuBase || 'ASM'}-${timestamp}`;
         }
 
-        await db.transaction(async (tx) => {
+        await db.transaction(async (tx: any) => {
             const [item] = await tx.insert(items).values({
                 ...itemData,
                 type: 'Assembly'
@@ -269,6 +288,7 @@ export async function getItemCenterDataV2(selectedId?: number) {
             salesPrice: items.salesPrice,
             status: items.status,
             qtyOnHand: sql<number>`COALESCE((SELECT SUM(remaining_qty) FROM inventory_layers WHERE item_id = ${items.id} AND is_depleted = 0), 0)`,
+            qtyAvailable: sql<number>`COALESCE((SELECT SUM(remaining_qty) FROM inventory_layers WHERE item_id = ${items.id} AND is_depleted = 0 AND (qc_status = 'APPROVED' OR qc_status = 'NOT_REQUIRED')), 0)`,
             totalValue: sql<number>`COALESCE((SELECT SUM(remaining_qty * unit_cost) FROM inventory_layers WHERE item_id = ${items.id} AND is_depleted = 0), 0)`,
         })
             .from(items)
@@ -285,10 +305,10 @@ export async function getItemCenterDataV2(selectedId?: number) {
 
         // 2. Group by item class for tabs
         const byClass = {
-            RAW_MATERIAL: itemsWithAvgCost.filter(i => i.itemClass === 'RAW_MATERIAL'),
-            WIP: itemsWithAvgCost.filter(i => i.itemClass === 'WIP'),
-            FINISHED_GOODS: itemsWithAvgCost.filter(i => i.itemClass === 'FINISHED_GOODS'),
-            SERVICE: itemsWithAvgCost.filter(i => i.itemClass === 'SERVICE'),
+            RAW_MATERIAL: itemsWithAvgCost.filter((i: any) => i.itemClass === 'RAW_MATERIAL'),
+            WIP: itemsWithAvgCost.filter((i: any) => i.itemClass === 'WIP'),
+            FINISHED_GOODS: itemsWithAvgCost.filter((i: any) => i.itemClass === 'FINISHED_GOODS'),
+            SERVICE: itemsWithAvgCost.filter((i: any) => i.itemClass === 'SERVICE'),
         };
 
         // 3. Selected item details
@@ -300,9 +320,13 @@ export async function getItemCenterDataV2(selectedId?: number) {
                 const layers = await db.select().from(inventoryLayers)
                     .where(and(eq(inventoryLayers.itemId, selectedId), eq(inventoryLayers.isDepleted, false)));
 
-                const qtyOnHand = layers.reduce((sum, l) => sum + l.remainingQty, 0);
-                const totalValue = layers.reduce((sum, l) => sum + (l.remainingQty * l.unitCost), 0);
-                const lastReceipt = layers.length > 0 ? Math.max(...layers.map(l => new Date(l.receiveDate).getTime())) : null;
+                const qtyOnHand = layers.reduce((sum: number, l: any) => sum + l.remainingQty, 0);
+                const qtyApproved = layers
+                    .filter((l: any) => l.qcStatus === 'APPROVED' || l.qcStatus === 'NOT_REQUIRED')
+                    .reduce((sum: number, l: any) => sum + l.remainingQty, 0);
+
+                const totalValue = layers.reduce((sum: number, l: any) => sum + (l.remainingQty * l.unitCost), 0);
+                const lastReceipt = layers.length > 0 ? Math.max(...layers.map((l: any) => new Date(l.receiveDate).getTime())) : null;
 
                 // Get committed qty from reservations
                 const reservations = await db.select({
@@ -338,7 +362,8 @@ export async function getItemCenterDataV2(selectedId?: number) {
                         qtyOnHand,
                         totalValue,
                         qtyCommitted,
-                        qtyAvailable: qtyOnHand - qtyCommitted,
+                        qtyApproved,
+                        qtyAvailable: qtyApproved - qtyCommitted,
                         avgUnitCost: qtyOnHand > 0 ? Math.round(totalValue / qtyOnHand) : 0,
                         lastReceipt: lastReceipt ? new Date(lastReceipt) : null,
                     }
@@ -589,5 +614,45 @@ export async function getItemHistory(itemId: number): Promise<{
     } catch (error: any) {
         console.error('getItemHistory error:', error);
         return { success: false, purchases: [], sales: [], error: error.message };
+    }
+}
+
+/**
+ * Get or create WIP (Work-In-Progress) item for multi-step production
+ * Automatically creates WIP items with standardized naming
+ */
+export async function getOrCreateWIPItem(
+    tx: any,
+    config: { name: string; stepNumber: number; description?: string }
+) {
+    try {
+        // Try to find existing WIP item
+        let wipItem = tx.select().from(items)
+            .where(
+                and(
+                    eq(items.name, config.name),
+                    eq(items.itemClass, 'WIP')
+                )
+            )
+            .get();
+
+        // Create if doesn't exist
+        if (!wipItem) {
+            const [newItem] = tx.insert(items).values({
+                name: config.name,
+                sku: `WIP-AUTO-${Date.now()}`,
+                itemClass: 'WIP',
+                itemType: 'INVENTORY',
+                description: config.description || `Auto-generated WIP item for production step ${config.stepNumber}`,
+                baseUomId: 12, // Килограмм (kg)
+            }).returning().all();
+
+            wipItem = newItem;
+        }
+
+        return wipItem;
+    } catch (error: any) {
+        console.error('getOrCreateWIPItem error:', error);
+        throw error;
     }
 }

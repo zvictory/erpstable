@@ -152,7 +152,7 @@ export default function CapitalizeAssetModal({
                                 </div>
                                 <div>
                                     <p className="text-xs text-slate-500">Amount</p>
-                                    <p className="font-semibold text-slate-900">{(lineAmount / 100).toLocaleString()} UZS</p>
+                                    <p className="font-semibold text-slate-900">{(lineAmount / 100).toLocaleString()} сўм</p>
                                 </div>
                                 <div>
                                     <p className="text-xs text-slate-500">Bill Date</p>
@@ -341,13 +341,13 @@ export default function CapitalizeAssetModal({
                                         {monthlyDepreciation.toLocaleString()} Tiyin
                                     </p>
                                     <p className="text-xs text-slate-500 mt-1">
-                                        {(monthlyDepreciation / 100).toLocaleString()} UZS
+                                        {(monthlyDepreciation / 100).toLocaleString()} сўм
                                     </p>
                                 </div>
                                 <div>
                                     <p className="text-xs text-slate-500 font-bold uppercase">Book Value (Year 1)</p>
                                     <p className="text-lg font-bold text-slate-900 mt-1">
-                                        {(bookValue / 100).toLocaleString()} UZS
+                                        {(bookValue / 100).toLocaleString()} сўм
                                     </p>
                                 </div>
                                 <div>
@@ -367,11 +367,11 @@ export default function CapitalizeAssetModal({
                                     <span className="text-slate-600">
                                         Dr {form.watch('assetAccountCode')} Asset Account
                                     </span>
-                                    <span className="text-slate-900 font-bold">{(lineAmount / 100).toLocaleString()} UZS</span>
+                                    <span className="text-slate-900 font-bold">{(lineAmount / 100).toLocaleString()} сўм</span>
                                 </div>
                                 <div className="flex justify-between border-t border-amber-300 pt-2 mt-2">
                                     <span className="text-slate-600">Cr 2110 Accrued Expenses</span>
-                                    <span className="text-slate-900 font-bold">{(lineAmount / 100).toLocaleString()} UZS</span>
+                                    <span className="text-slate-900 font-bold">{(lineAmount / 100).toLocaleString()} сўм</span>
                                 </div>
                             </div>
                         </div>

@@ -52,7 +52,7 @@ export async function getItemLocations(itemId: number) {
         asc(inventoryLayers.receiveDate)
       );
 
-    const totalQty = layers.reduce((sum, layer) => sum + layer.remainingQty, 0);
+    const totalQty = layers.reduce((sum: number, layer: any) => sum + layer.remainingQty, 0);
 
     return {
       itemId,
@@ -82,7 +82,7 @@ export async function transferInventoryLocation(data: {
   operatorName?: string;
 }) {
   try {
-    return await db.transaction(async (tx) => {
+    return await db.transaction(async (tx: any) => {
       // 1. Validate source has sufficient qty
       if (data.fromLocationId) {
         const sourceLayer = await tx
@@ -278,7 +278,7 @@ export async function suggestPutawayLocation(
       .limit(3);
 
     if (consolidation.length) {
-      return consolidation.map((c) => c.location);
+      return consolidation.map((c: any) => c.location);
     }
 
     // 3. Find empty locations in preferred zone
@@ -298,7 +298,7 @@ export async function suggestPutawayLocation(
         )
       )
       .limit(3)
-      .then((results) => results.map((r) => r.warehouse_locations));
+      .then((results: any[]) => results.map((r: any) => r.warehouse_locations));
 
     if (empty.length) {
       return empty;
@@ -467,7 +467,7 @@ export async function performStockCount(
   }>
 ) {
   try {
-    return await db.transaction(async (tx) => {
+    return await db.transaction(async (tx: any) => {
       const adjustments: Array<{
         itemId: number;
         expectedQty: number;

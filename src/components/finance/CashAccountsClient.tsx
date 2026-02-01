@@ -72,7 +72,7 @@ export function CashAccountsClient({ accounts, transfers }: CashAccountsClientPr
                         <div>
                             <p className="text-sm text-slate-500">{t('total_balance')}</p>
                             <p className="text-2xl font-bold text-slate-900">
-                                {(totalBalance / 100).toLocaleString()} UZS
+                                {(totalBalance / 100).toLocaleString()} сўм
                             </p>
                         </div>
                     </div>
@@ -197,7 +197,7 @@ export function CashAccountsClient({ accounts, transfers }: CashAccountsClientPr
                                             {transfer.toAccountCode}
                                         </td>
                                         <td className="px-4 py-3 text-sm text-right font-semibold text-slate-900">
-                                            {(transfer.amount / 100).toLocaleString()} UZS
+                                            {(transfer.amount / 100).toLocaleString()} сўм
                                         </td>
                                     </tr>
                                 ))

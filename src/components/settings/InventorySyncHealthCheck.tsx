@@ -89,7 +89,7 @@ export default function InventorySyncHealthCheck() {
                     <div>
                         {itemsOutOfSync > 0
                             ? t('items_need_resync', { needResync: itemsOutOfSync, total: totalItems })
-                            : `Total discrepancy: ${(discrepancyAmount / 100).toLocaleString()} UZS`}
+                            : `Total discrepancy: ${(discrepancyAmount / 100).toLocaleString()} сўм`}
                     </div>
                     <div className="font-medium">
                         {t('use_tools')}

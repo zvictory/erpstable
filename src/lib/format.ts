@@ -51,15 +51,17 @@ export function formatNumber(
 /**
  * Format currency amount (expects value in Tiyin, converts to decimal)
  * @param tiyinAmount - Amount in Tiyin (1/100th of UZS)
- * @param currency - Currency code (default: 'UZS')
- * @returns Formatted string like "288,000 UZS"
+ * @param currency - Currency code (default: 'сўм')
+ * @returns Formatted string like "288,000 сўм"
  */
-export function formatCurrency(tiyinAmount: number, currency: string = 'UZS'): string {
+export function formatCurrency(tiyinAmount: number, currency: string = 'сўм'): string {
     const decimalAmount = tiyinAmount / 100;
+    // Normalize old 'UZS' to 'сўм' for backward compatibility
+    const displayCurrency = currency === 'UZS' ? 'сўм' : currency;
     return formatNumber(decimalAmount, {
         decimals: 0,
         separator: ',',
-        currency
+        currency: displayCurrency
     });
 }
 

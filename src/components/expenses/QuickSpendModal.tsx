@@ -54,7 +54,7 @@ export function QuickSpendModal({
         setError(null);
 
         try {
-            // Convert UZS to Tiyin (multiply by 100)
+            // Convert сўм to Tiyin (multiply by 100)
             const amountInTiyin = Math.round(data.amount * 100);
 
             const result = await quickSpend({
@@ -155,7 +155,7 @@ export function QuickSpendModal({
                                 disabled={isSubmitting}
                             />
                             <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
-                                UZS
+                                сўм
                             </div>
                         </div>
                         {errors.amount && (
