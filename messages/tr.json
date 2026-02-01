@@ -146,659 +146,59 @@
     "tax": "Vergi"
   },
   "purchasing": {
-    "purchase_orders_page": {
-      "title": "Satın Alma Siparişleri",
-      "description": "Siparişleri ve alınan malları takip edin.",
-      "new_order": "Yeni Sipariş",
-      "loading": "Siparişler yükleniyor..."
-    },
-    "bill_approval": {
-      "pending_approval": "Onay bekliyor",
-      "waiting_approval": "Yönetici onayı bekleniyor",
-      "amount_label": "Tutar:",
-      "processing": "İşleniyor...",
-      "approve": "Onayla",
-      "reject": "Reddet",
-      "approved": "Onaylandı",
-      "rejected": "Reddedildi",
-      "rejected_message": "Bu fatura reddedildi ve işlenmeyecek"
-    },
-    "payment_modal": {
-      "title": "Ödeme Kaydet",
-      "paying_bill": "Fatura Ödeme",
-      "to": "için",
-      "amount": "Tutar",
-      "payment_date": "Ödeme Tarihi",
-      "bank_account": "Banka Hesabı",
-      "reference": "Referans",
-      "confirm_payment": "Ödemeyi Onayla"
-    },
-    "bills_page": {
-      "title": "Tedarikçi Faturaları",
-      "coming_soon": "Tedarikçi Faturaları modülü yakında gelecek.",
-      "start_hint": "Satın Alma Siparişleri oluşturarak ve Ürün Alarak başlayın."
-    },
-    "po_detail": {
-      "loading": "Sipariş yükleniyor...",
-      "edit": "Düzenle",
-      "delete": "Sil",
-      "receive_items": "Ürünleri Al",
-      "order_items": "Sipariş Ürünleri",
-      "sku": "SKU",
-      "received": "alındı",
-      "remaining": "kalan",
-      "vendor_details": "Tedarikçi Detayları",
-      "name": "İsim",
-      "email": "Email",
-      "phone": "Telefon",
-      "notes": "Notlar"
-    },
-    "modals": {
-      "delete_po": {
-        "title": "Delete Purchase Order {orderNumber}",
-        "button_confirm": "Delete Purchase Order",
-        "checkbox_label": "I understand the consequences",
-        "warnings": {
-          "open": "You are about to delete an open purchase order. This action cannot be undone.",
-          "received": "⚠️ WARNING: This purchase order has been received.",
-          "received_unusual": "Deleting a received PO is unusual and may indicate:",
-          "received_reasons": {
-            "incorrect": "Receipt was recorded incorrectly",
-            "error": "Order was entered in error",
-            "return": "Items need to be returned"
-          },
-          "received_advice": "If items were received, consider creating a return order instead.",
-          "partial": "⚠️ WARNING: This purchase order has been partially received.",
-          "partial_info": "Deleting will reverse the PO but does NOT reverse item receipts. Consider voiding receipts first if needed."
-        },
-        "details": {
-          "order_number": "Order Number",
-          "amount": "Amount",
-          "status": "Status"
-        },
-        "consequences": {
-          "title": "This will:",
-          "delete_po": "Delete purchase order and all line items",
-          "reverse_gl": "Reverse General Ledger entries",
-          "update_balance": "Update vendor balance"
-        }
-      },
-      "delete_bill": {
-        "title": "Delete Bill {billNumber}",
-        "button_confirm": "Delete Bill",
-        "checkbox_label": "I understand the consequences",
-        "warnings": {
-          "open": "You are about to delete an open (unpaid) bill. This action cannot be undone.",
-          "paid": "⚠️ WARNING: This bill has been marked as PAID.",
-          "paid_unusual": "Deleting a paid bill is unusual and may indicate:",
-          "paid_reasons": {
-            "incorrect": "Payment was recorded incorrectly",
-            "error": "Bill was entered in error",
-            "credit": "Vendor issued a credit"
-          },
-          "paid_advice": "If a payment was actually made, you should void the payment first.",
-          "partial": "⚠️ WARNING: This bill has been partially paid.",
-          "partial_info": "Deleting will reverse the bill but does NOT reverse payments. Consider voiding partial payments first if needed."
-        },
-        "details": {
-          "bill_number": "Bill Number",
-          "amount": "Amount",
-          "status": "Status"
-        },
-        "consequences": {
-          "title": "This will:",
-          "delete_bill": "Delete bill and all line items",
-          "reverse_gl": "Reverse General Ledger entries",
-          "update_balance": "Update vendor balance"
-        }
-      }
+    "nav": {
+      "overview": "Genel Bakış",
+      "vendors": "Tedarikçiler",
+      "purchase_orders": "Satınalma Siparişleri",
+      "bills": "Tedarikçi Faturaları"
     },
     "vendors": {
-      "title": "Vendors",
-      "center_title": "Vendor Center",
-      "filter_placeholder": "Filter Vendors...",
-      "new_vendor": "New Vendor",
-      "no_vendors": "No vendors found",
-      "sidebar_confirm_delete": "Are you sure you want to delete this vendor? This will archive the vendor if they have bills/POs, or permanently delete if not used.",
-      "sidebar_edit_title": "Edit vendor",
-      "sidebar_delete_title": "Delete vendor",
-      "new_vendor_desc": "Add a new vendor to your directory.",
-      "edit_vendor": "Edit Vendor",
-      "edit_vendor_desc": "Update vendor information",
-      "cancel": "Cancel",
-      "select_detail": "Select a vendor to view details",
-      "create_new": "Create New...",
-      "new_bill": "New Bill",
-      "new_po": "New Order",
-      "active_filter": "Active Filter:",
-      "clear_filter": "Clear Filter",
-      "no_transactions": "No transactions found",
-      "manage_contacts": "Manage Contacts",
-      "manage_contacts_desc": "Store contact names, positions, and emails for this vendor.",
-      "add_contact": "Kişi Ekle",
-      "notes_placeholder": "Tedarikçi hakkında notları buraya girin... (örn. nakliye talimatları)",
-      "scoreboard": {
-        "open_pos": "Açık PO'lar",
-        "overdue": "Gecikmiş",
-        "open_bills": "Açık Faturalar",
-        "paid_30_days": "Ödenen (30 Gün)"
-      },
+      "title": "Kontrol Paneli",
+      "select_vendor": "Bir tedarikçi seçin",
+      "select_vendor_hint": "Sol taraftaki listeden bir tedarikçi seçerek işlem geçmişini ve profil ayrıntılarını görün.",
       "list": {
         "title": "Tedarikçiler",
         "new_vendor": "Yeni Tedarikçi",
-        "search_placeholder": "Tedarikçilerde ara",
-        "no_results": "Aramanızla eşleşen tedarikçi bulunamadı",
-        "open_balance": "Açık Bakiye",
-        "no_open_balance": "Açık bakiye yok"
+        "search_placeholder": "Tedarikçileri ara...",
+        "no_results": "Tedarikçi bulunamadı",
+        "open_balance": "Açık bakiye",
+        "no_open_balance": "Kapatıldı"
       },
-      "profile": {
-        "no_vendor_selected": "Tedarikçi seçilmedi",
-        "select_vendor_hint": "İşlem geçmişini ve iletişim bilgilerini görüntülemek için listeden bir tedarikçi seçin.",
-        "edit": "Düzenle",
-        "delete": "Sil",
-        "new_transaction": "Yeni işlem",
-        "no_email": "E-posta eklenmedi",
-        "no_phone": "Telefon eklenmedi",
-        "terms_label": "Şartlar:",
-        "transactions_title": "İşlemler",
-        "total_transactions": "Toplam: {count} işlem",
-        "no_transactions_italic": "Bu tedarikçinin işlem geçmişi bulunmamaktadır.",
-        "delete_title": "Tedarikçiyi Sil?",
-        "delete_desc": "{name} tedarikçisini silmek istediğinizden emin misiniz? Tedarikçinin mevcut işlemleri yoksa bu işlem geri alınamaz.",
-        "open_balance": "Açık Bakiye",
-        "errors": {
-          "failed_to_delete": "Tedarikçi silinemedi",
-          "unexpected": "Beklenmeyen bir hata oluştu"
-        }
-      },
-      "fields": {
-        "vendor_name": "Vendor Name",
-        "tax_id": "Tax ID / INN",
-        "open_balance": "Open Balance",
-        "ytd_volume": "YTD Volume",
-        "last_payment": "Last Payment",
-        "reliability_score": "Reliability Score",
-        "top_tier": "Top Tier",
-        "spending_trend": "Spending Trend (Last 6 Months)",
-        "company_name": "Company Name",
-        "company_name_placeholder": "e.g. Fresh Farms LLC",
-        "tax_id_placeholder": "123456789",
-        "currency": "Currency",
-        "email": "Email",
-        "email_placeholder": "contact@supplier.com",
-        "phone": "Phone",
-        "phone_placeholder": "+998 90 123 45 67",
-        "address": "Address",
-        "address_placeholder": "Full street address...",
-        "payment_terms": "Payment Terms",
-        "payment_terms_placeholder": "Net 30, Net 60, etc."
-      },
-      "currencies": {
-        "uzs": "сўм (Uzbek Som)",
-        "usd": "USD (US Dollar)"
-      },
-      "modal": {
-        "button_cancel": "Cancel",
-        "button_save": "Save Changes",
-        "button_saving": "Saving..."
-      },
-      "tabs": {
-        "transactions": "Transaction List",
-        "contacts": "Contacts",
-        "notes": "Notes"
-      },
-      "table": {
-        "header_name": "Name",
-        "header_contact": "Contact",
-        "header_currency": "Currency",
-        "header_actions": "Actions",
-        "empty_state": "No vendors found. Click 'New Vendor' to create one.",
-        "confirm_delete": "Are you sure you want to delete this vendor?",
-        "toggle_hide_archived": "Hide Archived",
-        "toggle_show_archived": "Show Archived",
-        "button_edit": "Edit vendor",
-        "date": "Date",
-        "type": "Type",
-        "ref": "Ref #",
-        "amount": "Amount",
-        "status": "Status"
-      },
-      "save_vendor": "Save Vendor",
-      "errors": {
-        "name_required": "Name is required",
-        "invalid_email": "Invalid email",
-        "failed_to_create": "Failed to create vendor",
-        "unexpected": "An unexpected error occurred"
-      },
-      "status": {
-        "inactive": "Inactive",
-        "archived": "Archived"
-      },
-      "transaction_types": {
-        "purchase_order": "Purchase Order",
-        "bill": "Bill"
-      },
-      "statuses": {
-        "paid": "Ödendi",
-        "open": "Açık",
-        "partial": "Kısmi",
-        "closed": "Kapalı",
-        "cancelled": "İptal Edildi"
-      },
-      "form": {
-        "vendor_settings": "Tedarikçi Ayarları",
-        "add_new_vendor": "Yeni Tedarikçi Ekle",
-        "configure_vendor_desc": "Tedarikçi kimliğini ve muhasebe şartlarını yapılandırın",
-        "identity": "Kimlik",
-        "display_name": "Görünen Ad",
-        "tax_id_stir": "Vergi No / STIR",
-        "contact_details": "İletişim Bilgileri",
-        "email_address": "E-posta Adresi",
-        "phone_number": "Telefon Numarası",
-        "physical_address": "Fiziksel Adres",
-        "accounting_defaults": "Muhasebe Varsayılanları",
-        "default_terms": "Varsayılan Şartlar",
-        "update_vendor": "Tedarikçiyi Güncelle",
-        "save_vendor": "Tedarikçiyi Kaydet"
-      },
-      "cards": {
-        "document_info": "Doküman Bilgileri",
-        "payment_terms": "Ödeme Şartları"
+      "scoreboard": {
+        "open_pos": "Açık Siparişler",
+        "overdue": "Vadesi Geçmiş Faturalar",
+        "open_bills": "Açık Faturalar",
+        "paid_30_days": "Ödenen (30 gün)"
       }
-    },
-    "purchase_orders": {
-      "table": {
-        "header_po_number": "PO Number",
-        "header_vendor": "Vendor",
-        "header_date": "Date",
-        "header_status": "Status",
-        "header_total": "Total",
-        "header_actions": "Actions",
-        "empty_state": "No purchase orders found."
-      },
-      "form": {
-        "title_new": "New Purchase Order",
-        "description": "Create a new order for a vendor.",
-        "button_cancel": "Cancel",
-        "button_save": "Save Order",
-        "label_vendor": "Vendor",
-        "label_po_number": "PO Number",
-        "label_date": "Date",
-        "placeholder_vendor": "Select Vendor",
-        "placeholder_po_number": "e.g. PO-2024-001",
-        "placeholder_item": "Select Item",
-        "section_items": "Items",
-        "column_item": "Item",
-        "column_qty": "Qty",
-        "column_unit_cost": "Unit Cost (сўм)",
-        "column_total": "Total",
-        "button_add_item": "Add Item Line",
-        "label_total_amount": "Total Amount",
-        "currency": "сўм"
-      }
-    },
-    "bills": {
-      "form": {
-        "loading_items": "Loading items...",
-        "payment_terms": {
-          "due_on_receipt": "Due on Receipt"
-        },
-        "error_items_required": "Please add at least one item with quantity greater than 0",
-        "error_failed": "Failed to save bill",
-        "error_unexpected": "An error occurred while saving the bill"
-      }
-    },
-    "documents": {
-      "new_po": "New Purchase Order",
-      "edit_po": "Edit Purchase Order",
-      "new_receipt": "New Item Receipt",
-      "edit_receipt": "Edit Item Receipt",
-      "new_bill": "New Vendor Bill",
-      "edit_bill": "Edit Vendor Bill",
-      "fields": {
-        "vendor": "Tedarikçi",
-        "date": "Tarih",
-        "type": "Tür",
-        "status": "Durum",
-        "ref_number": "Reference # / Invoice #",
-        "payment_terms": "Payment Terms",
-        "memo": "Memo / Private Notes",
-        "memo_placeholder": "Add a memo for your records...",
-        "subtotal": "Subtotal",
-        "total": "Total",
-        "item": "Item",
-        "description": "Description",
-        "description_placeholder": "Add description...",
-        "qty": "Qty",
-        "rate": "Rate",
-        "amount": "Amount",
-        "add_line": "Add another line",
-        "select_vendor": "Select Vendor...",
-        "select_item": "Kalem Seç...",
-        "loading_items": "Kalemler yükleniyor...",
-        "validation_errors": "Doğrulama hataları:",
-        "invoice_placeholder": "FAT-XXXX",
-        "draft": "Taslak",
-        "bill_number": "Fatura Numarası",
-        "warehouse_receiving": "Mal Kabul Deposu",
-        "select_warehouse": "-- Depo Seç --",
-        "bay_optional": "Raf/Hücre (Opsiyonel)",
-        "auto_select": "-- Otomatik Seç --",
-        "unknown_vendor": "Bilinmeyen Tedarikçi",
-        "total_amount": "Toplam Tutar",
-        "no_label": "No.",
-        "view": "Görüntüle",
-        "edit": "Düzenle",
-        "delete": "Sil",
-        "action": "Eylem"
-      }
-    },
-    "receive_items": {
-      "title": "Receive Items",
-      "po_number": "PO #{number}",
-      "ordered": "Ordered",
-      "received": "Received",
-      "receive_now": "Receive Now",
-      "confirm": "Confirm Receipt",
-      "error_qty": "Please enter quantity to receive for at least one item.",
-      "item": "Item"
-    },
-    "new_bill_placeholder": {
-      "title": "Enter New Bill",
-      "desc": "Record a vendor invoice",
-      "note": "Note: Bill entry logic is currently being finalized. This modal was triggered via deep link!",
-      "vendor": "Vendor",
-      "bill_date": "Bill Date",
-      "save": "Save Bill"
-    },
-    "open_pos": {
-      "title": "Open Purchase Orders",
-      "desc": "Select a PO for {vendor} to auto-fill",
-      "no_pos": "No open purchase orders found for this vendor.",
-      "status_open": "Open",
-      "select": "Select",
-      "skip": "Skip & Create Manually"
     }
   },
   "sales": {
+    "nav": {
+      "overview": "Genel Bakış",
+      "pipeline": "Satış Hunisi",
+      "leads": "Potansiyel Müşteriler",
+      "opportunities": "Fırsatlar",
+      "customers": "Müşteriler",
+      "quotes": "Teklifler",
+      "invoices": "Faturalar",
+      "commissions": "Komisyonlar"
+    },
     "customers": {
-      "title": "Customers",
-      "loading": "Loading customers...",
-      "back_to_dashboard": "Back to Dashboard",
-      "center_title": "Customer Center",
-      "command_center": "Sales Command Center",
-      "dashboard": "Panel",
-      "select_detail": "Bir Müşteri Seçin",
-      "select_customer_hint": "İşlem geçmişini ve profil detaylarını görmek için soldaki listeden bir müşteri seçin.",
-      "search_placeholder": "Müşterileri ara...",
-      "filters": {
-        "all": "All",
-        "open": "Open",
-        "overdue": "Overdue"
-      },
-      "empty_state": "No customers found",
-      "total_count": "Total Count",
-      "status_overdue": "Overdue",
+      "dashboard": "Kontrol Paneli",
+      "select_detail": "Bir müşteri seçin",
+      "select_customer_hint": "Sol taraftaki listeden bir müşteri seçerek işlem geçmişini ve profil ayrıntılarını görün.",
+      "title": "Müşteriler",
       "new_customer": "Yeni Müşteri",
-      "new_customer_title": "Yeni Müşteri",
-      "edit": "Düzenle",
-      "delete": "Delete",
+      "search_placeholder": "Müşterileri ara...",
+      "empty_state": "Müşteri bulunamadı",
+      "outstanding_balance": "Beklemede Olan Bakiye",
+      "no_outstanding_balance": "Beklemede olan bakiye yok",
       "scoreboard": {
         "open_quotes": "Açık Teklifler",
         "unbilled_orders": "Faturalanmamış Siparişler",
-        "overdue_ar": "Gecikmiş Alacaklar",
-        "paid_30_days": "Ödenen (30 Gün)"
-      },
-      "fields": {
-        "credit_limit": "Credit Limit"
-      },
-      "form": {
-        "title_create": "New Customer",
-        "title_edit": "Edit Customer",
-        "company_name": "Company Name",
-        "email": "Email",
-        "phone": "Phone",
-        "address": "Address",
-        "credit_limit": "Credit Limit",
-        "payment_terms": "Payment Terms",
-        "tax_id": "Tax ID",
-        "currency": "Currency",
-        "cancel": "Cancel",
-        "save": "Save Customer",
-        "saving": "Saving..."
+        "overdue_ar": "Vadesi Geçmiş Alacaklar",
+        "paid_30_days": "Ödenen (30 gün)"
       }
-    },
-    "invoice": {
-      "title": "Invoice",
-      "fields": {
-        "bill_to": "Bill To",
-        "ship_to": "Ship To",
-        "subtotal": "Subtotal"
-      }
-    },
-    "invoices": {
-      "new_invoice": "New Invoice",
-      "edit_invoice": "Edit Invoice",
-      "cards": {
-        "document_info": "Invoice Information",
-        "payment_terms": "Payment Terms"
-      },
-      "fields": {
-        "customer": "Customer",
-        "select_customer": "Select customer",
-        "invoice_date": "Invoice Date",
-        "invoice_number": "Invoice #",
-        "due_date": "Due Date",
-        "payment_terms": "Payment Terms",
-        "memo": "Memo"
-      },
-      "payment_terms_options": {
-        "net_30": "Net 30",
-        "net_15": "Net 15",
-        "due_on_receipt": "Due on Receipt"
-      }
-    },
-    "invoice_form": {
-      "title_new": "New Invoice",
-      "button_cancel": "Cancel",
-      "button_save": "Save Invoice",
-      "label_customer_id": "Customer ID",
-      "label_terms": "Terms",
-      "label_invoice_date": "Invoice Date",
-      "label_due_date": "Due Date",
-      "payment_terms": {
-        "net15": "Net 15",
-        "net30": "Net 30",
-        "due_on_receipt": "Due on Receipt"
-      },
-      "column_number": "#",
-      "column_item": "Item",
-      "column_description": "Description",
-      "column_qty": "Qty",
-      "column_rate": "Rate",
-      "column_amount": "Amount",
-      "button_add_line": "Add Line",
-      "placeholder_item": "Select Item...",
-      "placeholder_description": "Desc...",
-      "label_subtotal": "Subtotal",
-      "label_total": "Total",
-      "stock_warning": "Insufficient Stock: {qty} on hand"
-    },
-    "customer_detail": {
-      "empty_state_title": "Pick a Customer",
-      "empty_state_description": "Select a customer from the left list to view their financials and transaction history.",
-      "button_new_invoice": "New Invoice",
-      "button_receive_payment": "Receive Payment",
-      "button_send_statement": "Send Statement",
-      "no_phone": "No phone",
-      "no_email": "No email",
-      "no_tax_id": "No Tax ID",
-      "label_open_balance": "Open Balance",
-      "label_overdue": "Overdue",
-      "label_unused_credits": "Unused Credits",
-      "label_credit_limit": "Credit Limit",
-      "label_open_invoices": "Open Invoices",
-      "sales_trend": "Sales Trend",
-      "collection_title": "Collection Assistant Suggestion",
-      "collection_message": "Account is overdue and hasn't been contacted in {days} days. Time to call for payment.",
-      "button_mark_contacted": "Mark Contacted",
-      "tab_transactions": "Recent Transactions",
-      "tab_contacts": "Contacts",
-      "tab_locations": "Job Locations",
-      "table_header_date": "Date",
-      "table_header_type": "Type",
-      "table_header_number": "Number",
-      "table_header_amount": "Amount",
-      "table_header_status": "Status",
-      "empty_transactions": "No recent transactions for this customer.",
-      "empty_contacts": "Additional contacts for this customer will appear here.",
-      "empty_locations": "Shipping and job site locations will appear here."
-    },
-    "customer_history": {
-      "tab_transactions": "Transactions",
-      "tab_contacts": "Contacts",
-      "tab_locations": "Locations",
-      "filtered_by": "Filtered by",
-      "header_date": "Date",
-      "header_type": "Type",
-      "header_number": "Number",
-      "header_amount": "Amount",
-      "header_status": "Status",
-      "header_actions": "Actions",
-      "action_edit": "Edit",
-      "action_delete": "Delete",
-      "empty_transactions": "No transactions found",
-      "empty_contacts": "No contacts found",
-      "empty_locations": "No locations found"
-    },
-    "estimate": {
-      "title": "Estimate"
-    },
-    "receive_payment": {
-      "title": "Receive Payment"
-    },
-    "modals": {
-      "delete_invoice": {
-        "title": "Delete Invoice {invoiceNumber}",
-        "button_confirm": "Delete Invoice",
-        "checkbox_label": "I understand the consequences",
-        "warnings": {
-          "open": "You are about to delete an open (unpaid) invoice. This action cannot be undone.",
-          "paid": "⚠️ WARNING: This invoice has been marked as PAID.",
-          "paid_unusual": "Deleting a paid invoice is unusual and may indicate:",
-          "paid_reasons": {
-            "incorrect": "Payment was recorded incorrectly",
-            "error": "Invoice was entered in error",
-            "credit": "Customer issued a credit"
-          },
-          "paid_advice": "If a payment was actually received, you should reverse the payment first.",
-          "partial": "⚠️ WARNING: This invoice has been partially paid.",
-          "partial_info": "Deleting will reverse the invoice but does NOT reverse payments. Consider reversing partial payments first if needed."
-        },
-        "details": {
-          "invoice_number": "Invoice Number",
-          "amount": "Amount",
-          "status": "Status"
-        },
-        "consequences": {
-          "title": "Bu işlem:",
-          "delete_invoice": "Faturayı ve tüm satırları sil",
-          "reverse_gl": "Genel Muhasebe kayıtlarını tersine çevir",
-          "restore_inventory": "Envanteri stoğa geri yükle",
-          "update_balance": "Müşteri bakiyesini güncelle"
-        }
-      }
-    },
-    "grid": {
-      "headers": {
-        "item": "Ürün",
-        "description": "Açıklama",
-        "quantity": "Miktar",
-        "uom": "Birim",
-        "unit_price": "Fiyat",
-        "amount": "Tutar",
-        "warehouse": "Depo",
-        "discount_percent": "% İndirim",
-        "tax_rate": "Vergi Oranı"
-      },
-      "placeholders": {
-        "select_item": "Ürün seçin...",
-        "description": "Açıklama...",
-        "select_warehouse": "Depo seçin...",
-        "no_tax": "Vergi Yok"
-      },
-      "add_line": "Satır ekle",
-      "delete_confirmation": {
-        "title": "Satırı sil?",
-        "description": "Bu işlem geri alınamaz."
-      }
-    },
-    "document_form": {
-      "fields": {
-        "customer": "Müşteri",
-        "invoice_date": "Fatura tarihi",
-        "payment_terms": "Ödeme koşulları",
-        "memo": "Not"
-      },
-      "placeholders": {
-        "customer": "Müşteri seçin...",
-        "memo": "Ek bilgi..."
-      },
-      "payment_terms": {
-        "net_30": "Net 30",
-        "net_15": "Net 15",
-        "due_on_receipt": "Teslimatta"
-      }
-    },
-    "stock_validation": {
-      "service_item": "Hizmet (stok gerekmiyor)",
-      "insufficient_stock": "Yetersiz stok",
-      "stock_details": "İstenen: {requested} | Mevcut: {available}",
-      "low_stock_warning": "Düşük stok uyarısı ({available} mevcut, {remaining} kalacak)",
-      "stock_ok": "Stok yeterli ({available} mevcut)"
-    },
-    "picking_locations": {
-      "title": "Toplama Konumları (FIFO Sırası)",
-      "loading": "Toplama konumları yükleniyor...",
-      "warning_title": "Depo Konumları Tam Yapılandırılmamış",
-      "warning_detail": "Ürün #{itemId} için {shortQty} birim daha gerekli.",
-      "warning_explanation": "Ürün depoda var ama konumu atanmamış.",
-      "warning_generic": "Bazı ürünler konumlarına yerleştirilmemiş.",
-      "can_proceed": "✓ Yine de bu faturayı oluşturabilirsiniz",
-      "future_steps_intro": "Toplama konumlarını etkinleştirmek için:",
-      "future_steps": {
-        "receive_inventory": "Ürünleri Fatura/Siparişler üzerinden kabul edin",
-        "use_transfer": "Stok atamak için Transfer kullanın"
-      },
-      "item_label": "Ürün",
-      "unassigned": "ATANMAMIŞ",
-      "batch_label": "Parti",
-      "units": "birim",
-      "no_stock_available": "⚠️ Stok yok"
-    },
-    "pdf": {
-      "companyName": "Stable ERP",
-      "invoice": "FATURA",
-      "invoiceNumber": "Fatura No",
-      "date": "Tarih",
-      "dueDate": "Vade Tarihi",
-      "billTo": "Fatura Edilecek",
-      "taxId": "Vergi No",
-      "phone": "Telefon",
-      "email": "E-posta",
-      "itemColumn": "Ürün",
-      "qtyColumn": "Miktar",
-      "priceColumn": "Fiyat",
-      "amountColumn": "Tutar",
-      "subtotal": "Ara Toplam",
-      "total": "TOPLAM",
-      "bankDetails": "Banka Bilgileri",
-      "bankName": "Banka Adı",
-      "mfo": "MFO",
-      "accountNumber": "Hesap Numarası",
-      "director": "Müdür",
-      "accountant": "Baş Muhasebeci",
-      "signature": "İmza"
     }
   },
   "manufacturing": {
@@ -953,52 +353,15 @@
     }
   },
   "finance": {
-    "coa": {
-      "title": "Hesap Planı",
-      "fields": {
-        "asset": "Varlık",
-        "liability": "Yükümlülük"
-      }
-    },
-    "chartOfAccounts": {
-      "title": "Hesap Planı",
-      "subtitle": "Gerçek zamanlı finansal durum ve hesap bakiyeleri",
-      "loading": "Hesaplar yükleniyor...",
-      "enter_opening_balances": "Açılış Bakiyelerini Girin",
-      "accountTypes": {
-        "asset": "Varlık",
-        "liability": "Yükümlülük",
-        "equity": "Özkaynak",
-        "revenue": "Gelir",
-        "expense": "Gider",
-        "assets": "Varlıklar",
-        "liabilities": "Yükümlülükler",
-        "revenues": "Gelirler",
-        "expenses": "Giderler"
-      },
-      "tableHeaders": {
-        "code": "Kod",
-        "accountName": "Hesap Adı",
-        "balance": "Bakiye (сўм)"
-      },
-      "totalLabel": "Toplam"
-    },
-    "journal_entry": {
-      "title": "Journal Entry",
-      "fields": {
-        "debit": "Debit",
-        "credit": "Credit"
-      }
-    },
-    "gl_impact": {
-      "title": "GL Impact"
-    },
-    "reports": {
-      "title": "Reports",
-      "fields": {
-        "net_profit": "Net Profit",
-        "fiscal_year": "Fiscal Year"
-      }
+    "nav": {
+      "overview": "Genel Bakış",
+      "chart_of_accounts": "Hesap Planı",
+      "general_ledger": "Genel Muhasebe",
+      "cash_accounts": "Nakit Hesapları",
+      "fixed_assets": "Sabit Kıymetler",
+      "expenses": "Giderler",
+      "financial_reports": "Finansal Raporlar",
+      "payroll": "Bordro"
     }
   },
   "inventory": {
@@ -1062,428 +425,435 @@
         "category": "Kategori",
         "none": "Yok",
         "valuation": "Değerleme"
-      }
-    },
-    "reconciliation_page": {
-      "title": "Envanter Mutabakatı",
-      "meta_title": "Envanter Mutabakatı",
-      "description": "Genel Muhasebe (finansal) envanter değerlerini Ürün Defteri (fiziksel) stok değerleri ile karşılaştırın. Muhasebe ve depo verileri arasındaki tutarsızlıkları belirleyin ve çözün."
-    },
-    "category_combobox": {
-      "select_category": "Kategori seçin...",
-      "search_categories": "Kategorileri ara...",
-      "no_categories": "Kategori bulunamadı",
-      "create_new_category": "Yeni Kategori Oluştur"
-    },
-    "data_grid": {
-      "sort": {
-        "name": "Ad",
-        "qty_on_hand": "Eldeki Miktar",
-        "price": "Fiyat",
-        "date_added": "Eklenme Tarihi",
-        "label": "Sırala"
-      }
-    },
-    "table": {
-      "item": "Item",
-      "type": "Type",
-      "on_hand": "On Hand",
-      "price": "Price",
-      "cost": "Cost"
-    },
-    "types": {
-      "inventory": "Inventory",
-      "service": "Service",
-      "assembly": "Assembly",
-      "non_inventory": "Non-Inventory"
-    },
-    "form": {
-      "basic_info": "Basic Information",
-      "financials": "Financials & Inventory",
-      "name": "Item Name",
-      "name_placeholder": "e.g., Red Apple XL",
-      "sku": "SKU / Code",
-      "sku_placeholder": "SKU-001",
-      "description": "Description",
-      "description_placeholder": "Detailed description...",
-      "category": "Category",
-      "select_category": "Select category...",
-      "category_required": "Category is required",
-      "sales_price": "Sales Price (сўм)",
-      "standard_cost": "Standard Cost (сўм)",
-      "reorder_point": "Reorder Point",
-      "base_unit": "Base Unit",
-      "purchase_unit": "Purchase Unit",
-      "select_unit": "Select unit",
-      "active": "Item is Active",
-      "bom": "Bill of Materials (BOM)",
-      "add_component": "Add Component",
-      "select_component": "Select component...",
-      "no_components": "No components added yet.",
-      "save_info": "Changes will reflect in inventory immediately.",
-      "create_title": "Create New Item",
-      "create_desc": "Define your new inventory, service or assembly.",
-      "select_type": "Select Item Type",
-      "select_type_desc": "Pick the kind of item you are creating to see relevant fields.",
-      "inventory_desc": "Storable item with quantity tracking",
-      "service_desc": "Labor or expertise",
-      "assembly_desc": "Assembled from other items"
-    },
-    "actions": {
-      "edit": "Edit",
-      "adjust_qty": "Adjust Qty",
-      "build": "Build",
-      "stock_level": "Stock Level",
-      "reorder_needed": "Reorder Needed",
-      "in_stock": "In Stock",
-      "active": "Active",
-      "inactive": "Inactive",
-      "archived": "Archived",
-      "hide_archived": "Hide Archived",
-      "show_archived": "Show Archived"
-    },
-    "no_items_found": "No items found. Create a new one to get started.",
-    "delete_modal": {
-      "title_check": "Delete Item: {itemName}",
-      "title_confirm": "Confirm Permanent Deletion",
-      "checking_history": "Checking item history...",
-      "no_history_title": "No History Found",
-      "no_history_message": "This item has no transaction history and can be safely deleted.",
-      "button_delete_permanently": "Delete Permanently",
-      "has_history_title": "Item Has Transaction History",
-      "has_history_warning": "This item cannot be safely deleted because it has been used in transactions:",
-      "section_purchasing": "Purchasing History",
-      "count_po_lines": "{count} Purchase Order lines",
-      "count_bill_lines": "{count} Vendor Bill lines",
-      "section_sales": "Sales History",
-      "count_invoice_lines": "{count} Invoice lines",
-      "section_manufacturing": "Manufacturing History",
-      "count_bom_items": "{count} Bill of Materials references",
-      "count_production_inputs": "{count} Production inputs",
-      "count_production_outputs": "{count} Production outputs",
-      "section_inventory": "Inventory History",
-      "count_inventory_layers": "{count} Inventory layers (FIFO costing)",
-      "action_prompt": "What would you like to do?",
-      "button_archive": "Archive Item",
-      "button_archive_desc": "Keep all history (Safe)",
-      "button_clean_delete": "Clean History & Delete",
-      "button_clean_delete_desc": "Permanently delete all data (Dangerous)",
-      "confirm_title": "⚠️ Confirm Permanent Deletion",
-      "confirm_warning": "This will permanently delete:",
-      "confirm_warning_item": "The item: {itemName}",
-      "confirm_warning_history": "ALL transaction history listed above",
-      "confirm_warning_cannot_undo": "This action CANNOT be undone.",
-      "confirm_instruction": "Type DELETE to confirm:",
-      "confirm_placeholder": "Type DELETE",
-      "checkbox_understand": "I understand this action cannot be undone",
-      "button_confirm_delete": "Confirm Permanent Deletion",
-      "deleting": "Deleting...",
-      "archiving": "Archiving...",
-      "success_deleted": "Item permanently deleted",
-      "success_archived": "Item archived (history preserved)",
-      "error_failed": "Failed to delete item"
-    },
-    "history": {
-      "title": "İşlem Geçmişi",
-      "transaction_types": {
-        "bill": "Fatura",
-        "invoice": "Satış Faturası",
-        "production_in": "Üretim Girişi",
-        "production_out": "Üretim Çıkışı",
-        "transfer": "Transfer",
-        "adjustment": "Düzeltme",
-        "sales_return": "Satış İadesi",
-        "purchase_return": "Satın Alma İadesi"
       },
-      "columns": {
-        "date": "Tarih",
-        "type": "Tür",
-        "reference": "Referans",
-        "partner": "İş Ortağı",
-        "location": "Konum",
-        "warehouse": "Depo",
-        "gl_account": "Genel Muhasebe Hesabı",
-        "qty_change": "Miktar Değişimi",
-        "cost_price": "Maliyet/Fiyat",
-        "running_balance": "Kalan Bakiye",
-        "batch": "Parti",
-        "actions": "İşlemler"
+      "reconciliation_page": {
+        "title": "Envanter Mutabakatı",
+        "meta_title": "Envanter Mutabakatı",
+        "description": "Genel Muhasebe (finansal) envanter değerlerini Ürün Defteri (fiziksel) stok değerleri ile karşılaştırın. Muhasebe ve depo verileri arasındaki tutarsızlıkları belirleyin ve çözün."
       },
-      "filters": {
-        "from_date": "Başlangıç Tarihi",
-        "to_date": "Bitiş Tarihi",
-        "movement_type": "Hareket Türü",
-        "all_movements": "Tüm Hareketler",
-        "inbound_only": "Sadece Giriş",
-        "outbound_only": "Sadece Çıkış",
-        "production_only": "Sadece Üretim",
-        "transfers_only": "Sadece Transferler",
-        "adjustments_only": "Sadece Düzeltmeler",
-        "clear_filters": "Filtreleri Temizle"
+      "category_combobox": {
+        "select_category": "Kategori seçin...",
+        "search_categories": "Kategorileri ara...",
+        "no_categories": "Kategori bulunamadı",
+        "create_new_category": "Yeni Kategori Oluştur"
       },
-      "buttons": {
-        "adjust_inventory": "Stok Düzelt",
-        "export_csv": "CSV Olarak Dışa Aktar"
+      "data_grid": {
+        "sort": {
+          "name": "Ad",
+          "qty_on_hand": "Eldeki Miktar",
+          "price": "Fiyat",
+          "date_added": "Eklenme Tarihi",
+          "label": "Sırala"
+        }
       },
-      "adjustment_reasons": {
-        "physical_count": "Fiziksel Sayım",
-        "damage": "Hasar",
-        "obsolete": "Eskimiş",
-        "theft": "Hırsızlık",
-        "correction": "Düzeltme",
-        "other": "Diğer"
-      },
-      "empty_state": "Bu ürün için hareket bulunamadı",
-      "try_adjusting_filters": "Filtreleri ayarlamayı deneyin",
-      "summary": {
-        "total_movements": "Toplam Hareket",
-        "total_in": "Toplam Giriş",
-        "total_out": "Toplam Çıkış",
-        "final_balance": "Son Bakiye"
-      },
-      "tooltips": {
-        "edit": "Düzenle",
-        "delete": "Sil",
-        "view_only": "Sadece Görüntüle"
-      }
-    },
-    "adjustment_modal": {
-      "title": "Stok Düzelt",
-      "adjustment_type": "Düzeltme Türü",
-      "adjustment_type_quantity": "Sadece Miktar",
-      "adjustment_type_cost": "Sadece Maliyet",
-      "adjustment_type_both": "Hem Miktar Hem Maliyet",
-      "quantity_change": "Miktar Değişimi",
-      "quantity_change_help": "Eklemek için pozitif, çıkarmak için negatif sayı girin",
-      "new_unit_cost": "Yeni Birim Maliyeti (сўм)",
-      "new_unit_cost_help": "Bu ürün için yeni birim maliyetini girin",
-      "warehouse": "Depo",
-      "location": "Konum",
-      "reason": "Sebep",
-      "notes": "Notlar (Opsiyonel)",
-      "notes_placeholder": "Bu düzeltme hakkında detay ekleyin...",
-      "current_quantity": "Mevcut Miktar",
-      "current_cost": "Mevcut Birim Maliyeti (сўм)",
-      "new_quantity": "Yeni Miktar",
-      "new_quantity_preview": "Yeni Miktar:",
-      "invalid_negative": "(Geçersiz - negatif olamaz)",
-      "characters_remaining": "karakter",
-      "submit": "Düzeltme Oluştur",
-      "cancel": "İptal",
-      "creating": "Oluşturuluyor...",
-      "error_prefix": "Hata:"
-    },
-    "editor": {
-      "validation": {
-        "name_required": "Ad gereklidir",
-        "category_required": "Kategori gereklidir",
-        "base_uom_required": "Temel ölçü birimi gereklidir"
-      },
-      "header": {
-        "new": "Yeni Ürün",
-        "edit": "Ürünü Düzenle"
-      },
-      "tabs": {
-        "general": "Genel",
-        "accounting": "Muhasebe",
-        "inventory": "Stok",
-        "vendors": "Satıcılar"
-      },
-      "buttons": {
-        "cancel": "İptal",
-        "saving": "Kaydediliyor...",
-        "save": "Kaydet"
-      },
-      "alerts": {
-        "error": "Kaydetme başarısız oldu"
-      },
-      "form": {
-        "name_label": "Ad *",
-        "sku_label": "SKU",
-        "barcode_label": "Barkod",
-        "item_class_label": "Ürün Sınıfı *",
-        "item_class_options": {
-          "raw_material": "Ham Madde",
-          "wip": "Devam Eden Üretim",
-          "finished_goods": "Bitmiş Mal",
-          "service": "Hizmet"
-        },
-        "category_label": "Kategori *",
-        "category_placeholder": "Seçiniz...",
-        "description_label": "Açıklama",
-        "valuation_label": "Değerleme Yöntemi",
-        "valuation_options": {
-          "fifo": "FIFO (İlk Giren, İlk Çıkan)",
-          "weighted_avg": "Ağırlıklı Ortalama",
-          "standard": "Standart Maliyet"
-        },
-        "valuation_warning": "Değiştirilemez - stok işlemleri mevcuttur",
-        "gl_section": "Genel Muhasebe Hesap Eşleştirmesi",
-        "inventory_asset_label": "Stok Varlığı Hesabı",
-        "inventory_asset_default": "Varsayılan",
-        "income_label": "Gelir Hesabı",
-        "income_default": "Varsayılan",
-        "cogs_label": "COGS / Gider Hesabı",
-        "cogs_default": "Varsayılan",
-        "base_uom_label": "Temel Ölçü Birimi *",
-        "base_uom_placeholder": "Seçiniz...",
-        "purchase_uom_label": "Satın Alma Ölçü Birimi",
-        "purchase_uom_default": "Temel ile Aynı",
-        "conversion_label": "Dönüştürme Faktörü (1 Satın Alma ÖB = X Temel ÖB)",
-        "conversion_hint": "örneğin, 1 Koli = 20 kg ise 20 girin (faktör * 100 olarak depolanır)",
-        "standard_cost_label": "Standart Maliyet",
-        "sales_price_label": "Satış Fiyatı",
-        "reorder_point_label": "Yeniden Sipariş Noktası",
-        "safety_stock_label": "Emniyet Stoğu",
-        "preferred_vendor_label": "Tercih Edilen Satıcı",
-        "preferred_vendor_default": "Hiçbiri",
-        "preferred_vendor_hint": "Otomatik PO oluşturma için kullanılır"
-      }
-    },
-    "item_list": {
-      "no_sku_display": "SKU yok",
-      "badges": {
-        "out_of_stock": "Stokta yok",
-        "low_stock": "Düşük"
-      },
-      "avg_cost_label": "Ort. Maliyet:"
-    },
-    "item_profile": {
-      "errors": {
-        "unexpected": "Beklenmeyen bir hata oluştu"
-      },
-      "sections": {
-        "classification": "Sınıflandırma",
-        "unit_of_measure": "Ölçü Birimi",
-        "pricing": "Fiyatlandırma & Değerleme",
-        "gl_accounts": "Genel Muhasebe Hesapları",
-        "inventory_settings": "Stok Ayarları",
-        "stock_on_hand": "Eldeki Stok Miktarı",
-        "total_value": "Toplam Değer"
-      },
-      "labels": {
-        "category": "kategori",
-        "purchase": "Satın Alma:",
-        "sales_price": "Satış Fiyatı",
-        "standard_cost": "Standart Maliyet",
-        "asset": "Varlık",
-        "income": "Gelir",
-        "cogs": "COGS/Gider",
-        "reorder_point": "Yeniden Sipariş Noktası",
-        "safety_stock": "Emniyet Stoğu",
-        "preferred_vendor": "Tercih Edilen Satıcı"
-      }
-    },
-    "stock_sidebar": {
-      "section_title": "Stok Mevcudiyeti",
-      "labels": {
-        "total_on_hand": "Toplam Eldeki",
-        "total_value": "Toplam Değer",
-        "committed": "Ayrılmış",
-        "available": "Mevcut",
-        "avg_unit_cost": "Ort. Birim Maliyeti",
-        "separator": "/",
-        "last_receipt": "Son Alış",
-        "no_receipts": "Alış yok"
-      }
-    },
-    "category_management": {
-      "colors": {
-        "slate": "Arduvaz",
-        "red": "Kırmızı",
-        "orange": "Turuncu",
-        "amber": "Kehribar",
-        "yellow": "Sarı",
-        "lime": "Kireç",
-        "green": "Yeşil",
-        "emerald": "Zümrüt",
-        "teal": "Deniz Yeşili",
-        "cyan": "Camgöbeği",
-        "sky": "Gökyüzü",
-        "blue": "Mavi",
-        "indigo": "İndigo",
-        "violet": "Menekşe",
-        "purple": "Mor",
-        "fuchsia": "Fuşya",
-        "pink": "Pembe",
-        "rose": "Gül"
-      },
-      "icons": {
-        "box": "Kutu",
-        "package": "Paket",
-        "boxes": "Kutular",
-        "archive": "Arşiv",
-        "folder": "Klasör",
-        "tag": "Etiket",
-        "tags": "Etiketler",
-        "layers": "Katmanlar",
-        "grid": "Izgara",
-        "layout_grid": "Düzen Izgarası",
-        "cpu": "CPU",
-        "cog": "Dişli Çark",
-        "wrench": "İngiliz Anahtarı",
-        "hammer": "Çekiç",
-        "zap": "Şimşek",
-        "flame": "Alev",
-        "droplet": "Damla",
-        "leaf": "Yaprak",
-        "apple": "Elma",
-        "carrot": "Havuç"
-      },
-      "validation": {
-        "name_required": "Kategori adı gereklidir"
-      },
-      "messages": {
-        "deactivate_confirm": "Bu kategorinin {count} ürünü vardır. Devre dışı bırakmak istiyor musunuz?",
-        "deactivate_warning": "Bu kategoriyi devre dışı bırakmak istediğinizden emin misiniz?",
-        "deactivate_failed": "Devre dışı bırakma başarısız oldu",
-        "deactivate_error": "Kategori devre dışı bırakma başarısız oldu",
-        "reactivate_failed": "Kategori etkinleştirme başarısız oldu"
-      },
-      "header": "Ürünleri kategoriler halinde düzenleyin",
-      "show_inactive": "İnaktifi göster",
-      "add_button": "Kategori Ekle",
       "table": {
-        "name": "Ad",
-        "description": "Açıklama",
-        "icon": "İkon",
-        "color": "Renk",
-        "items": "Ürünler",
-        "status": "Durum",
-        "actions": "İşlemler"
+        "item": "Item",
+        "type": "Type",
+        "on_hand": "On Hand",
+        "price": "Price",
+        "cost": "Cost"
+      },
+      "types": {
+        "inventory": "Inventory",
+        "service": "Service",
+        "assembly": "Assembly",
+        "non_inventory": "Non-Inventory"
       },
       "form": {
-        "name_placeholder": "Kategori adı",
-        "description_placeholder": "Açıklama (isteğe bağlı)",
-        "icon_none": "Hiçbiri",
-        "color_none": "Hiçbiri",
-        "status_active": "Aktif",
-        "status_inactive": "İnaktif"
+        "basic_info": "Basic Information",
+        "financials": "Financials & Inventory",
+        "name": "Item Name",
+        "name_placeholder": "e.g., Red Apple XL",
+        "sku": "SKU / Code",
+        "sku_placeholder": "SKU-001",
+        "description": "Description",
+        "description_placeholder": "Detailed description...",
+        "category": "Category",
+        "select_category": "Select category...",
+        "category_required": "Category is required",
+        "sales_price": "Sales Price (сўм)",
+        "standard_cost": "Standard Cost (сўм)",
+        "reorder_point": "Reorder Point",
+        "base_unit": "Base Unit",
+        "purchase_unit": "Purchase Unit",
+        "select_unit": "Select unit",
+        "active": "Item is Active",
+        "bom": "Bill of Materials (BOM)",
+        "add_component": "Add Component",
+        "select_component": "Select component...",
+        "no_components": "No components added yet.",
+        "save_info": "Changes will reflect in inventory immediately.",
+        "create_title": "Create New Item",
+        "create_desc": "Define your new inventory, service or assembly.",
+        "select_type": "Select Item Type",
+        "select_type_desc": "Pick the kind of item you are creating to see relevant fields.",
+        "inventory_desc": "Storable item with quantity tracking",
+        "service_desc": "Labor or expertise",
+        "assembly_desc": "Assembled from other items"
       },
-      "empty": "Kategori bulunamadı. Başlamak için bir tane oluşturun."
-    },
-    "uom_management": {
-      "deactivate_confirm": "Bu ölçü birimi {count} ürün tarafından kullanılmaktadır. Devre dışı bırakmak istiyor musunuz?",
-      "show_inactive": "İnaktifi göster",
-      "items_header": "Ürünler"
-    },
-    "master_data_drawer": {
-      "tabs": {
-        "units": "Ölçü Birimleri",
-        "categories": "Kategoriler"
+      "actions": {
+        "edit": "Edit",
+        "adjust_qty": "Adjust Qty",
+        "build": "Build",
+        "stock_level": "Stock Level",
+        "reorder_needed": "Reorder Needed",
+        "in_stock": "In Stock",
+        "active": "Active",
+        "inactive": "Inactive",
+        "archived": "Archived",
+        "hide_archived": "Hide Archived",
+        "show_archived": "Show Archived"
       },
-      "sheet_title": "Ana Veri",
-      "description": "Ölçü birimlerini ve kategorileri yönetin"
+      "no_items_found": "No items found. Create a new one to get started.",
+      "delete_modal": {
+        "title_check": "Delete Item: {itemName}",
+        "title_confirm": "Confirm Permanent Deletion",
+        "checking_history": "Checking item history...",
+        "no_history_title": "No History Found",
+        "no_history_message": "This item has no transaction history and can be safely deleted.",
+        "button_delete_permanently": "Delete Permanently",
+        "has_history_title": "Item Has Transaction History",
+        "has_history_warning": "This item cannot be safely deleted because it has been used in transactions:",
+        "section_purchasing": "Purchasing History",
+        "count_po_lines": "{count} Purchase Order lines",
+        "count_bill_lines": "{count} Vendor Bill lines",
+        "section_sales": "Sales History",
+        "count_invoice_lines": "{count} Invoice lines",
+        "section_manufacturing": "Manufacturing History",
+        "count_bom_items": "{count} Bill of Materials references",
+        "count_production_inputs": "{count} Production inputs",
+        "count_production_outputs": "{count} Production outputs",
+        "section_inventory": "Inventory History",
+        "count_inventory_layers": "{count} Inventory layers (FIFO costing)",
+        "action_prompt": "What would you like to do?",
+        "button_archive": "Archive Item",
+        "button_archive_desc": "Keep all history (Safe)",
+        "button_clean_delete": "Clean History & Delete",
+        "button_clean_delete_desc": "Permanently delete all data (Dangerous)",
+        "confirm_title": "⚠️ Confirm Permanent Deletion",
+        "confirm_warning": "This will permanently delete:",
+        "confirm_warning_item": "The item: {itemName}",
+        "confirm_warning_history": "ALL transaction history listed above",
+        "confirm_warning_cannot_undo": "This action CANNOT be undone.",
+        "confirm_instruction": "Type DELETE to confirm:",
+        "confirm_placeholder": "Type DELETE",
+        "checkbox_understand": "I understand this action cannot be undone",
+        "button_confirm_delete": "Confirm Permanent Deletion",
+        "deleting": "Deleting...",
+        "archiving": "Archiving...",
+        "success_deleted": "Item permanently deleted",
+        "success_archived": "Item archived (history preserved)",
+        "error_failed": "Failed to delete item"
+      },
+      "history": {
+        "title": "İşlem Geçmişi",
+        "transaction_types": {
+          "bill": "Fatura",
+          "invoice": "Satış Faturası",
+          "production_in": "Üretim Girişi",
+          "production_out": "Üretim Çıkışı",
+          "transfer": "Transfer",
+          "adjustment": "Düzeltme",
+          "sales_return": "Satış İadesi",
+          "purchase_return": "Satın Alma İadesi"
+        },
+        "columns": {
+          "date": "Tarih",
+          "type": "Tür",
+          "reference": "Referans",
+          "partner": "İş Ortağı",
+          "location": "Konum",
+          "warehouse": "Depo",
+          "gl_account": "Genel Muhasebe Hesabı",
+          "qty_change": "Miktar Değişimi",
+          "cost_price": "Maliyet/Fiyat",
+          "running_balance": "Kalan Bakiye",
+          "batch": "Parti",
+          "actions": "İşlemler"
+        },
+        "filters": {
+          "from_date": "Başlangıç Tarihi",
+          "to_date": "Bitiş Tarihi",
+          "movement_type": "Hareket Türü",
+          "all_movements": "Tüm Hareketler",
+          "inbound_only": "Sadece Giriş",
+          "outbound_only": "Sadece Çıkış",
+          "production_only": "Sadece Üretim",
+          "transfers_only": "Sadece Transferler",
+          "adjustments_only": "Sadece Düzeltmeler",
+          "clear_filters": "Filtreleri Temizle"
+        },
+        "buttons": {
+          "adjust_inventory": "Stok Düzelt",
+          "export_csv": "CSV Olarak Dışa Aktar"
+        },
+        "adjustment_reasons": {
+          "physical_count": "Fiziksel Sayım",
+          "damage": "Hasar",
+          "obsolete": "Eskimiş",
+          "theft": "Hırsızlık",
+          "correction": "Düzeltme",
+          "other": "Diğer"
+        },
+        "empty_state": "Bu ürün için hareket bulunamadı",
+        "try_adjusting_filters": "Filtreleri ayarlamayı deneyin",
+        "summary": {
+          "total_movements": "Toplam Hareket",
+          "total_in": "Toplam Giriş",
+          "total_out": "Toplam Çıkış",
+          "final_balance": "Son Bakiye"
+        },
+        "tooltips": {
+          "edit": "Düzenle",
+          "delete": "Sil",
+          "view_only": "Sadece Görüntüle"
+        }
+      },
+      "adjustment_modal": {
+        "title": "Stok Düzelt",
+        "adjustment_type": "Düzeltme Türü",
+        "adjustment_type_quantity": "Sadece Miktar",
+        "adjustment_type_cost": "Sadece Maliyet",
+        "adjustment_type_both": "Hem Miktar Hem Maliyet",
+        "quantity_change": "Miktar Değişimi",
+        "quantity_change_help": "Eklemek için pozitif, çıkarmak için negatif sayı girin",
+        "new_unit_cost": "Yeni Birim Maliyeti (сўм)",
+        "new_unit_cost_help": "Bu ürün için yeni birim maliyetini girin",
+        "warehouse": "Depo",
+        "location": "Konum",
+        "reason": "Sebep",
+        "notes": "Notlar (Opsiyonel)",
+        "notes_placeholder": "Bu düzeltme hakkında detay ekleyin...",
+        "current_quantity": "Mevcut Miktar",
+        "current_cost": "Mevcut Birim Maliyeti (сўм)",
+        "new_quantity": "Yeni Miktar",
+        "new_quantity_preview": "Yeni Miktar:",
+        "invalid_negative": "(Geçersiz - negatif olamaz)",
+        "characters_remaining": "karakter",
+        "submit": "Düzeltme Oluştur",
+        "cancel": "İptal",
+        "creating": "Oluşturuluyor...",
+        "error_prefix": "Hata:"
+      },
+      "editor": {
+        "validation": {
+          "name_required": "Ad gereklidir",
+          "category_required": "Kategori gereklidir",
+          "base_uom_required": "Temel ölçü birimi gereklidir"
+        },
+        "header": {
+          "new": "Yeni Ürün",
+          "edit": "Ürünü Düzenle"
+        },
+        "tabs": {
+          "general": "Genel",
+          "accounting": "Muhasebe",
+          "inventory": "Stok",
+          "vendors": "Satıcılar"
+        },
+        "buttons": {
+          "cancel": "İptal",
+          "saving": "Kaydediliyor...",
+          "save": "Kaydet"
+        },
+        "alerts": {
+          "error": "Kaydetme başarısız oldu"
+        },
+        "form": {
+          "name_label": "Ad *",
+          "sku_label": "SKU",
+          "barcode_label": "Barkod",
+          "item_class_label": "Ürün Sınıfı *",
+          "item_class_options": {
+            "raw_material": "Ham Madde",
+            "wip": "Devam Eden Üretim",
+            "finished_goods": "Bitmiş Mal",
+            "service": "Hizmet"
+          },
+          "category_label": "Kategori *",
+          "category_placeholder": "Seçiniz...",
+          "description_label": "Açıklama",
+          "valuation_label": "Değerleme Yöntemi",
+          "valuation_options": {
+            "fifo": "FIFO (İlk Giren, İlk Çıkan)",
+            "weighted_avg": "Ağırlıklı Ortalama",
+            "standard": "Standart Maliyet"
+          },
+          "valuation_warning": "Değiştirilemez - stok işlemleri mevcuttur",
+          "gl_section": "Genel Muhasebe Hesap Eşleştirmesi",
+          "inventory_asset_label": "Stok Varlığı Hesabı",
+          "inventory_asset_default": "Varsayılan",
+          "income_label": "Gelir Hesabı",
+          "income_default": "Varsayılan",
+          "cogs_label": "COGS / Gider Hesabı",
+          "cogs_default": "Varsayılan",
+          "base_uom_label": "Temel Ölçü Birimi *",
+          "base_uom_placeholder": "Seçiniz...",
+          "purchase_uom_label": "Satın Alma Ölçü Birimi",
+          "purchase_uom_default": "Temel ile Aynı",
+          "conversion_label": "Dönüştürme Faktörü (1 Satın Alma ÖB = X Temel ÖB)",
+          "conversion_hint": "örneğin, 1 Koli = 20 kg ise 20 girin (faktör * 100 olarak depolanır)",
+          "standard_cost_label": "Standart Maliyet",
+          "sales_price_label": "Satış Fiyatı",
+          "reorder_point_label": "Yeniden Sipariş Noktası",
+          "safety_stock_label": "Emniyet Stoğu",
+          "preferred_vendor_label": "Tercih Edilen Satıcı",
+          "preferred_vendor_default": "Hiçbiri",
+          "preferred_vendor_hint": "Otomatik PO oluşturma için kullanılır"
+        }
+      },
+      "item_list": {
+        "no_sku_display": "SKU yok",
+        "badges": {
+          "out_of_stock": "Stokta yok",
+          "low_stock": "Düşük"
+        },
+        "avg_cost_label": "Ort. Maliyet:"
+      },
+      "item_profile": {
+        "errors": {
+          "unexpected": "Beklenmeyen bir hata oluştu"
+        },
+        "sections": {
+          "classification": "Sınıflandırma",
+          "unit_of_measure": "Ölçü Birimi",
+          "pricing": "Fiyatlandırma & Değerleme",
+          "gl_accounts": "Genel Muhasebe Hesapları",
+          "inventory_settings": "Stok Ayarları",
+          "stock_on_hand": "Eldeki Stok Miktarı",
+          "total_value": "Toplam Değer"
+        },
+        "labels": {
+          "category": "kategori",
+          "purchase": "Satın Alma:",
+          "sales_price": "Satış Fiyatı",
+          "standard_cost": "Standart Maliyet",
+          "asset": "Varlık",
+          "income": "Gelir",
+          "cogs": "COGS/Gider",
+          "reorder_point": "Yeniden Sipariş Noktası",
+          "safety_stock": "Emniyet Stoğu",
+          "preferred_vendor": "Tercih Edilen Satıcı"
+        }
+      },
+      "stock_sidebar": {
+        "section_title": "Stok Mevcudiyeti",
+        "labels": {
+          "total_on_hand": "Toplam Eldeki",
+          "total_value": "Toplam Değer",
+          "committed": "Ayrılmış",
+          "available": "Mevcut",
+          "avg_unit_cost": "Ort. Birim Maliyeti",
+          "separator": "/",
+          "last_receipt": "Son Alış",
+          "no_receipts": "Alış yok"
+        }
+      },
+      "category_management": {
+        "colors": {
+          "slate": "Arduvaz",
+          "red": "Kırmızı",
+          "orange": "Turuncu",
+          "amber": "Kehribar",
+          "yellow": "Sarı",
+          "lime": "Kireç",
+          "green": "Yeşil",
+          "emerald": "Zümrüt",
+          "teal": "Deniz Yeşili",
+          "cyan": "Camgöbeği",
+          "sky": "Gökyüzü",
+          "blue": "Mavi",
+          "indigo": "İndigo",
+          "violet": "Menekşe",
+          "purple": "Mor",
+          "fuchsia": "Fuşya",
+          "pink": "Pembe",
+          "rose": "Gül"
+        },
+        "icons": {
+          "box": "Kutu",
+          "package": "Paket",
+          "boxes": "Kutular",
+          "archive": "Arşiv",
+          "folder": "Klasör",
+          "tag": "Etiket",
+          "tags": "Etiketler",
+          "layers": "Katmanlar",
+          "grid": "Izgara",
+          "layout_grid": "Düzen Izgarası",
+          "cpu": "CPU",
+          "cog": "Dişli Çark",
+          "wrench": "İngiliz Anahtarı",
+          "hammer": "Çekiç",
+          "zap": "Şimşek",
+          "flame": "Alev",
+          "droplet": "Damla",
+          "leaf": "Yaprak",
+          "apple": "Elma",
+          "carrot": "Havuç"
+        },
+        "validation": {
+          "name_required": "Kategori adı gereklidir"
+        },
+        "messages": {
+          "deactivate_confirm": "Bu kategorinin {count} ürünü vardır. Devre dışı bırakmak istiyor musunuz?",
+          "deactivate_warning": "Bu kategoriyi devre dışı bırakmak istediğinizden emin misiniz?",
+          "deactivate_failed": "Devre dışı bırakma başarısız oldu",
+          "deactivate_error": "Kategori devre dışı bırakma başarısız oldu",
+          "reactivate_failed": "Kategori etkinleştirme başarısız oldu"
+        },
+        "header": "Ürünleri kategoriler halinde düzenleyin",
+        "show_inactive": "İnaktifi göster",
+        "add_button": "Kategori Ekle",
+        "table": {
+          "name": "Ad",
+          "description": "Açıklama",
+          "icon": "İkon",
+          "color": "Renk",
+          "items": "Ürünler",
+          "status": "Durum",
+          "actions": "İşlemler"
+        },
+        "form": {
+          "name_placeholder": "Kategori adı",
+          "description_placeholder": "Açıklama (isteğe bağlı)",
+          "icon_none": "Hiçbiri",
+          "color_none": "Hiçbiri",
+          "status_active": "Aktif",
+          "status_inactive": "İnaktif"
+        },
+        "empty": "Kategori bulunamadı. Başlamak için bir tane oluşturun."
+      },
+      "uom_management": {
+        "deactivate_confirm": "Bu ölçü birimi {count} ürün tarafından kullanılmaktadır. Devre dışı bırakmak istiyor musunuz?",
+        "show_inactive": "İnaktifi göster",
+        "items_header": "Ürünler"
+      },
+      "master_data_drawer": {
+        "tabs": {
+          "units": "Ölçü Birimleri",
+          "categories": "Kategoriler"
+        },
+        "sheet_title": "Ana Veri",
+        "description": "Ölçü birimlerini ve kategorileri yönetin"
+      },
+      "gl_account_types": {
+        "inventory_asset": "Stok Varlığı",
+        "cogs": "Satılan Malın Maliyeti",
+        "wip": "Devam Eden Üretim",
+        "adjustment": "Düzeltme",
+        "na": "Y/A"
+      },
+      "item_routing": {
+        "none": "Hiçbiri"
+      }
     },
-    "gl_account_types": {
-      "inventory_asset": "Stok Varlığı",
-      "cogs": "Satılan Malın Maliyeti",
-      "wip": "Devam Eden Üretim",
-      "adjustment": "Düzeltme",
-      "na": "Y/A"
-    },
-    "item_routing": {
-      "none": "Hiçbiri"
+    "nav": {
+      "overview": "Genel Bakış",
+      "items": "Ürünler",
+      "warehouse": "Depo",
+      "reception": "Resepsiyon",
+      "reconciliation": "Uzlaştırma"
     }
   },
   "auth": {
@@ -1774,7 +1144,7 @@
     "purchasing": "Satın Alma",
     "production": "Üretim",
     "wms": "Depo Yönetimi",
-    "service": "Servis",
+    "service": "Hizmet",
     "finance": "Finans",
     "commercial": "Ticari",
     "sales_crm": "Satış ve CRM",
@@ -1785,7 +1155,6 @@
     "quotes": "Teklifler",
     "invoices": "Faturalar",
     "estimates": "Tahminler",
-    "purchasing": "Satın Alma",
     "supply_chain": "Tedarik Zinciri",
     "vendors": "Tedarikçiler",
     "purchase_orders": "Satınalma Siparişleri",
@@ -1800,7 +1169,6 @@
     "lookup": "Arama",
     "production_manufacturing": "Üretim",
     "production_dashboard": "Üretim Paneli",
-    "production": "Üretim",
     "recipes": "Reçeteler",
     "production_wizard": "Üretim Sihirbazı",
     "production_terminal": "Üretim Terminali",
@@ -1818,7 +1186,6 @@
     "service_contracts": "Hizmet Sözleşmeleri",
     "service_tickets": "Hizmet Talepleri",
     "service_assets": "Hizmet Varlıkları",
-    "finance": "Finans",
     "chart_of_accounts": "Hesap Planı",
     "general_ledger": "Genel Muhasebe",
     "cash_accounts": "Nakit Hesapları",
@@ -1833,92 +1200,516 @@
     "collapse_sidebar": "Daralt",
     "sales": "Satış",
     "warehouse": "Depo",
-    "service": "Hizmet",
     "reception": "Alım"
   },
-  "sales": {
-    "nav": {
-      "overview": "Genel Bakış",
-      "pipeline": "Satış Hunisi",
-      "leads": "Potansiyel Müşteriler",
-      "opportunities": "Fırsatlar",
-      "customers": "Müşteriler",
-      "quotes": "Teklifler",
-      "invoices": "Faturalar",
-      "commissions": "Komisyonlar"
-    },
-    "customers": {
-      "dashboard": "Kontrol Paneli",
-      "select_detail": "Bir müşteri seçin",
-      "select_customer_hint": "Sol taraftaki listeden bir müşteri seçerek işlem geçmişini ve profil ayrıntılarını görün.",
-      "title": "Müşteriler",
-      "new_customer": "Yeni Müşteri",
-      "search_placeholder": "Müşterileri ara...",
-      "empty_state": "Müşteri bulunamadı",
-      "outstanding_balance": "Beklemede Olan Bakiye",
-      "no_outstanding_balance": "Beklemede olan bakiye yok",
-      "scoreboard": {
-        "open_quotes": "Açık Teklifler",
-        "unbilled_orders": "Faturalanmamış Siparişler",
-        "overdue_ar": "Vadesi Geçmiş Alacaklar",
-        "paid_30_days": "Ödenen (30 gün)"
-      }
-    }
-  },
-  "purchasing": {
-    "nav": {
-      "overview": "Genel Bakış",
-      "vendors": "Tedarikçiler",
-      "purchase_orders": "Satınalma Siparişleri",
-      "bills": "Tedarikçi Faturaları"
-    },
-    "vendors": {
-      "title": "Kontrol Paneli",
-      "select_vendor": "Bir tedarikçi seçin",
-      "select_vendor_hint": "Sol taraftaki listeden bir tedarikçi seçerek işlem geçmişini ve profil ayrıntılarını görün.",
-      "list": {
-        "title": "Tedarikçiler",
-        "new_vendor": "Yeni Tedarikçi",
-        "search_placeholder": "Tedarikçileri ara...",
-        "no_results": "Tedarikçi bulunamadı",
-        "open_balance": "Açık bakiye",
-        "no_open_balance": "Kapatıldı"
-      },
-      "scoreboard": {
-        "open_pos": "Açık Siparişler",
-        "overdue": "Vadesi Geçmiş Faturalar",
-        "open_bills": "Açık Faturalar",
-        "paid_30_days": "Ödenen (30 gün)"
-      }
-    }
-  },
   "wms": {
-    "nav": {
-      "overview": "Genel Bakış",
+    "menu": {
+      "title": "WMS Tarayıcı",
+      "lookup": "Arama",
       "transfer": "Transfer",
       "picking": "Toplama",
-      "cycle_count": "Envanter Sayımı",
-      "lookup": "Arama"
+      "count": "Envanter Sayımı"
+    },
+    "lookup": {
+      "title": "Arama",
+      "ready": "Taramaya Hazır",
+      "scanning": "Taranıyor...",
+      "instruction": "Ürün barkodunu veya konum kodunu tarayın",
+      "not_found": "Bulunamadı",
+      "not_found_message": "Bu koda uygun ürün veya konum bulunamadı",
+      "item_details": "Ürün Detayları",
+      "location_details": "Konum Detayları",
+      "stock_locations": "Stok Konumları",
+      "items_at_location": "Konumdaki Ürünler",
+      "qoh": "Eldeki Miktar",
+      "zone": "Bölge",
+      "warehouse": "Depo"
+    },
+    "transfer": {
+      "title": "Stok Transferi",
+      "step1": {
+        "title": "Adım 1: Ürünü Tarayın",
+        "instruction": "Transfer edilecek ürün barkodunu tarayın"
+      },
+      "step2": {
+        "title": "Adım 2: Hedefi Tarayın",
+        "instruction": "Hedef konum kodunu tarayın"
+      },
+      "step3": {
+        "title": "Adım 3: Miktarı Girin",
+        "instruction": "Transfer edilecek miktarı girin"
+      },
+      "from": "Nereden",
+      "to": "Nereye",
+      "quantity": "Miktar",
+      "available": "Mevcut",
+      "confirm_transfer": "Transferi Onayla",
+      "success": "Transfer Tamamlandı",
+      "success_message": "Stok başarıyla taşındı",
+      "transferring": "Transfer Ediliyor...",
+      "item": "Ürün",
+      "destination": "Hedef",
+      "source": "Kaynak"
+    },
+    "picking": {
+      "title": "Toplama Listesi",
+      "progress": "İlerleme",
+      "pick_qty": "Toplama Miktarı",
+      "pick_from": "Nereden Alınacak",
+      "next": "Sonraki Ürün",
+      "complete": "Toplamayı Tamamla",
+      "completed": "Toplama Tamamlandı",
+      "completed_message": "Tüm ürünler başarıyla toplandı",
+      "empty": "Toplanacak ürün yok",
+      "loading": "Toplama listesi yükleniyor..."
+    },
+    "count": {
+      "title": "Kör Sayım",
+      "step1": {
+        "title": "Adım 1: Konumu Tarayın",
+        "instruction": "Sayım için konum barkodunu tarayın"
+      },
+      "step2": {
+        "title": "Adım 2: Ürünleri Tarayın",
+        "instruction": "Her ürünü tarayın (ayarlamak için + basın)"
+      },
+      "location": "Konum",
+      "submit_count": "Sayımı Gönder",
+      "success": "Sayım Gönderildi",
+      "success_message": "Envanter sayımı kaydedildi",
+      "submitting": "Gönderiliyor...",
+      "counted_items": "Sayılan Ürünler"
+    },
+    "common": {
+      "back_to_menu": "Menüye Dön",
+      "error": "Hata",
+      "retry": "Tekrar Dene",
+      "start_over": "Baştan Başla"
     }
   },
   "service": {
-    "nav": {
-      "overview": "Genel Bakış",
-      "service_contracts": "Hizmet Sözleşmeleri",
-      "service_tickets": "Hizmet Talepleri",
-      "service_assets": "Hizmet Varlıkları"
-    }
-  },
-  "finance": {
-    "nav": {
-      "overview": "Genel Bakış",
-      "chart_of_accounts": "Hesap Planı",
-      "general_ledger": "Genel Muhasebe",
-      "cash_accounts": "Nakit Hesapları",
-      "fixed_assets": "Sabit Kıymetler",
-      "expenses": "Giderler",
-      "financial_reports": "Finansal Raporlar",
-      "payroll": "Bordro"
+    "dashboard": {
+      "page_title": "Saha Servisi Paneli",
+      "page_description": "Servis operasyonlarını, biletleri ve sözleşmeleri izleyin",
+      "kpi": {
+        "open_tickets": "Açık Biletler",
+        "open_tickets_desc": "Açık, planlanmış ve devam eden",
+        "pending_installations": "Bekleyen Kurulumlar",
+        "pending_installations_desc": "Kurulum bekleyen ekipmanlar",
+        "active_contracts": "Aktif Sözleşmeler",
+        "active_contracts_desc": "Şu anda aktif servis sözleşmeleri",
+        "refills_due": "Dolum Gereken",
+        "refills_due_desc": "Bekleyen dolumlara sahip sözleşmeler"
+      },
+      "recent_tickets": "Son Biletler",
+      "view_all_tickets": "Tüm Biletleri Görüntüle",
+      "no_tickets": "Bilet bulunamadı",
+      "upcoming_service": "Yaklaşan Servis",
+      "next_7_days": "Sonraki 7 gün",
+      "no_upcoming": "Sonraki 7 gün içinde planlanmış servis yok"
+    },
+    "ticket": {
+      "ticket_number": "Bilet №",
+      "customer": "Müşteri",
+      "type": {
+        "installation": "Kurulum",
+        "repair": "Onarım",
+        "maintenance": "Bakım",
+        "support": "Destek",
+        "emergency": "Acil"
+      },
+      "priority": {
+        "low": "Düşük",
+        "medium": "Orta",
+        "high": "Yüksek",
+        "critical": "Kritik"
+      },
+      "scheduled_date": "Planlanan Tarih",
+      "technician": "Teknisyen",
+      "assets": "Varlıklar",
+      "unassigned": "Atanmamış",
+      "status": {
+        "open": "Açık",
+        "scheduled": "Planlandı",
+        "in_progress": "Devam Ediyor",
+        "completed": "Tamamlandı",
+        "cancelled": "İptal Edildi"
+      }
+    },
+    "tickets_page": {
+      "title": "Servis Biletleri",
+      "description": "Servis biletlerini ve saha operasyonlarını yönetin",
+      "new_ticket": "Yeni Bilet",
+      "loading": "Biletler yükleniyor..."
+    },
+    "new_ticket_page": {
+      "title": "Servis Bileti Oluştur",
+      "description": "Müşteri desteği için yeni bir servis bileti oluşturun"
+    },
+    "tickets_list": {
+      "filters": {
+        "title": "Filtreler",
+        "status": "Durum",
+        "type": "Tür",
+        "priority": "Öncelik",
+        "all": "Tümü"
+      },
+      "table": {
+        "ticket_number": "Bilet №",
+        "customer": "Müşteri",
+        "title": "Başlık",
+        "type": "Tür",
+        "priority": "Öncelik",
+        "status": "Durum",
+        "technician": "Teknisyen",
+        "scheduled": "Planlandı",
+        "actions": "İşlemler"
+      },
+      "status": {
+        "open": "Açık",
+        "scheduled": "Planlandı",
+        "in_progress": "Devam Ediyor",
+        "completed": "Tamamlandı",
+        "cancelled": "İptal Edildi"
+      },
+      "priority": {
+        "low": "Düşük",
+        "medium": "Orta",
+        "high": "Yüksek",
+        "critical": "Kritik"
+      },
+      "type": {
+        "installation": "Kurulum",
+        "repair": "Onarım",
+        "maintenance": "Bakım",
+        "support": "Destek",
+        "emergency": "Acil"
+      },
+      "unassigned": "Atanmamış",
+      "view": "Görüntüle",
+      "empty": "Bilet bulunamadı",
+      "showing": "{total} biletten {count} tanesi gösteriliyor"
+    },
+    "ticket_form": {
+      "customer_id": "Müşteri ID",
+      "customer_id_placeholder": "Müşteri ID girin",
+      "customer_id_hint": "Üretimde bu aranabilir bir açılır liste olacak",
+      "title": "Bilet Başlığı",
+      "title_placeholder": "Sorunun kısa açıklaması",
+      "description": "Açıklama",
+      "description_placeholder": "Sorunun detaylı açıklaması...",
+      "ticket_type": "Bilet Türü",
+      "priority": {
+        "low": "Düşük",
+        "medium": "Orta",
+        "high": "Yüksek",
+        "critical": "Kritik"
+      },
+      "scheduled_date": "Planlanan Tarih",
+      "assign_technician": "Teknisyen Ata",
+      "unassigned": "Atanmamış",
+      "create_ticket": "Bilet Oluştur",
+      "creating": "Oluşturuluyor...",
+      "cancel": "İptal",
+      "type": {
+        "installation": "Kurulum",
+        "repair": "Onarım",
+        "maintenance": "Bakım",
+        "support": "Destek",
+        "emergency": "Acil"
+      },
+      "error": {
+        "required_fields": "Lütfen tüm gerekli alanları doldurun",
+        "generic": "Bilet oluşturulamadı"
+      }
+    },
+    "ticket_detail": {
+      "loading": "Bilet detayları yükleniyor...",
+      "mark_in_progress": "Devam Ediyor Olarak İşaretle",
+      "complete_ticket": "Bileti Tamamla",
+      "tabs": {
+        "overview": "Genel Bakış",
+        "timeline": "Zaman Çizelgesi",
+        "work_details": "İş Detayları"
+      },
+      "customer_info": "Müşteri Bilgileri",
+      "customer_name": "Müşteri Adı",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "ticket_info": "Bilet Bilgileri",
+      "ticket_type": "Bilet Türü",
+      "created_at": "Oluşturulma",
+      "scheduled_date": "Planlanan Tarih",
+      "contract": "Sözleşme",
+      "description": "Açıklama",
+      "assigned_technician": "Atanan Teknisyen",
+      "unassigned": "Atanmamış",
+      "linked_assets": "Bağlı Varlıklar",
+      "labor_hours": "İşçilik Saatleri",
+      "hours": "saat",
+      "parts_used": "Kullanılan Parçalar",
+      "part_item_id": "Ürün №{id}",
+      "completion_notes": "Tamamlanma Notları",
+      "customer_signature": "Müşteri İmzası",
+      "service_invoice": "Servis Faturası",
+      "work_details_empty": "İş detayları bilet tamamlandıktan sonra burada görünecek",
+      "status": {
+        "open": "Açık",
+        "scheduled": "Planlandı",
+        "in_progress": "Devam Ediyor",
+        "completed": "Tamamlandı",
+        "cancelled": "İptal Edildi"
+      },
+      "priority": {
+        "low": "Düşük",
+        "medium": "Orta",
+        "high": "Yüksek",
+        "critical": "Kritik"
+      },
+      "error": {
+        "generic": "Bir hata oluştu"
+      }
+    },
+    "ticket_timeline": {
+      "created": "Oluşturuldu",
+      "created_description": "Bilet oluşturuldu",
+      "assigned": "Atandı",
+      "assigned_description": "{name}'e atandı",
+      "scheduled": "Planlandı",
+      "scheduled_description": "{date} için planlandı",
+      "in_progress": "Devam Ediyor",
+      "in_progress_description": "İş başladı",
+      "completed": "Tamamlandı",
+      "completed_description": "Bilet başarıyla tamamlandı",
+      "cancelled": "İptal Edildi",
+      "cancelled_description": "Bilet iptal edildi"
+    },
+    "completion_form": {
+      "title": "Servis Biletini Tamamla",
+      "completion_notes": "Tamamlanma Notları",
+      "completion_notes_placeholder": "Yapılan işi açıklayın...",
+      "minimum_10_chars": "En az 10 karakter gerekli",
+      "labor_hours": "İşçilik Saatleri",
+      "labor_hours_hint": "Ondalık saat girin (örn. 2 saat 30 dakika için 2.5)",
+      "parts_used": "Kullanılan Parçalar",
+      "add_part": "Parça Ekle",
+      "no_parts_added": "Henüz parça eklenmedi",
+      "item_id": "Ürün ID",
+      "quantity": "Miktar",
+      "unit_cost": "Birim Maliyet (Tiyin)",
+      "customer_signature": "Müşteri İmzası",
+      "signature_placeholder": "Müşteri adı veya imzası",
+      "signature_hint": "Metin girişi (imza tableti ile geliştirilebilir)",
+      "complete_ticket": "Bileti Tamamla",
+      "completing": "Tamamlanıyor...",
+      "cancel": "İptal",
+      "error": {
+        "notes_required": "Tamamlanma notları gerekli (en az 10 karakter)",
+        "labor_hours_required": "İşçilik saatleri gerekli",
+        "invalid_parts": "Tüm parçalar geçerli ürün ID, miktar ve maliyete sahip olmalı",
+        "generic": "Bilet tamamlanamadı"
+      }
+    },
+    "contract": {
+      "page_title": "Servis Sözleşmeleri",
+      "page_description": "Servis sözleşmelerini ve bakım anlaşmalarını yönetin",
+      "create_contract": "Sözleşme Oluştur",
+      "edit_contract": "Sözleşmeyi Düzenle",
+      "contract_number": "Sözleşme №",
+      "contract_details": "Sözleşme Detayları",
+      "customer": "Müşteri",
+      "customer_id_placeholder": "Müşteri ID girin (TODO: Müşteri açılır menü ekle)",
+      "contract_type": "Sözleşme Türü",
+      "start_date": "Başlangıç Tarihi",
+      "end_date": "Bitiş Tarihi",
+      "billing_frequency": "Faturalama Sıklığı",
+      "monthly_value": "Aylık Değer",
+      "next_billing_date": "Sonraki Faturalama Tarihi",
+      "source_invoice": "Kaynak Fatura",
+      "assigned_technician": "Atanan Teknisyen",
+      "auto_generate_refills": "Otomatik Dolum Oluştur",
+      "suspension_reason": "Askıya Alma Nedeni",
+      "filter_all": "Tüm Sözleşmeler",
+      "filter_active": "Aktif",
+      "filter_suspended": "Askıya Alınmış",
+      "filter_expired": "Süresi Dolmuş",
+      "filter_cancelled": "İptal Edilmiş",
+      "no_contracts": "Sözleşme bulunamadı",
+      "view_contract": "Sözleşmeyi Görüntüle",
+      "suspend_contract": "Sözleşmeyi Askıya Al",
+      "renew_contract": "Sözleşmeyi Yenile",
+      "cancel_contract": "Sözleşmeyi İptal Et",
+      "edit_refill_items": "Dolum Ürünlerini Düzenle",
+      "changes_affect_future": "Değişiklikler yalnızca gelecekteki dolumları etkiler",
+      "cannot_edit_status": "{status} sözleşme düzenlenemez",
+      "read_only_view": "Salt okunur görünüm",
+      "status": {
+        "active": "Aktif",
+        "suspended": "Askıya Alınmış",
+        "expired": "Süresi Dolmuş",
+        "cancelled": "İptal Edilmiş"
+      },
+      "type": {
+        "warranty": "Garanti",
+        "maintenance": "Bakım",
+        "full_service": "Tam Servis",
+        "supplies_only": "Yalnızca Malzeme"
+      },
+      "billing_frequency_options": {
+        "monthly": "Aylık",
+        "quarterly": "Üç Aylık (3 ay)",
+        "semi_annual": "Altı Aylık (6 ay)",
+        "annual": "Yıllık (12 ay)"
+      },
+      "tabs": {
+        "basic_info": "Temel Bilgiler",
+        "refill_items": "Dolum Ürünleri",
+        "billing_history": "Faturalama Geçmişi",
+        "associated_tickets": "Servis Biletleri"
+      },
+      "refill_items": {
+        "title": "Dolum Ürünleri Yapılandırması",
+        "add_item": "Ürün Ekle",
+        "item": "Ürün",
+        "quantity_per_cycle": "Döngü Başına Miktar",
+        "unit_price": "Birim Fiyat",
+        "cycle_total": "Döngü Toplamı",
+        "no_items": "Dolum ürünleri yapılandırılmamış",
+        "remove_item": "Ürünü Kaldır"
+      },
+      "billing_history": {
+        "title": "Faturalama Geçmişi",
+        "invoice_number": "Fatura №",
+        "date": "Tarih",
+        "amount": "Tutar",
+        "status": "Durum",
+        "no_invoices": "Henüz fatura oluşturulmadı"
+      },
+      "tickets": {
+        "title": "İlişkili Servis Biletleri",
+        "no_tickets": "Bu sözleşmeye bağlı servis bileti yok"
+      },
+      "validation": {
+        "customer_required": "Müşteri gerekli",
+        "start_date_required": "Başlangıç tarihi gerekli",
+        "end_date_required": "Bitiş tarihi gerekli"
+      },
+      "actions": {
+        "save": "Sözleşmeyi Kaydet",
+        "cancel": "İptal",
+        "confirm_suspend": "Bu sözleşmeyi askıya almak istediğinizden emin misiniz?",
+        "confirm_renew": "Bu sözleşmeyi yenilemek istiyor musunuz?",
+        "confirm_cancel": "Bu sözleşmeyi iptal etmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+        "suspend_reason_placeholder": "Askıya alma nedenini girin...",
+        "cancel_reason_placeholder": "İptal nedenini girin...",
+        "new_end_date": "Yeni Bitiş Tarihi",
+        "success_created": "Sözleşme başarıyla oluşturuldu",
+        "success_updated": "Sözleşme başarıyla güncellendi",
+        "success_suspended": "Sözleşme askıya alındı",
+        "success_renewed": "Sözleşme yenilendi",
+        "success_cancelled": "Sözleşme iptal edildi",
+        "error_creating": "Sözleşme oluşturulamadı",
+        "error_updating": "Sözleşme güncellenemedi",
+        "error_suspending": "Sözleşme askıya alınamadı",
+        "error_renewing": "Sözleşme yenilenemedi",
+        "error_cancelling": "Sözleşme iptal edilemedi"
+      }
+    },
+    "assets_page": {
+      "title": "Müşteri Varlıkları",
+      "description": "Ekipman kayıt defteri ve hizmet geçmişi",
+      "loading": "Varlıklar yükleniyor..."
+    },
+    "assets_list": {
+      "filters": {
+        "title": "Filtreler",
+        "customer": "Müşteri",
+        "status": "Durum",
+        "warranty": "Garanti",
+        "serial_number": "Seri Numarası",
+        "serial_placeholder": "Seri numarasına göre ara...",
+        "all": "Tümü"
+      },
+      "status": {
+        "pending_installation": "Kurulum Bekliyor",
+        "active": "Aktif",
+        "under_service": "Hizmet Altında",
+        "decommissioned": "Hizmet Dışı"
+      },
+      "warranty": {
+        "active": "Garanti Aktif",
+        "expired": "Garanti Süresi Dolmuş",
+        "none": "Garantisiz"
+      },
+      "empty": "Varlık bulunamadı",
+      "showing": "{total} varlıktan {count} tanesi gösteriliyor"
+    },
+    "assets_card": {
+      "serial": "S/N",
+      "installed": "Kuruldu",
+      "contract": "Sözleşme",
+      "view_details": "Detayları Görüntüle",
+      "status": {
+        "pending_installation": "Kurulum Bekliyor",
+        "active": "Aktif",
+        "under_service": "Hizmet Altında",
+        "decommissioned": "Hizmet Dışı"
+      }
+    },
+    "warranty_badge": {
+      "no_warranty": "Garantisiz",
+      "active": "Garanti Aktif",
+      "expires": "Sona Eriyor",
+      "expired": "Garanti Süresi Dolmuş",
+      "expired_on": "Sona Erme Tarihi"
+    },
+    "asset_detail": {
+      "subtitle": "Ekipman detayları ve hizmet geçmişi",
+      "loading": "Yükleniyor...",
+      "equipment_info": "Ekipman Bilgileri",
+      "customer_info": "Müşteri Bilgileri",
+      "installation_info": "Kurulum Detayları",
+      "warranty_contract": "Garanti ve Sözleşme",
+      "service_history": "Hizmet Geçmişi",
+      "asset_number": "Varlık Numarası",
+      "serial_number": "Seri Numarası",
+      "item_name": "Ekipman Türü",
+      "status": {
+        "pending_installation": "Kurulum Bekliyor",
+        "active": "Aktif",
+        "under_service": "Hizmet Altında",
+        "decommissioned": "Hizmet Dışı"
+      },
+      "customer_name": "Müşteri",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "installation_address": "Kurulum Adresi",
+      "installation_date": "Kurulum Tarihi",
+      "source_invoice": "Kaynak Fatura",
+      "warranty_status": "Garanti Durumu",
+      "service_contract": "Hizmet Sözleşmesi",
+      "contract_type": "Tür",
+      "expires": "Sona Eriyor",
+      "technician": "Teknisyen",
+      "close": "Kapat"
+    },
+    "service_history": {
+      "no_history": "Henüz hizmet geçmişi yok",
+      "view_ticket": "Bileti Görüntüle",
+      "status": {
+        "open": "Açık",
+        "scheduled": "Planlandı",
+        "in_progress": "Devam Ediyor",
+        "completed": "Tamamlandı",
+        "cancelled": "İptal Edildi"
+      },
+      "type": {
+        "installation": "Kurulum",
+        "repair": "Onarım",
+        "maintenance": "Bakım",
+        "support": "Destek",
+        "emergency": "Acil"
+      }
     }
   },
   "expenses": {
@@ -2347,91 +2138,6 @@
       "error": "Hata"
     }
   },
-  "wms": {
-    "menu": {
-      "title": "WMS Tarayıcı",
-      "lookup": "Arama",
-      "transfer": "Transfer",
-      "picking": "Toplama",
-      "count": "Envanter Sayımı"
-    },
-    "lookup": {
-      "title": "Arama",
-      "ready": "Taramaya Hazır",
-      "scanning": "Taranıyor...",
-      "instruction": "Ürün barkodunu veya konum kodunu tarayın",
-      "not_found": "Bulunamadı",
-      "not_found_message": "Bu koda uygun ürün veya konum bulunamadı",
-      "item_details": "Ürün Detayları",
-      "location_details": "Konum Detayları",
-      "stock_locations": "Stok Konumları",
-      "items_at_location": "Konumdaki Ürünler",
-      "qoh": "Eldeki Miktar",
-      "zone": "Bölge",
-      "warehouse": "Depo"
-    },
-    "transfer": {
-      "title": "Stok Transferi",
-      "step1": {
-        "title": "Adım 1: Ürünü Tarayın",
-        "instruction": "Transfer edilecek ürün barkodunu tarayın"
-      },
-      "step2": {
-        "title": "Adım 2: Hedefi Tarayın",
-        "instruction": "Hedef konum kodunu tarayın"
-      },
-      "step3": {
-        "title": "Adım 3: Miktarı Girin",
-        "instruction": "Transfer edilecek miktarı girin"
-      },
-      "from": "Nereden",
-      "to": "Nereye",
-      "quantity": "Miktar",
-      "available": "Mevcut",
-      "confirm_transfer": "Transferi Onayla",
-      "success": "Transfer Tamamlandı",
-      "success_message": "Stok başarıyla taşındı",
-      "transferring": "Transfer Ediliyor...",
-      "item": "Ürün",
-      "destination": "Hedef",
-      "source": "Kaynak"
-    },
-    "picking": {
-      "title": "Toplama Listesi",
-      "progress": "İlerleme",
-      "pick_qty": "Toplama Miktarı",
-      "pick_from": "Nereden Alınacak",
-      "next": "Sonraki Ürün",
-      "complete": "Toplamayı Tamamla",
-      "completed": "Toplama Tamamlandı",
-      "completed_message": "Tüm ürünler başarıyla toplandı",
-      "empty": "Toplanacak ürün yok",
-      "loading": "Toplama listesi yükleniyor..."
-    },
-    "count": {
-      "title": "Kör Sayım",
-      "step1": {
-        "title": "Adım 1: Konumu Tarayın",
-        "instruction": "Sayım için konum barkodunu tarayın"
-      },
-      "step2": {
-        "title": "Adım 2: Ürünleri Tarayın",
-        "instruction": "Her ürünü tarayın (ayarlamak için + basın)"
-      },
-      "location": "Konum",
-      "submit_count": "Sayımı Gönder",
-      "success": "Sayım Gönderildi",
-      "success_message": "Envanter sayımı kaydedildi",
-      "submitting": "Gönderiliyor...",
-      "counted_items": "Sayılan Ürünler"
-    },
-    "common": {
-      "back_to_menu": "Menüye Dön",
-      "error": "Hata",
-      "retry": "Tekrar Dene",
-      "start_over": "Baştan Başla"
-    }
-  },
   "crm": {
     "title": "CRM ve Satış Hattı",
     "leads": {
@@ -2639,431 +2345,6 @@
       "settings": "Ayarlar",
       "view": "Görüntüle",
       "actions": "İşlemler"
-    }
-  },
-  "service": {
-    "dashboard": {
-      "page_title": "Saha Servisi Paneli",
-      "page_description": "Servis operasyonlarını, biletleri ve sözleşmeleri izleyin",
-      "kpi": {
-        "open_tickets": "Açık Biletler",
-        "open_tickets_desc": "Açık, planlanmış ve devam eden",
-        "pending_installations": "Bekleyen Kurulumlar",
-        "pending_installations_desc": "Kurulum bekleyen ekipmanlar",
-        "active_contracts": "Aktif Sözleşmeler",
-        "active_contracts_desc": "Şu anda aktif servis sözleşmeleri",
-        "refills_due": "Dolum Gereken",
-        "refills_due_desc": "Bekleyen dolumlara sahip sözleşmeler"
-      },
-      "recent_tickets": "Son Biletler",
-      "view_all_tickets": "Tüm Biletleri Görüntüle",
-      "no_tickets": "Bilet bulunamadı",
-      "upcoming_service": "Yaklaşan Servis",
-      "next_7_days": "Sonraki 7 gün",
-      "no_upcoming": "Sonraki 7 gün içinde planlanmış servis yok"
-    },
-    "ticket": {
-      "ticket_number": "Bilet №",
-      "customer": "Müşteri",
-      "type": {
-        "installation": "Kurulum",
-        "repair": "Onarım",
-        "maintenance": "Bakım",
-        "support": "Destek",
-        "emergency": "Acil"
-      },
-      "priority": {
-        "low": "Düşük",
-        "medium": "Orta",
-        "high": "Yüksek",
-        "critical": "Kritik"
-      },
-      "scheduled_date": "Planlanan Tarih",
-      "technician": "Teknisyen",
-      "assets": "Varlıklar",
-      "unassigned": "Atanmamış",
-      "status": {
-        "open": "Açık",
-        "scheduled": "Planlandı",
-        "in_progress": "Devam Ediyor",
-        "completed": "Tamamlandı",
-        "cancelled": "İptal Edildi"
-      }
-    },
-    "tickets_page": {
-      "title": "Servis Biletleri",
-      "description": "Servis biletlerini ve saha operasyonlarını yönetin",
-      "new_ticket": "Yeni Bilet",
-      "loading": "Biletler yükleniyor..."
-    },
-    "new_ticket_page": {
-      "title": "Servis Bileti Oluştur",
-      "description": "Müşteri desteği için yeni bir servis bileti oluşturun"
-    },
-    "tickets_list": {
-      "filters": {
-        "title": "Filtreler",
-        "status": "Durum",
-        "type": "Tür",
-        "priority": "Öncelik",
-        "all": "Tümü"
-      },
-      "table": {
-        "ticket_number": "Bilet №",
-        "customer": "Müşteri",
-        "title": "Başlık",
-        "type": "Tür",
-        "priority": "Öncelik",
-        "status": "Durum",
-        "technician": "Teknisyen",
-        "scheduled": "Planlandı",
-        "actions": "İşlemler"
-      },
-      "status": {
-        "open": "Açık",
-        "scheduled": "Planlandı",
-        "in_progress": "Devam Ediyor",
-        "completed": "Tamamlandı",
-        "cancelled": "İptal Edildi"
-      },
-      "priority": {
-        "low": "Düşük",
-        "medium": "Orta",
-        "high": "Yüksek",
-        "critical": "Kritik"
-      },
-      "type": {
-        "installation": "Kurulum",
-        "repair": "Onarım",
-        "maintenance": "Bakım",
-        "support": "Destek",
-        "emergency": "Acil"
-      },
-      "unassigned": "Atanmamış",
-      "view": "Görüntüle",
-      "empty": "Bilet bulunamadı",
-      "showing": "{total} biletten {count} tanesi gösteriliyor"
-    },
-    "ticket_form": {
-      "customer_id": "Müşteri ID",
-      "customer_id_placeholder": "Müşteri ID girin",
-      "customer_id_hint": "Üretimde bu aranabilir bir açılır liste olacak",
-      "title": "Bilet Başlığı",
-      "title_placeholder": "Sorunun kısa açıklaması",
-      "description": "Açıklama",
-      "description_placeholder": "Sorunun detaylı açıklaması...",
-      "ticket_type": "Bilet Türü",
-      "priority": {
-        "low": "Düşük",
-        "medium": "Orta",
-        "high": "Yüksek",
-        "critical": "Kritik"
-      },
-      "scheduled_date": "Planlanan Tarih",
-      "assign_technician": "Teknisyen Ata",
-      "unassigned": "Atanmamış",
-      "create_ticket": "Bilet Oluştur",
-      "creating": "Oluşturuluyor...",
-      "cancel": "İptal",
-      "type": {
-        "installation": "Kurulum",
-        "repair": "Onarım",
-        "maintenance": "Bakım",
-        "support": "Destek",
-        "emergency": "Acil"
-      },
-      "error": {
-        "required_fields": "Lütfen tüm gerekli alanları doldurun",
-        "generic": "Bilet oluşturulamadı"
-      }
-    },
-    "ticket_detail": {
-      "loading": "Bilet detayları yükleniyor...",
-      "mark_in_progress": "Devam Ediyor Olarak İşaretle",
-      "complete_ticket": "Bileti Tamamla",
-      "tabs": {
-        "overview": "Genel Bakış",
-        "timeline": "Zaman Çizelgesi",
-        "work_details": "İş Detayları"
-      },
-      "customer_info": "Müşteri Bilgileri",
-      "customer_name": "Müşteri Adı",
-      "email": "E-posta",
-      "phone": "Telefon",
-      "ticket_info": "Bilet Bilgileri",
-      "ticket_type": "Bilet Türü",
-      "created_at": "Oluşturulma",
-      "scheduled_date": "Planlanan Tarih",
-      "contract": "Sözleşme",
-      "description": "Açıklama",
-      "assigned_technician": "Atanan Teknisyen",
-      "unassigned": "Atanmamış",
-      "linked_assets": "Bağlı Varlıklar",
-      "labor_hours": "İşçilik Saatleri",
-      "hours": "saat",
-      "parts_used": "Kullanılan Parçalar",
-      "part_item_id": "Ürün №{id}",
-      "completion_notes": "Tamamlanma Notları",
-      "customer_signature": "Müşteri İmzası",
-      "service_invoice": "Servis Faturası",
-      "work_details_empty": "İş detayları bilet tamamlandıktan sonra burada görünecek",
-      "status": {
-        "open": "Açık",
-        "scheduled": "Planlandı",
-        "in_progress": "Devam Ediyor",
-        "completed": "Tamamlandı",
-        "cancelled": "İptal Edildi"
-      },
-      "priority": {
-        "low": "Düşük",
-        "medium": "Orta",
-        "high": "Yüksek",
-        "critical": "Kritik"
-      },
-      "error": {
-        "generic": "Bir hata oluştu"
-      }
-    },
-    "ticket_timeline": {
-      "created": "Oluşturuldu",
-      "created_description": "Bilet oluşturuldu",
-      "assigned": "Atandı",
-      "assigned_description": "{name}'e atandı",
-      "scheduled": "Planlandı",
-      "scheduled_description": "{date} için planlandı",
-      "in_progress": "Devam Ediyor",
-      "in_progress_description": "İş başladı",
-      "completed": "Tamamlandı",
-      "completed_description": "Bilet başarıyla tamamlandı",
-      "cancelled": "İptal Edildi",
-      "cancelled_description": "Bilet iptal edildi"
-    },
-    "completion_form": {
-      "title": "Servis Biletini Tamamla",
-      "completion_notes": "Tamamlanma Notları",
-      "completion_notes_placeholder": "Yapılan işi açıklayın...",
-      "minimum_10_chars": "En az 10 karakter gerekli",
-      "labor_hours": "İşçilik Saatleri",
-      "labor_hours_hint": "Ondalık saat girin (örn. 2 saat 30 dakika için 2.5)",
-      "parts_used": "Kullanılan Parçalar",
-      "add_part": "Parça Ekle",
-      "no_parts_added": "Henüz parça eklenmedi",
-      "item_id": "Ürün ID",
-      "quantity": "Miktar",
-      "unit_cost": "Birim Maliyet (Tiyin)",
-      "customer_signature": "Müşteri İmzası",
-      "signature_placeholder": "Müşteri adı veya imzası",
-      "signature_hint": "Metin girişi (imza tableti ile geliştirilebilir)",
-      "complete_ticket": "Bileti Tamamla",
-      "completing": "Tamamlanıyor...",
-      "cancel": "İptal",
-      "error": {
-        "notes_required": "Tamamlanma notları gerekli (en az 10 karakter)",
-        "labor_hours_required": "İşçilik saatleri gerekli",
-        "invalid_parts": "Tüm parçalar geçerli ürün ID, miktar ve maliyete sahip olmalı",
-        "generic": "Bilet tamamlanamadı"
-      }
-    },
-    "contract": {
-      "page_title": "Servis Sözleşmeleri",
-      "page_description": "Servis sözleşmelerini ve bakım anlaşmalarını yönetin",
-      "create_contract": "Sözleşme Oluştur",
-      "edit_contract": "Sözleşmeyi Düzenle",
-      "contract_number": "Sözleşme №",
-      "contract_details": "Sözleşme Detayları",
-      "customer": "Müşteri",
-      "customer_id_placeholder": "Müşteri ID girin (TODO: Müşteri açılır menü ekle)",
-      "contract_type": "Sözleşme Türü",
-      "start_date": "Başlangıç Tarihi",
-      "end_date": "Bitiş Tarihi",
-      "billing_frequency": "Faturalama Sıklığı",
-      "monthly_value": "Aylık Değer",
-      "next_billing_date": "Sonraki Faturalama Tarihi",
-      "source_invoice": "Kaynak Fatura",
-      "assigned_technician": "Atanan Teknisyen",
-      "auto_generate_refills": "Otomatik Dolum Oluştur",
-      "suspension_reason": "Askıya Alma Nedeni",
-      "filter_all": "Tüm Sözleşmeler",
-      "filter_active": "Aktif",
-      "filter_suspended": "Askıya Alınmış",
-      "filter_expired": "Süresi Dolmuş",
-      "filter_cancelled": "İptal Edilmiş",
-      "no_contracts": "Sözleşme bulunamadı",
-      "view_contract": "Sözleşmeyi Görüntüle",
-      "suspend_contract": "Sözleşmeyi Askıya Al",
-      "renew_contract": "Sözleşmeyi Yenile",
-      "cancel_contract": "Sözleşmeyi İptal Et",
-      "edit_refill_items": "Dolum Ürünlerini Düzenle",
-      "changes_affect_future": "Değişiklikler yalnızca gelecekteki dolumları etkiler",
-      "cannot_edit_status": "{status} sözleşme düzenlenemez",
-      "read_only_view": "Salt okunur görünüm",
-      "status": {
-        "active": "Aktif",
-        "suspended": "Askıya Alınmış",
-        "expired": "Süresi Dolmuş",
-        "cancelled": "İptal Edilmiş"
-      },
-      "type": {
-        "warranty": "Garanti",
-        "maintenance": "Bakım",
-        "full_service": "Tam Servis",
-        "supplies_only": "Yalnızca Malzeme"
-      },
-      "billing_frequency_options": {
-        "monthly": "Aylık",
-        "quarterly": "Üç Aylık (3 ay)",
-        "semi_annual": "Altı Aylık (6 ay)",
-        "annual": "Yıllık (12 ay)"
-      },
-      "tabs": {
-        "basic_info": "Temel Bilgiler",
-        "refill_items": "Dolum Ürünleri",
-        "billing_history": "Faturalama Geçmişi",
-        "associated_tickets": "Servis Biletleri"
-      },
-      "refill_items": {
-        "title": "Dolum Ürünleri Yapılandırması",
-        "add_item": "Ürün Ekle",
-        "item": "Ürün",
-        "quantity_per_cycle": "Döngü Başına Miktar",
-        "unit_price": "Birim Fiyat",
-        "cycle_total": "Döngü Toplamı",
-        "no_items": "Dolum ürünleri yapılandırılmamış",
-        "remove_item": "Ürünü Kaldır"
-      },
-      "billing_history": {
-        "title": "Faturalama Geçmişi",
-        "invoice_number": "Fatura №",
-        "date": "Tarih",
-        "amount": "Tutar",
-        "status": "Durum",
-        "no_invoices": "Henüz fatura oluşturulmadı"
-      },
-      "tickets": {
-        "title": "İlişkili Servis Biletleri",
-        "no_tickets": "Bu sözleşmeye bağlı servis bileti yok"
-      },
-      "validation": {
-        "customer_required": "Müşteri gerekli",
-        "start_date_required": "Başlangıç tarihi gerekli",
-        "end_date_required": "Bitiş tarihi gerekli"
-      },
-      "actions": {
-        "save": "Sözleşmeyi Kaydet",
-        "cancel": "İptal",
-        "confirm_suspend": "Bu sözleşmeyi askıya almak istediğinizden emin misiniz?",
-        "confirm_renew": "Bu sözleşmeyi yenilemek istiyor musunuz?",
-        "confirm_cancel": "Bu sözleşmeyi iptal etmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
-        "suspend_reason_placeholder": "Askıya alma nedenini girin...",
-        "cancel_reason_placeholder": "İptal nedenini girin...",
-        "new_end_date": "Yeni Bitiş Tarihi",
-        "success_created": "Sözleşme başarıyla oluşturuldu",
-        "success_updated": "Sözleşme başarıyla güncellendi",
-        "success_suspended": "Sözleşme askıya alındı",
-        "success_renewed": "Sözleşme yenilendi",
-        "success_cancelled": "Sözleşme iptal edildi",
-        "error_creating": "Sözleşme oluşturulamadı",
-        "error_updating": "Sözleşme güncellenemedi",
-        "error_suspending": "Sözleşme askıya alınamadı",
-        "error_renewing": "Sözleşme yenilenemedi",
-        "error_cancelling": "Sözleşme iptal edilemedi"
-      }
-    },
-    "assets_page": {
-      "title": "Müşteri Varlıkları",
-      "description": "Ekipman kayıt defteri ve hizmet geçmişi",
-      "loading": "Varlıklar yükleniyor..."
-    },
-    "assets_list": {
-      "filters": {
-        "title": "Filtreler",
-        "customer": "Müşteri",
-        "status": "Durum",
-        "warranty": "Garanti",
-        "serial_number": "Seri Numarası",
-        "serial_placeholder": "Seri numarasına göre ara...",
-        "all": "Tümü"
-      },
-      "status": {
-        "pending_installation": "Kurulum Bekliyor",
-        "active": "Aktif",
-        "under_service": "Hizmet Altında",
-        "decommissioned": "Hizmet Dışı"
-      },
-      "warranty": {
-        "active": "Garanti Aktif",
-        "expired": "Garanti Süresi Dolmuş",
-        "none": "Garantisiz"
-      },
-      "empty": "Varlık bulunamadı",
-      "showing": "{total} varlıktan {count} tanesi gösteriliyor"
-    },
-    "assets_card": {
-      "serial": "S/N",
-      "installed": "Kuruldu",
-      "contract": "Sözleşme",
-      "view_details": "Detayları Görüntüle",
-      "status": {
-        "pending_installation": "Kurulum Bekliyor",
-        "active": "Aktif",
-        "under_service": "Hizmet Altında",
-        "decommissioned": "Hizmet Dışı"
-      }
-    },
-    "warranty_badge": {
-      "no_warranty": "Garantisiz",
-      "active": "Garanti Aktif",
-      "expires": "Sona Eriyor",
-      "expired": "Garanti Süresi Dolmuş",
-      "expired_on": "Sona Erme Tarihi"
-    },
-    "asset_detail": {
-      "subtitle": "Ekipman detayları ve hizmet geçmişi",
-      "loading": "Yükleniyor...",
-      "equipment_info": "Ekipman Bilgileri",
-      "customer_info": "Müşteri Bilgileri",
-      "installation_info": "Kurulum Detayları",
-      "warranty_contract": "Garanti ve Sözleşme",
-      "service_history": "Hizmet Geçmişi",
-      "asset_number": "Varlık Numarası",
-      "serial_number": "Seri Numarası",
-      "item_name": "Ekipman Türü",
-      "status": {
-        "pending_installation": "Kurulum Bekliyor",
-        "active": "Aktif",
-        "under_service": "Hizmet Altında",
-        "decommissioned": "Hizmet Dışı"
-      },
-      "customer_name": "Müşteri",
-      "email": "E-posta",
-      "phone": "Telefon",
-      "installation_address": "Kurulum Adresi",
-      "installation_date": "Kurulum Tarihi",
-      "source_invoice": "Kaynak Fatura",
-      "warranty_status": "Garanti Durumu",
-      "service_contract": "Hizmet Sözleşmesi",
-      "contract_type": "Tür",
-      "expires": "Sona Eriyor",
-      "technician": "Teknisyen",
-      "close": "Kapat"
-    },
-    "service_history": {
-      "no_history": "Henüz hizmet geçmişi yok",
-      "view_ticket": "Bileti Görüntüle",
-      "status": {
-        "open": "Açık",
-        "scheduled": "Planlandı",
-        "in_progress": "Devam Ediyor",
-        "completed": "Tamamlandı",
-        "cancelled": "İptal Edildi"
-      },
-      "type": {
-        "installation": "Kurulum",
-        "repair": "Onarım",
-        "maintenance": "Bakım",
-        "support": "Destek",
-        "emergency": "Acil"
-      }
     }
   },
   "production": {

@@ -248,677 +248,59 @@
     "pending_receivables": "Ожидаемые поступления"
   },
   "purchasing": {
-    "purchase_orders_page": {
-      "title": "Заказы поставщику",
-      "description": "Отслеживайте заказы и полученные товары.",
-      "new_order": "Новый заказ",
-      "loading": "Загрузка заказов..."
-    },
-    "bill_approval": {
-      "pending_approval": "Ожидает утверждения",
-      "waiting_approval": "Ожидает утверждения администратором",
-      "amount_label": "Сумма:",
-      "processing": "Обработка...",
-      "approve": "Утвердить",
-      "reject": "Отклонить",
-      "approved": "Утверждено",
-      "rejected": "Отклонено",
-      "rejected_message": "Этот счёт был отклонён и не будет обработан"
-    },
-    "payment_modal": {
-      "title": "Зарегистрировать платёж",
-      "paying_bill": "Оплата счёта",
-      "to": "для",
-      "amount": "Сумма",
-      "payment_date": "Дата платежа",
-      "bank_account": "Банковский счёт",
-      "reference": "Ссылка",
-      "confirm_payment": "Подтвердить платёж"
-    },
-    "bills_page": {
-      "title": "Счета поставщиков",
-      "coming_soon": "Модуль счетов поставщиков скоро появится.",
-      "start_hint": "Начните с создания заказов на закупку и приёмки товаров."
-    },
-    "po_detail": {
-      "loading": "Загрузка заказа...",
-      "edit": "Редактировать",
-      "delete": "Удалить",
-      "receive_items": "Принять товары",
-      "order_items": "Товары заказа",
-      "sku": "Артикул",
-      "received": "получено",
-      "remaining": "осталось",
-      "vendor_details": "Информация о поставщике",
-      "name": "Название",
-      "email": "Email",
-      "phone": "Телефон",
-      "notes": "Примечания"
-    },
-    "modals": {
-      "delete_po": {
-        "title": "Удалить заказ на закупку {orderNumber}",
-        "button_confirm": "Удалить заказ на закупку",
-        "checkbox_label": "Я понимаю последствия",
-        "warnings": {
-          "open": "Вы собираетесь удалить открытый заказ на закупку. Это действие нельзя отменить.",
-          "received": "⚠️ ВНИМАНИЕ: Этот заказ на закупку был получен.",
-          "received_unusual": "Удаление полученного заказа необычно и может указывать на:",
-          "received_reasons": {
-            "incorrect": "Приемка товара была зарегистрирована неправильно",
-            "error": "Заказ был создан по ошибке",
-            "return": "Товары нужно вернуть"
-          },
-          "received_advice": "Если товары были получены, рассмотрите возможность создания заказа на возврат.",
-          "partial": "⚠️ ВНИМАНИЕ: Этот заказ на закупку был частично получен.",
-          "partial_info": "Удаление отменит заказ, но не отменит приемку товаров. Рассмотрите возможность отмены приемки, если необходимо."
-        },
-        "details": {
-          "order_number": "Номер заказа",
-          "amount": "Сумма",
-          "status": "Статус"
-        },
-        "consequences": {
-          "title": "Это будет:",
-          "delete_po": "Удалить заказ на закупку и все товарные позиции",
-          "reverse_gl": "Отменить записи в главной книге",
-          "update_balance": "Обновить баланс поставщика"
-        }
-      },
-      "delete_bill": {
-        "title": "Удалить счет {billNumber}",
-        "button_confirm": "Удалить счет",
-        "checkbox_label": "Я понимаю последствия",
-        "warnings": {
-          "open": "Вы собираетесь удалить открытый (неоплаченный) счет. Это действие нельзя отменить.",
-          "paid": "⚠️ ВНИМАНИЕ: Этот счет помечен как ОПЛАЧЕНО.",
-          "paid_unusual": "Удаление оплаченного счета необычно и может указывать на:",
-          "paid_reasons": {
-            "incorrect": "Платеж был зарегистрирован неправильно",
-            "error": "Счет был создан по ошибке",
-            "credit": "Поставщик выдал кредит"
-          },
-          "paid_advice": "Если платеж действительно был произведен, вы должны сначала отменить платеж.",
-          "partial": "⚠️ ВНИМАНИЕ: Этот счет был частично оплачен.",
-          "partial_info": "Удаление отменит счет, но не отменит платежи. Рассмотрите возможность отмены частичных платежей, если необходимо."
-        },
-        "details": {
-          "bill_number": "Номер счета",
-          "amount": "Сумма",
-          "status": "Статус"
-        },
-        "consequences": {
-          "title": "Это будет:",
-          "delete_bill": "Удалить счет и все товарные позиции",
-          "reverse_gl": "Отменить записи в главной книге",
-          "update_balance": "Обновить баланс поставщика"
-        }
-      }
-    },
-    "purchase_orders": {
-      "table": {
-        "header_po_number": "Номер заказа",
-        "header_vendor": "Поставщик",
-        "header_date": "Дата",
-        "header_status": "Статус",
-        "header_total": "Итого",
-        "header_actions": "Действия",
-        "empty_state": "Заказы на закупку не найдены."
-      },
-      "form": {
-        "title_new": "Новый заказ на закупку",
-        "description": "Создайте новый заказ для поставщика.",
-        "button_cancel": "Отмена",
-        "button_save": "Сохранить заказ",
-        "label_vendor": "Поставщик",
-        "label_po_number": "Номер ПО",
-        "label_date": "Дата",
-        "placeholder_vendor": "Выберите поставщика",
-        "placeholder_po_number": "например ПО-2024-001",
-        "placeholder_item": "Выберите товар",
-        "section_items": "Товары",
-        "column_item": "Товар",
-        "column_qty": "Кол-во",
-        "column_unit_cost": "Стоимость единицы (сўм)",
-        "column_total": "Итого",
-        "button_add_item": "Добавить строку товара",
-        "label_total_amount": "Общая сумма",
-        "currency": "сўм"
-      }
-    },
-    "bills": {
-      "form": {
-        "loading_items": "Загрузка товаров...",
-        "payment_terms": {
-          "due_on_receipt": "Оплата при получении"
-        },
-        "error_items_required": "Пожалуйста, добавьте хотя бы один товар с количеством больше 0",
-        "error_failed": "Не удалось сохранить счет",
-        "error_unexpected": "Произошла ошибка при сохранении счета"
-      }
+    "nav": {
+      "overview": "Обзор",
+      "vendors": "Поставщики",
+      "purchase_orders": "Заказы на покупку",
+      "bills": "Счета поставщиков"
     },
     "vendors": {
-      "title": "Поставщики",
-      "center_title": "Центр Поставщиков",
-      "filter_placeholder": "Фильтр Поставщиков...",
-      "new_vendor": "Новый Поставщик",
-      "no_vendors": "Поставщики не найдены",
-      "sidebar_confirm_delete": "Вы уверены, что хотите удалить этого поставщика? Это будет архивировать поставщика, если у него есть счета/ПО, или навсегда удалить, если не используется.",
-      "sidebar_edit_title": "Редактировать поставщика",
-      "sidebar_delete_title": "Удалить поставщика",
-      "new_vendor_desc": "Добавьте нового поставщика в ваш справочник.",
-      "edit_vendor": "Редактировать поставщика",
-      "edit_vendor_desc": "Обновите информацию о поставщике",
-      "cancel": "Отмена",
-      "select_detail": "Выберите поставщика для просмотра деталей",
-      "create_new": "Создать...",
-      "new_bill": "Новый счет",
-      "new_po": "Новый заказ",
-      "active_filter": "Активный фильтр:",
-      "clear_filter": "Очистить фильтр",
-      "no_transactions": "Транзакции не найдены",
-      "manage_contacts": "Управление контактами",
-      "manage_contacts_desc": "Храните имена контактов, должности и адреса электронной почты для этого поставщика.",
-      "add_contact": "Добавить контакт",
-      "notes_placeholder": "Введите заметки о поставщике здесь... (например, инструкции по доставке)",
-      "scoreboard": {
-        "open_pos": "Открытые ПО",
-        "overdue": "Просрочено",
-        "open_bills": "Открытые Счета",
-        "paid_30_days": "Оплачено (30 дней)"
-      },
+      "title": "Панель управления",
+      "select_vendor": "Выберите поставщика",
+      "select_vendor_hint": "Выберите поставщика из списка слева, чтобы увидеть историю транзакций и детали профиля.",
       "list": {
         "title": "Поставщики",
-        "new_vendor": "Новый Поставщик",
-        "search_placeholder": "Поиск поставщиков",
+        "new_vendor": "Новый поставщик",
+        "search_placeholder": "Поиск поставщиков...",
         "no_results": "Поставщики не найдены",
-        "open_balance": "Текущий баланс",
-        "no_open_balance": "Нет задолженности"
+        "open_balance": "Открытый баланс",
+        "no_open_balance": "Расчёт произведён"
       },
-      "profile": {
-        "no_vendor_selected": "Поставщик не выбран",
-        "select_vendor_hint": "Выберите поставщика из списка, чтобы просмотреть историю транзакций и контактную информацию.",
-        "edit": "Редактировать",
-        "delete": "Удалить",
-        "new_transaction": "Новая транзакция",
-        "no_email": "Email не указан",
-        "no_phone": "Телефон не указан",
-        "terms_label": "Условия:",
-        "transactions_title": "Транзакции",
-        "total_transactions": "Всего: {count} транзакций",
-        "no_transactions_italic": "У этого поставщика нет истории транзакций.",
-        "delete_title": "Удалить поставщика?",
-        "delete_desc": "Вы уверены, что хотите удалить {name}? Это действие нельзя отменить, если у поставщика нет существующих транзакций.",
-        "open_balance": "Текущий баланс",
-        "errors": {
-          "failed_to_delete": "Не удалось удалить поставщика",
-          "unexpected": "Произошла непредвиденная ошибка"
-        }
-      },
-      "fields": {
-        "vendor_name": "Название поставщика",
-        "tax_id": "ИНН",
-        "open_balance": "Текущий баланс",
-        "ytd_volume": "Объем с начала года",
-        "last_payment": "Последний платеж",
-        "reliability_score": "Рейтинг надежности",
-        "top_tier": "Высший уровень",
-        "spending_trend": "Динамика расходов (последние 6 месяцев)",
-        "company_name": "Название компании",
-        "company_name_placeholder": "например, ООО «Поставщик Фруктов»",
-        "tax_id_placeholder": "123456789",
-        "currency": "Валюта",
-        "email": "Email",
-        "email_placeholder": "contact@supplier.com",
-        "phone": "Телефон",
-        "phone_placeholder": "+998 90 123 45 67",
-        "address": "Адрес",
-        "address_placeholder": "Полный адрес...",
-        "payment_terms": "Условия платежа",
-        "payment_terms_placeholder": "Нетто 30, Нетто 60 и т.д."
-      },
-      "currencies": {
-        "uzs": "сўм (Сўм)",
-        "usd": "USD (Доллар США)"
-      },
-      "modal": {
-        "button_cancel": "Отмена",
-        "button_save": "Сохранить изменения",
-        "button_saving": "Сохранение..."
-      },
-      "tabs": {
-        "transactions": "Список транзакций",
-        "contacts": "Контакты",
-        "notes": "Заметки"
-      },
-      "table": {
-        "header_name": "Название",
-        "header_contact": "Контакт",
-        "header_currency": "Валюта",
-        "header_actions": "Действия",
-        "empty_state": "Поставщики не найдены. Нажмите 'Новый Поставщик' для создания.",
-        "confirm_delete": "Вы уверены, что хотите удалить этого поставщика?",
-        "toggle_hide_archived": "Скрыть архивированные",
-        "toggle_show_archived": "Показать архивированные",
-        "button_edit": "Редактировать поставщика",
-        "date": "Дата",
-        "type": "Тип",
-        "ref": "Реф. №",
-        "amount": "Сумма",
-        "status": "Статус"
-      },
-      "status": {
-        "inactive": "Неактивно",
-        "archived": "Архивировано"
-      },
-      "save_vendor": "Сохранить поставщика",
-      "errors": {
-        "name_required": "Название обязательно",
-        "invalid_email": "Некорректный email",
-        "failed_to_create": "Не удалось создать поставщика",
-        "unexpected": "Произошла непредвиденная ошибка"
-      },
-      "transaction_types": {
-        "purchase_order": "Заказ на закупку",
-        "bill": "Счет"
-      },
-      "statuses": {
-        "paid": "Оплачено",
-        "open": "Открыто",
-        "partial": "Частично",
-        "closed": "Закрыто",
-        "cancelled": "Отменено"
-      },
-      "form": {
-        "vendor_settings": "Настройки поставщика",
-        "add_new_vendor": "Добавить нового поставщика",
-        "configure_vendor_desc": "Настройка идентификации поставщика и условий учета",
-        "identity": "Идентификация",
-        "display_name": "Отображаемое имя",
-        "tax_id_stir": "ИНН / STIR",
-        "contact_details": "Контактные данные",
-        "email_address": "Адрес электронной почты",
-        "phone_number": "Номер телефона",
-        "physical_address": "Физический адрес",
-        "accounting_defaults": "Настройки учета",
-        "default_terms": "Условия по умолчанию",
-        "update_vendor": "Обновить поставщика",
-        "save_vendor": "Сохранить поставщика"
-      },
-      "cards": {
-        "document_info": "Информация о документе",
-        "payment_terms": "Условия оплаты"
+      "scoreboard": {
+        "open_pos": "Открытые заказы",
+        "overdue": "Просроченные счета",
+        "open_bills": "Открытые счета",
+        "paid_30_days": "Оплачено (30 дней)"
       }
-    },
-    "documents": {
-      "new_po": "Новый заказ на закупку",
-      "edit_po": "Редактировать заказ на закупку",
-      "new_receipt": "Новое поступление товаров",
-      "edit_receipt": "Редактировать поступление товаров",
-      "new_bill": "Новый счет от поставщика",
-      "edit_bill": "Редактировать счет от поставщика",
-      "record_invoice": "Зарегистрировать новый счет от поставщика",
-      "payment_terms_options": {
-        "net_30": "Net 30",
-        "net_15": "Net 15",
-        "due_on_receipt": "Оплата при получении"
-      },
-      "fields": {
-        "vendor": "Поставщик",
-        "date": "Дата",
-        "type": "Тип",
-        "status": "Статус",
-        "ref_number": "Реф. № / Номер счета",
-        "payment_terms": "Условия оплаты",
-        "memo": "Заметка / Личные примечания",
-        "memo_placeholder": "Добавьте заметку для ваших записей...",
-        "subtotal": "Подитог",
-        "total": "Итого",
-        "item": "Товар",
-        "description": "Описание",
-        "description_placeholder": "Добавьте описание...",
-        "qty": "Кол-во",
-        "rate": "Цена",
-        "amount": "Сумма",
-        "add_line": "Добавить строку",
-        "select_vendor": "Выберите поставщика...",
-        "select_item": "Выберите товар...",
-        "loading_items": "Загрузка товаров...",
-        "validation_errors": "Ошибки валидации:",
-        "invoice_placeholder": "СЧ-XXXX",
-        "draft": "Черновик",
-        "bill_number": "№ Счета",
-        "warehouse_receiving": "Склад приемки",
-        "select_warehouse": "-- Выберите склад --",
-        "bay_optional": "Ячейка (Опционально)",
-        "auto_select": "-- Авто-выбор --",
-        "unknown_vendor": "Неизвестный поставщик",
-        "total_amount": "Общая сумма",
-        "no_label": "№",
-        "view": "Просмотр",
-        "edit": "Редактировать",
-        "delete": "Удалить",
-        "action": "Действие"
-      }
-    },
-    "finance": {
-      "reconciliation": "Сверка с банком",
-      "analytic_account": "Аналитический счет / Центр затрат",
-      "match": "Сопоставить",
-      "statement_balance": "Баланс по выписке",
-      "system_balance": "Баланс в системе",
-      "analytic_accounts": "Аналитические счета",
-      "bank_reconciliation": "Банковская сверка",
-      "import_statement": "Импорт выписки",
-      "unreconciled": "Не сверено",
-      "reconciled": "Сверено"
-    },
-    "receive_items": {
-      "title": "Прием товаров",
-      "po_number": "Заказ №{number}",
-      "ordered": "Заказано",
-      "received": "Получено",
-      "receive_now": "Принять сейчас",
-      "confirm": "Подтвердить получение",
-      "error_qty": "Пожалуйста, введите количество для получения хотя бы одного товара.",
-      "item": "Товар"
-    },
-    "new_bill_placeholder": {
-      "title": "Ввести новый счет",
-      "desc": "Зарегистрировать счет от поставщика",
-      "note": "Примечание: логика ввода счетов на данный момент завершается. Это модальное окно было вызвано через глубокую ссылку!",
-      "vendor": "Поставщик",
-      "bill_date": "Дата счета",
-      "save": "Сохранить счет"
-    },
-    "open_pos": {
-      "title": "Открытые заказы на закупку",
-      "desc": "Выберите заказ для {vendor} для автозаполнения",
-      "no_pos": "Открытых заказов для этого поставщика не найдено.",
-      "status_open": "Открыто",
-      "select": "Выбрать",
-      "skip": "Пропустить и создать вручную"
     }
   },
   "sales": {
+    "nav": {
+      "overview": "Обзор",
+      "pipeline": "Воронка продаж",
+      "leads": "Лиды",
+      "opportunities": "Возможности",
+      "customers": "Клиенты",
+      "quotes": "Коммерческие предложения",
+      "invoices": "Счета",
+      "commissions": "Комиссии"
+    },
     "customers": {
-      "title": "Клиенты",
-      "loading": "Загрузка клиентов...",
-      "back_to_dashboard": "Вернуться на Панель управления",
-      "center_title": "Центр клиентов",
-      "command_center": "Командный центр продаж",
-      "new_customer": "Новый клиент",
-      "new_customer_title": "Новый клиент",
       "dashboard": "Панель управления",
       "select_detail": "Выберите клиента",
       "select_customer_hint": "Выберите клиента из списка слева, чтобы увидеть историю транзакций и детали профиля.",
+      "title": "Клиенты",
+      "new_customer": "Новый клиент",
       "search_placeholder": "Поиск клиентов...",
-      "filters": {
-        "all": "Все",
-        "open": "Открыто",
-        "overdue": "Просрочено"
-      },
       "empty_state": "Клиенты не найдены",
-      "total_count": "Всего количество",
-      "status_overdue": "Просрочено",
-      "edit": "Редактировать",
-      "delete": "Удалить",
+      "outstanding_balance": "Задолженность",
+      "no_outstanding_balance": "Нет задолженности",
       "scoreboard": {
         "open_quotes": "Открытые предложения",
-        "unbilled_orders": "Невыставленные счета",
-        "overdue_ar": "Просроченная ДЗ",
+        "unbilled_orders": "Небиллированные заказы",
+        "overdue_ar": "Просроченная дебиторская задолженность",
         "paid_30_days": "Оплачено (30 дней)"
-      },
-      "fields": {
-        "credit_limit": "Кредитный лимит"
-      },
-      "form": {
-        "title_create": "Новый клиент",
-        "title_edit": "Редактировать клиента",
-        "company_name": "Название компании",
-        "email": "Электронная почта",
-        "phone": "Телефон",
-        "address": "Адрес",
-        "credit_limit": "Кредитный лимит",
-        "payment_terms": "Условия оплаты",
-        "tax_id": "ИНН",
-        "currency": "Валюта",
-        "cancel": "Отмена",
-        "save": "Сохранить клиента",
-        "saving": "Сохранение..."
       }
-    },
-    "invoice": {
-      "title": "Счет-фактура",
-      "fields": {
-        "bill_to": "Плательщик",
-        "ship_to": "Получатель",
-        "subtotal": "Промежуточный итог"
-      }
-    },
-    "invoices": {
-      "new_invoice": "Новый счет-фактура",
-      "edit_invoice": "Редактировать счет-фактуру",
-      "cards": {
-        "document_info": "Информация о счете",
-        "payment_terms": "Условия оплаты"
-      },
-      "fields": {
-        "customer": "Клиент",
-        "select_customer": "Выберите клиента",
-        "invoice_date": "Дата счета-фактуры",
-        "invoice_number": "Номер счета",
-        "due_date": "Дата исполнения",
-        "payment_terms": "Условия оплаты",
-        "memo": "Заметка"
-      },
-      "payment_terms_options": {
-        "net_30": "Нетто 30",
-        "net_15": "Нетто 15",
-        "due_on_receipt": "При получении"
-      }
-    },
-    "invoice_form": {
-      "title_new": "Новый счет-фактура",
-      "button_cancel": "Отмена",
-      "button_save": "Сохранить счет-фактуру",
-      "label_customer_id": "ID клиента",
-      "label_terms": "Условия платежа",
-      "label_invoice_date": "Дата счета-фактуры",
-      "label_due_date": "Дата исполнения",
-      "payment_terms": {
-        "net15": "Нетто 15",
-        "net30": "Нетто 30",
-        "due_on_receipt": "При получении"
-      },
-      "column_number": "№",
-      "column_item": "Товар",
-      "column_description": "Описание",
-      "column_qty": "Кол-во",
-      "column_rate": "Курс",
-      "column_amount": "Сумма",
-      "button_add_line": "Добавить строку",
-      "placeholder_item": "Выберите товар...",
-      "placeholder_description": "Опис...",
-      "label_subtotal": "Промежуточный итог",
-      "label_total": "Итого",
-      "stock_warning": "Недостаточно товара: {qty} в наличии"
-    },
-    "customer_detail": {
-      "empty_state_title": "Выберите клиента",
-      "empty_state_description": "Выберите клиента из левого списка, чтобы просмотреть его финансовую информацию и историю транзакций.",
-      "button_new_invoice": "Новый счет-фактура",
-      "button_receive_payment": "Получить платеж",
-      "button_send_statement": "Отправить выписку",
-      "no_phone": "Без телефона",
-      "no_email": "Без email",
-      "no_tax_id": "Без ИНН",
-      "label_open_balance": "Текущий баланс",
-      "label_overdue": "Просрочено",
-      "label_unused_credits": "Неиспользованные кредиты",
-      "label_credit_limit": "Кредитный лимит",
-      "label_open_invoices": "Открытые счета",
-      "sales_trend": "Тренд продаж",
-      "collection_title": "Предложение помощника по сбору платежей",
-      "collection_message": "Счет просрочен и с клиентом не связывались {days} дней. Пора позвонить для получения платежа.",
-      "button_mark_contacted": "Отметить контактировано",
-      "tab_transactions": "Недавние транзакции",
-      "tab_contacts": "Контакты",
-      "tab_locations": "Места работ",
-      "table_header_date": "Дата",
-      "table_header_type": "Тип",
-      "table_header_number": "Номер",
-      "table_header_amount": "Сумма",
-      "table_header_status": "Статус",
-      "empty_transactions": "Нет недавних транзакций для этого клиента.",
-      "empty_contacts": "Дополнительные контакты для этого клиента появятся здесь.",
-      "empty_locations": "Места доставки и рабочие места появятся здесь."
-    },
-    "customer_history": {
-      "tab_transactions": "Транзакции",
-      "tab_contacts": "Контакты",
-      "tab_locations": "Места",
-      "filtered_by": "Отфильтровано по",
-      "header_date": "Дата",
-      "header_type": "Тип",
-      "header_number": "Номер",
-      "header_amount": "Сумма",
-      "header_status": "Статус",
-      "header_actions": "Действия",
-      "action_edit": "Редактировать",
-      "action_delete": "Удалить",
-      "empty_transactions": "Транзакции не найдены",
-      "empty_contacts": "Контакты не найдены",
-      "empty_locations": "Места не найдены"
-    },
-    "estimate": {
-      "title": "Смета"
-    },
-    "receive_payment": {
-      "title": "Прием платежа"
-    },
-    "modals": {
-      "delete_invoice": {
-        "title": "Удалить счет {invoiceNumber}",
-        "button_confirm": "Удалить счет",
-        "checkbox_label": "Я понимаю последствия",
-        "warnings": {
-          "open": "Вы собираетесь удалить открытый (неоплаченный) счет. Это действие невозможно отменить.",
-          "paid": "⚠️ ВНИМАНИЕ: Этот счет помечен как ОПЛАЧЕН.",
-          "paid_unusual": "Удаление оплаченного счета необычно и может указывать на:",
-          "paid_reasons": {
-            "incorrect": "Платеж был записан неправильно",
-            "error": "Счет был введен по ошибке",
-            "credit": "Клиент выдал кредит"
-          },
-          "paid_advice": "Если платеж действительно получен, сначала отмените платеж.",
-          "partial": "⚠️ ВНИМАНИЕ: Этот счет был частично оплачен.",
-          "partial_info": "Удаление отменит счет, но не отменит платежи. Если необходимо, сначала отмените частичные платежи."
-        },
-        "details": {
-          "invoice_number": "Номер счета",
-          "amount": "Сумма",
-          "status": "Статус"
-        },
-        "consequences": {
-          "title": "Это будет:",
-          "delete_invoice": "Удалить счет и все позиции",
-          "reverse_gl": "Обратить записи главной книги",
-          "restore_inventory": "Восстановить запасы на складе",
-          "update_balance": "Обновить баланс клиента"
-        }
-      }
-    },
-    "grid": {
-      "headers": {
-        "item": "Товар",
-        "description": "Описание",
-        "quantity": "Кол-во",
-        "uom": "Ед. изм.",
-        "unit_price": "Цена",
-        "amount": "Сумма",
-        "warehouse": "Склад",
-        "discount_percent": "% Скидка",
-        "tax_rate": "Налоговая ставка"
-      },
-      "placeholders": {
-        "select_item": "Выберите товар...",
-        "description": "Описание...",
-        "select_warehouse": "Выберите склад...",
-        "no_tax": "Без налога"
-      },
-      "add_line": "Добавить строку",
-      "delete_confirmation": {
-        "title": "Удалить строку?",
-        "description": "Это действие нельзя отменить."
-      }
-    },
-    "document_form": {
-      "fields": {
-        "customer": "Клиент",
-        "invoice_date": "Дата счета",
-        "payment_terms": "Условия оплаты",
-        "memo": "Заметка"
-      },
-      "placeholders": {
-        "customer": "Выберите клиента...",
-        "memo": "Дополнительная информация..."
-      },
-      "payment_terms": {
-        "net_30": "Нетто 30",
-        "net_15": "Нетто 15",
-        "due_on_receipt": "При получении"
-      }
-    },
-    "stock_validation": {
-      "service_item": "Услуга (запас не требуется)",
-      "insufficient_stock": "Недостаточный запас",
-      "stock_details": "Запрошено: {requested} | Доступно: {available}",
-      "low_stock_warning": "Предупреждение о низком запасе ({available} доступно, {remaining} останется)",
-      "stock_ok": "Запас в порядке ({available} доступно)"
-    },
-    "picking_locations": {
-      "title": "Места отбора (порядок FIFO)",
-      "loading": "Загрузка мест отбора...",
-      "warning_title": "Места склада не полностью настроены",
-      "warning_detail": "Товар #{itemId} требует еще {shortQty} единиц в складских местах.",
-      "warning_explanation": "Товар есть на складе, но не размещен в конкретных ячейках.",
-      "warning_generic": "Некоторые товары не размещены в складских местах.",
-      "can_proceed": "✓ Вы все еще можете создать этот счет",
-      "future_steps_intro": "Для включения мест отбора:",
-      "future_steps": {
-        "receive_inventory": "Принимайте товары через Счета/Заказы поставщику",
-        "use_transfer": "Используйте Перемещение для назначения запасов"
-      },
-      "item_label": "Товар",
-      "unassigned": "НЕ НАЗНАЧЕНО",
-      "batch_label": "Партия",
-      "units": "единиц",
-      "no_stock_available": "⚠️ Нет запаса для этого товара"
-    },
-    "pdf": {
-      "companyName": "Stable ERP",
-      "invoice": "СЧЕТ",
-      "invoiceNumber": "№ Счета",
-      "date": "Дата",
-      "dueDate": "Срок оплаты",
-      "billTo": "Счет для",
-      "taxId": "ИНН",
-      "phone": "Телефон",
-      "email": "Email",
-      "itemColumn": "Наименование",
-      "qtyColumn": "Кол-во",
-      "priceColumn": "Цена",
-      "amountColumn": "Сумма",
-      "subtotal": "Промежуточный итог",
-      "total": "ИТОГО",
-      "bankDetails": "Банковские реквизиты",
-      "bankName": "Название банка",
-      "mfo": "МФО",
-      "accountNumber": "Расчетный счет",
-      "director": "Директор",
-      "accountant": "Главный бухгалтер",
-      "signature": "Подпись"
     }
   },
   "manufacturing": {
@@ -1079,511 +461,15 @@
     }
   },
   "finance": {
-    "chartOfAccounts": {
-      "title": "План Счетов",
-      "subtitle": "Финансовое положение и остатки на счетах в реальном времени",
-      "loading": "Загрузка счетов...",
-      "enter_opening_balances": "Ввести начальные остатки",
-      "accountTypes": {
-        "asset": "Актив",
-        "liability": "Обязательство",
-        "equity": "Капитал",
-        "revenue": "Доход",
-        "expense": "Расход",
-        "assets": "Активы",
-        "liabilities": "Обязательства",
-        "revenues": "Доходы",
-        "expenses": "Расходы"
-      },
-      "tableHeaders": {
-        "code": "Код",
-        "accountName": "Название Счета",
-        "balance": "Остаток (сўм)"
-      },
-      "totalLabel": "Итого"
-    },
-    "accountRegister": {
-      "loading": "Загрузка регистра счета...",
-      "backToDashboard": "Вернуться на панель",
-      "accountInfo": {
-        "description": "Описание",
-        "status": "Статус",
-        "type": "Тип",
-        "lastUpdated": "Последнее обновление",
-        "noDescription": "Н/Д"
-      },
-      "summaryStats": {
-        "currentBalance": "Текущий Остаток",
-        "totalDebits": "Итого Дебет",
-        "totalCredits": "Итого Кредит",
-        "transactions": "Транзакции"
-      },
-      "balanceTrend": {
-        "title": "Тренд Остатка"
-      },
-      "filters": {
-        "search": "Поиск",
-        "searchPlaceholder": "Поиск по описанию или ссылке...",
-        "fromDate": "Дата С",
-        "toDate": "Дата До",
-        "clear": "Очистить",
-        "showReversals": "Показать сторнирующие проводки (для аудита)"
-      },
-      "transactionTable": {
-        "headers": {
-          "date": "Дата",
-          "reference": "Ссылка",
-          "description": "Описание",
-          "debit": "Дебет",
-          "credit": "Кредит",
-          "balance": "Остаток",
-          "actions": "Действия"
-        }
-      },
-      "emptyState": {
-        "title": "Транзакции Не Найдены",
-        "message": "У этого счета нет транзакций.",
-        "createFirst": "Создать Первую Запись"
-      },
-      "buttons": {
-        "edit": "Редактировать",
-        "newEntry": "Новая Запись",
-        "export": "Экспорт",
-        "loadMore": "Загрузить Еще",
-        "editJournalEntry": "Редактировать Проводку",
-        "deleteJournalEntry": "Удалить Проводку"
-      },
-      "deleteConfirm": {
-        "title": "Удалить проводку №{id}?",
-        "message": "Это создаст сторнирующую проводку и пометит эту запись как удалённую.",
-        "warning": "Это действие нельзя отменить.",
-        "error": "Ошибка",
-        "failedToDelete": "Не удалось удалить"
-      },
-      "inactiveWarning": {
-        "title": "Неактивный Счет",
-        "message": "Этот счет помечен как неактивный. Новые транзакции не могут быть проведены."
-      }
-    },
-    "editAccount": {
-      "title": "Редактировать Счет",
-      "labels": {
-        "accountCode": "Код Счета",
-        "accountName": "Название Счета",
-        "description": "Описание",
-        "activeAccount": "Активный Счет"
-      },
-      "placeholders": {
-        "accountName": "Введите название счета",
-        "description": "Введите опциональное описание"
-      },
-      "messages": {
-        "codeCannotChange": "Коды счетов не могут быть изменены",
-        "nameRequired": "Название счета обязательно"
-      },
-      "buttons": {
-        "cancel": "Отмена",
-        "save": "Сохранить Изменения",
-        "saving": "Сохранение..."
-      }
-    },
-    "createJournalEntry": {
-      "title": "Создать Журнальную Проводку",
-      "labels": {
-        "date": "Дата",
-        "reference": "Ссылка",
-        "description": "Описание"
-      },
-      "placeholders": {
-        "reference": "например, INV-123",
-        "description": "Опишите эту журнальную проводку",
-        "selectAccount": "Выберите счет...",
-        "optional": "Опционально"
-      },
-      "tableHeaders": {
-        "account": "Счет",
-        "debit": "Дебет",
-        "credit": "Кредит",
-        "description": "Описание",
-        "totals": "Итого"
-      },
-      "buttons": {
-        "addLine": "Добавить Строку",
-        "cancel": "Отмена",
-        "create": "Создать Проводку",
-        "creating": "Создание..."
-      },
-      "validation": {
-        "dateRequired": "Дата обязательна",
-        "descriptionRequired": "Описание обязательно",
-        "accountRequired": "Все строки должны иметь выбранный счет",
-        "notBalanced": "Проводка должна быть сбалансирована. Дебет: {debit}, Кредит: {credit}",
-        "outOfBalance": "Проводка не сбалансирована. Дебет: {debit}, Кредит: {credit}"
-      },
-      "errors": {
-        "createFailed": "Не удалось создать журнальную проводку",
-        "loadAccountsFailed": "Не удалось загрузить счета"
-      }
-    },
-    "glImpact": {
-      "title": "Влияние на Главную Книгу",
-      "buttonLabel": "Влияние ГК",
-      "loading": "Загрузка записей...",
-      "noEntries": "Записи главной книги не найдены для этой транзакции.",
-      "journalEntry": "Журнальная Проводка №",
-      "tableHeaders": {
-        "account": "Счет",
-        "debit": "Дебет",
-        "credit": "Кредит",
-        "totals": "Итого"
-      },
-      "outOfBalance": "КРИТИЧНО: ПРОВОДКА НЕ СБАЛАНСИРОВАНА"
-    },
-    "generalLedger": {
-      "title": "Журнал проводок",
-      "subtitle": "Поиск и анализ всех бухгалтерских проводок",
-      "filters": {
-        "dateFrom": "Дата с",
-        "dateTo": "Дата по",
-        "account": "Счёт",
-        "allAccounts": "Все счета",
-        "type": "Тип операции",
-        "allTypes": "Все типы",
-        "bills": "Счета поставщиков",
-        "invoices": "Счета клиентам",
-        "payments": "Платежи",
-        "manual": "Ручные проводки",
-        "search": "Поиск",
-        "searchPlaceholder": "Поиск по описанию или ссылке...",
-        "showReversals": "Показать сторнирующие проводки (для аудита)"
-      },
-      "table": {
-        "date": "Дата",
-        "transaction": "Транзакция",
-        "account": "Счёт",
-        "description": "Описание",
-        "debit": "Дебет",
-        "credit": "Кредит"
-      },
-      "emptyState": {
-        "title": "Нет проводок",
-        "message": "Попробуйте изменить фильтры для поиска проводок"
-      },
-      "pagination": {
-        "showing": "Показано",
-        "of": "из",
-        "previous": "Назад",
-        "next": "Вперёд"
-      },
-      "buttons": {
-        "export": "Экспорт в CSV"
-      }
-    },
-    "coa": {
-      "title": "План счетов",
-      "fields": {
-        "asset": "Актив",
-        "liability": "Обязательство"
-      }
-    },
-    "journal_entry": {
-      "title": "Журнальная проводка",
-      "fields": {
-        "debit": "Дебет",
-        "credit": "Кредит"
-      }
-    },
-    "reports": {
-      "title": "Финансовые отчеты",
-      "subtitle": "Отчет о прибылях и убытках и балансовый отчет",
-      "tabs": {
-        "profitLoss": "Отчет о прибылях и убытках",
-        "balanceSheet": "Балансовый отчет"
-      },
-      "profitLoss": {
-        "title": "Отчет о прибылях и убытках",
-        "sections": {
-          "revenue": "Доходы",
-          "costOfGoodsSold": "Себестоимость продаж",
-          "operatingExpenses": "Операционные расходы"
-        },
-        "totals": {
-          "totalRevenue": "Итого доходы",
-          "totalCOGS": "Итого себестоимость",
-          "grossProfit": "Валовая прибыль",
-          "totalExpenses": "Итого расходы",
-          "netIncome": "Чистая прибыль (убыток)"
-        }
-      },
-      "balanceSheet": {
-        "title": "Балансовый отчет",
-        "asOf": "По состоянию на",
-        "sections": {
-          "assets": "АКТИВЫ",
-          "currentAssets": "Оборотные активы",
-          "nonCurrentAssets": "Внеоборотные активы",
-          "liabilities": "ОБЯЗАТЕЛЬСТВА",
-          "currentLiabilities": "Краткосрочные обязательства",
-          "nonCurrentLiabilities": "Долгосрочные обязательства",
-          "equity": "КАПИТАЛ"
-        },
-        "totals": {
-          "totalCurrentAssets": "Итого оборотные активы",
-          "totalNonCurrentAssets": "Итого внеоборотные активы",
-          "totalAssets": "ИТОГО АКТИВЫ",
-          "totalCurrentLiabilities": "Итого краткосрочные обязательства",
-          "totalNonCurrentLiabilities": "Итого долгосрочные обязательства",
-          "totalLiabilities": "Итого обязательства",
-          "totalEquity": "Итого капитал",
-          "totalLiabilitiesAndEquity": "ИТОГО ОБЯЗАТЕЛЬСТВА И КАПИТАЛ"
-        },
-        "verification": {
-          "title": "Проверка балансового уравнения",
-          "assets": "Активы",
-          "liabilitiesEquity": "Обязательства + Капитал",
-          "difference": "Разница"
-        }
-      },
-      "datePresets": {
-        "thisMonth": "Этот месяц",
-        "lastMonth": "Прошлый месяц",
-        "thisQuarter": "Этот квартал",
-        "yearToDate": "С начала года",
-        "custom": "Произвольный период",
-        "today": "Сегодня",
-        "endOfLastMonth": "Конец прошлого месяца",
-        "endOfThisMonth": "Конец этого месяца",
-        "endOfYear": "Конец года"
-      },
-      "buttons": {
-        "print": "Печать",
-        "exportCSV": "Экспорт в CSV",
-        "refresh": "Обновить"
-      },
-      "loading": "Загрузка отчета...",
-      "noData": "Нет данных за выбранный период",
-      "fields": {
-        "net_profit": "Чистая прибыль",
-        "fiscal_year": "Финансовый год"
-      }
-    },
-    "transfer": {
-      "title": "Перевод Средств",
-      "subtitle": "Перевод между денежными счетами",
-      "from_account": "Со счета",
-      "to_account": "На счет",
-      "amount": "Сумма",
-      "date": "Дата",
-      "memo": "Примечание",
-      "memo_placeholder": "Причина перевода",
-      "balance_before": "Баланс до",
-      "balance_after": "Баланс после",
-      "info_box": "Перевод будет записан немедленно. Будет создана проводка в главной книге.",
-      "submit": "Выполнить Перевод",
-      "submitting": "Выполнение...",
-      "validation": {
-        "from_required": "Выберите счет списания",
-        "to_required": "Выберите счет зачисления",
-        "amount_positive": "Сумма должна быть положительной",
-        "same_account": "Нельзя переводить на тот же счет",
-        "insufficient_balance": "Недостаточно средств на счете",
-        "memo_required": "Укажите причину перевода"
-      }
-    },
-    "cash_accounts": {
-      "title": "Денежные Счета",
-      "subtitle": "Управление денежными средствами и переводами",
-      "total_balance": "Общий баланс",
-      "active_accounts": "Активные счета",
-      "recent_transfers": "Недавние переводы",
-      "new_transfer": "Новый Перевод",
-      "transfer_out": "Перевести",
-      "transfer_in": "Получить",
-      "from_account": "Со счета",
-      "to_account": "На счет",
-      "amount": "Сумма",
-      "no_transfers": "Переводы отсутствуют"
-    },
-    "fixedAssets": {
-      "title": "Основные средства",
-      "subtitle": "Отслеживание долгосрочных активов и амортизации",
-      "new_asset": "Новое средство",
-      "run_depreciation": "Запустить амортизацию",
-      "kpi": {
-        "total_cost": "Общая стоимость",
-        "total_book_value": "Балансовая стоимость",
-        "asset_count": "Количество активов"
-      },
-      "registry": {
-        "asset_number": "Номер актива",
-        "name": "Название",
-        "type": "Тип",
-        "book_value": "Балансовая стоимость",
-        "status": "Статус",
-        "purchase_date": "Дата покупки"
-      },
-      "status": {
-        "ACTIVE": "Активно",
-        "FULLY_DEPRECIATED": "Полностью амортизировано",
-        "DISPOSED": "Списано",
-        "all": "Все"
-      },
-      "type": {
-        "MACHINERY": "Оборудование",
-        "VEHICLE": "Транспортное средство",
-        "BUILDING": "Здание",
-        "EQUIPMENT": "Техника",
-        "OTHER": "Прочее"
-      },
-      "form": {
-        "general_tab": "Основное",
-        "depreciation_tab": "Амортизация",
-        "accounting_tab": "Бухгалтерия",
-        "asset_number": "Номер актива",
-        "asset_number_placeholder": "например, FA-2024-001",
-        "asset_name": "Название актива",
-        "asset_name_placeholder": "например, Freeze Dryer Model X",
-        "asset_type": "Тип актива",
-        "purchase_date": "Дата покупки",
-        "description": "Описание",
-        "description_placeholder": "Опциональное описание актива",
-        "cost": "Стоимость приобретения",
-        "cost_placeholder": "в сўм",
-        "salvage_value": "Ликвидационная стоимость",
-        "salvage_value_placeholder": "остаточная стоимость",
-        "useful_life": "Срок полезного использования",
-        "useful_life_months": "месяцев",
-        "useful_life_years": "лет",
-        "depreciation_method": "Метод амортизации",
-        "straight_line": "Прямолинейный",
-        "asset_account": "Счет актива",
-        "depreciation_expense_account": "Счет расходов на амортизацию",
-        "accumulated_depreciation_account": "Счет накопленной амортизации",
-        "monthly_depreciation_preview": "Ежемесячная амортизация",
-        "completion_date": "Дата завершения",
-        "save": "Сохранить",
-        "cancel": "Отмена",
-        "creating": "Создание...",
-        "updating": "Обновление...",
-        "create_asset": "Создать актив",
-        "edit_asset": "Редактировать актив"
-      },
-      "wizard": {
-        "title": "Ежемесячная обработка амортизации",
-        "step_select": "Выбор периода",
-        "step_preview": "Предварительный просмотр",
-        "step_results": "Результаты",
-        "select_period": "Выберите период",
-        "year": "Год",
-        "month": "Месяц",
-        "preview": "Предварительный просмотр",
-        "assets_to_process": "Активы для обработки",
-        "total_amount": "Общая сумма амортизации",
-        "skipped_count": "Пропущено активов",
-        "warning": "Это создаст проводки и обновит балансы активов",
-        "warning_irreversible": "Это действие создаст бухгалтерские проводки и не может быть отменено",
-        "run": "Запустить амортизацию",
-        "running": "Обработка...",
-        "success": "Амортизация завершена успешно",
-        "processed_count": "Обработано активов",
-        "view_journal_entry": "Посмотреть проводку",
-        "close": "Закрыть",
-        "back": "Назад",
-        "next": "Далее",
-        "months": {
-          "1": "Январь",
-          "2": "Февраль",
-          "3": "Март",
-          "4": "Апрель",
-          "5": "Май",
-          "6": "Июнь",
-          "7": "Июль",
-          "8": "Август",
-          "9": "Сентябрь",
-          "10": "Октябрь",
-          "11": "Ноябрь",
-          "12": "Декабрь"
-        },
-        "errors": {
-          "already_processed": "Амортизация уже обработана для этого периода",
-          "no_assets": "Нет активов для обработки",
-          "period_locked": "Период закрыт для проводок"
-        }
-      },
-      "detail": {
-        "back": "Назад к реестру",
-        "edit": "Редактировать",
-        "tab_overview": "Обзор",
-        "tab_history": "История амортизации",
-        "tab_schedule": "График",
-        "tab_gl": "Проводки ГК",
-        "overview": {
-          "financial_summary": "Финансовая сводка",
-          "original_cost": "Первоначальная стоимость",
-          "salvage_value": "Ликвидационная стоимость",
-          "accumulated_depreciation": "Накопленная амортизация",
-          "book_value": "Балансовая стоимость",
-          "monthly_depreciation": "Ежемесячная амортизация",
-          "useful_life": "Срок службы",
-          "months_remaining": "Осталось месяцев",
-          "depreciation_info": "Информация об амортизации",
-          "method": "Метод",
-          "purchase_date": "Дата покупки",
-          "completion_date": "Дата завершения",
-          "accounting_setup": "Настройки бухгалтерии",
-          "asset_account": "Счет актива",
-          "expense_account": "Счет расходов",
-          "accumulated_account": "Счет накопленной амортизации"
-        },
-        "history": {
-          "title": "История амортизации",
-          "no_entries": "Нет записей амортизации",
-          "period": "Период",
-          "amount": "Сумма",
-          "accumulated_before": "Накоплено до",
-          "accumulated_after": "Накоплено после",
-          "book_value": "Балансовая стоимость",
-          "journal_entry": "Проводка",
-          "view_entry": "Посмотреть"
-        },
-        "schedule": {
-          "title": "График амортизации",
-          "subtitle": "Проектируемая амортизация на весь срок службы",
-          "period": "Период",
-          "monthly_amount": "Ежемесячная сумма",
-          "accumulated": "Накопленная",
-          "book_value": "Балансовая стоимость",
-          "status": "Статус",
-          "posted": "Проведено",
-          "future": "Будущее",
-          "fully_depreciated": "Полностью амортизировано"
-        },
-        "gl_impact": {
-          "title": "Влияние на Главную книгу",
-          "no_entries": "Нет проводок для этого актива",
-          "capitalization": "Капитализация",
-          "depreciation": "Амортизация",
-          "disposal": "Списание"
-        }
-      },
-      "validation": {
-        "asset_number_required": "Номер актива обязателен",
-        "asset_number_unique": "Номер актива уже существует",
-        "name_required": "Название обязательно",
-        "cost_required": "Стоимость обязательна",
-        "cost_positive": "Стоимость должна быть положительной",
-        "cost_greater_than_salvage": "Стоимость должна быть больше ликвидационной стоимости",
-        "useful_life_positive": "Срок использования должен быть положительным",
-        "purchase_date_required": "Дата покупки обязательна",
-        "account_required": "Все счета должны быть указаны"
-      },
-      "errors": {
-        "load_failed": "Не удалось загрузить активы",
-        "create_failed": "Не удалось создать актив",
-        "update_failed": "Не удалось обновить актив",
-        "preview_failed": "Не удалось создать предварительный просмотр",
-        "depreciation_failed": "Не удалось запустить амортизацию"
-      }
+    "nav": {
+      "overview": "Обзор",
+      "chart_of_accounts": "План счетов",
+      "general_ledger": "Главная книга",
+      "cash_accounts": "Денежные счета",
+      "fixed_assets": "Основные средства",
+      "expenses": "Расходы",
+      "financial_reports": "Финансовые отчеты",
+      "payroll": "Зарплата"
     }
   },
   "inventory": {
@@ -1647,428 +533,435 @@
         "category": "Категория",
         "none": "Нет",
         "valuation": "Метод оценки"
-      }
-    },
-    "reconciliation_page": {
-      "title": "Сверка остатков на складе",
-      "meta_title": "Сверка остатков на складе",
-      "description": "Сравните стоимость запасов в Главной книге (финансовые данные) со значениями в Журнале товаров (физические остатки). Выявляйте и устраняйте расхождения между бухгалтерскими и складскими данными."
-    },
-    "category_combobox": {
-      "select_category": "Выберите категорию...",
-      "search_categories": "Поиск категорий...",
-      "no_categories": "Категории не найдены",
-      "create_new_category": "Создать новую категорию"
-    },
-    "data_grid": {
-      "sort": {
-        "name": "Название",
-        "qty_on_hand": "Кол-во на складе",
-        "price": "Цена",
-        "date_added": "Дата добавления",
-        "label": "Сортировка"
-      }
-    },
-    "table": {
-      "item": "Товар",
-      "type": "Тип",
-      "on_hand": "В наличии",
-      "price": "Цена",
-      "cost": "Себестоимость"
-    },
-    "types": {
-      "inventory": "Инвентарный",
-      "service": "Услуга",
-      "assembly": "Сборка",
-      "non_inventory": "Неинвентарный"
-    },
-    "form": {
-      "basic_info": "Основная информация",
-      "financials": "Финансы и Склад",
-      "name": "Название",
-      "name_placeholder": "например, Красное яблоко XL",
-      "sku": "Артикул / Код товара",
-      "sku_placeholder": "SKU-001",
-      "description": "Описание",
-      "description_placeholder": "Подробное описание...",
-      "category": "Категория",
-      "select_category": "Выберите категорию...",
-      "category_required": "Категория обязательна",
-      "sales_price": "Цена продажи (сўм)",
-      "standard_cost": "Стандартная стоимость (сўм)",
-      "reorder_point": "Точка дозаказа",
-      "base_unit": "Базовая единица",
-      "purchase_unit": "Единица закупки",
-      "select_unit": "Выберите единицу",
-      "active": "Товар активен",
-      "bom": "Спецификация (BOM)",
-      "add_component": "Добавить компонент",
-      "select_component": "Выберите компонент...",
-      "no_components": "Компоненты еще не добавлены.",
-      "save_info": "Изменения сразу отразятся на складе.",
-      "create_title": "Создание нового товара",
-      "create_desc": "Определите ваш новый инвентарь, услугу или сборку.",
-      "select_type": "Выберите тип товара",
-      "select_type_desc": "Выберите тип создаваемого товара, чтобы увидеть соответствующие поля.",
-      "inventory_desc": "Складской товар с отслеживанием количества",
-      "service_desc": "Работа или экспертиза",
-      "assembly_desc": "Собрано из других товаров"
-    },
-    "actions": {
-      "edit": "Редактировать",
-      "adjust_qty": "Корректировать кол-во",
-      "build": "Собрать",
-      "stock_level": "Уровень запасов",
-      "reorder_needed": "Нужен дозаказ",
-      "in_stock": "В наличии",
-      "active": "Активен",
-      "inactive": "Неактивен",
-      "archived": "Архивировано",
-      "hide_archived": "Скрыть архивированные",
-      "show_archived": "Показать архивированные"
-    },
-    "no_items_found": "Товары не найдены. Создайте новый, чтобы начать.",
-    "delete_modal": {
-      "title_check": "Удалить товар: {itemName}",
-      "title_confirm": "Подтвердить окончательное удаление",
-      "checking_history": "Проверка истории товара...",
-      "no_history_title": "История не найдена",
-      "no_history_message": "Этот товар не имеет истории транзакций и может быть безопасно удален.",
-      "button_delete_permanently": "Удалить окончательно",
-      "has_history_title": "Товар имеет историю транзакций",
-      "has_history_warning": "Этот товар не может быть безопасно удален, так как он использовался в транзакциях:",
-      "section_purchasing": "История закупок",
-      "count_po_lines": "{count} строк заказа на покупку",
-      "count_bill_lines": "{count} строк счета поставщика",
-      "section_sales": "История продаж",
-      "count_invoice_lines": "{count} строк счета",
-      "section_manufacturing": "История производства",
-      "count_bom_items": "{count} ссылок на спецификацию",
-      "count_production_inputs": "{count} входных материалов производства",
-      "count_production_outputs": "{count} выходных материалов производства",
-      "section_inventory": "История склада",
-      "count_inventory_layers": "{count} слоев запасов (FIFO)",
-      "action_prompt": "Что вы хотите сделать?",
-      "button_archive": "Архивировать товар",
-      "button_archive_desc": "Сохранить всю историю (Безопасно)",
-      "button_clean_delete": "Очистить историю и удалить",
-      "button_clean_delete_desc": "Окончательное удаление всех данных (Опасно)",
-      "confirm_title": "⚠️ Подтвердить окончательное удаление",
-      "confirm_warning": "Это окончательно удалит:",
-      "confirm_warning_item": "Товар: {itemName}",
-      "confirm_warning_history": "ВСЮ историю транзакций, указанную выше",
-      "confirm_warning_cannot_undo": "Это действие НЕВОЗМОЖНО будет отменить.",
-      "confirm_instruction": "Введите DELETE для подтверждения:",
-      "confirm_placeholder": "Введите DELETE",
-      "checkbox_understand": "Я понимаю, что это действие невозможно отменить",
-      "button_confirm_delete": "Подтвердить окончательное удаление",
-      "deleting": "Удаление...",
-      "archiving": "Архивирование...",
-      "success_deleted": "Товар окончательно удален",
-      "success_archived": "Товар архивирован (история сохранена)",
-      "error_failed": "Ошибка при удалении товара"
-    },
-    "history": {
-      "title": "История транзакций",
-      "transaction_types": {
-        "bill": "Счет",
-        "invoice": "Накладная",
-        "production_in": "Производственный ввод",
-        "production_out": "Производственный вывод",
-        "transfer": "Перемещение",
-        "adjustment": "Корректировка",
-        "sales_return": "Возврат продажи",
-        "purchase_return": "Возврат покупки"
       },
-      "columns": {
-        "date": "Дата",
-        "type": "Тип",
-        "reference": "Ссылка",
-        "partner": "Партнер",
-        "location": "Местоположение",
-        "warehouse": "Склад",
-        "gl_account": "Счет ГК",
-        "qty_change": "Изменение кол-ва",
-        "cost_price": "Цена/Стоимость",
-        "running_balance": "Текущий баланс",
-        "batch": "Партия",
-        "actions": "Действия"
+      "reconciliation_page": {
+        "title": "Сверка остатков на складе",
+        "meta_title": "Сверка остатков на складе",
+        "description": "Сравните стоимость запасов в Главной книге (финансовые данные) со значениями в Журнале товаров (физические остатки). Выявляйте и устраняйте расхождения между бухгалтерскими и складскими данными."
       },
-      "filters": {
-        "from_date": "С даты",
-        "to_date": "До даты",
-        "movement_type": "Тип движения",
-        "all_movements": "Все движения",
-        "inbound_only": "Только приход",
-        "outbound_only": "Только расход",
-        "production_only": "Только производство",
-        "transfers_only": "Только перемещения",
-        "adjustments_only": "Только корректировки",
-        "clear_filters": "Очистить фильтры"
+      "category_combobox": {
+        "select_category": "Выберите категорию...",
+        "search_categories": "Поиск категорий...",
+        "no_categories": "Категории не найдены",
+        "create_new_category": "Создать новую категорию"
       },
-      "buttons": {
-        "adjust_inventory": "Корректировать запасы",
-        "export_csv": "Экспорт в CSV"
+      "data_grid": {
+        "sort": {
+          "name": "Название",
+          "qty_on_hand": "Кол-во на складе",
+          "price": "Цена",
+          "date_added": "Дата добавления",
+          "label": "Сортировка"
+        }
       },
-      "adjustment_reasons": {
-        "physical_count": "Физический подсчет",
-        "damage": "Повреждение",
-        "obsolete": "Устаревание",
-        "theft": "Кража",
-        "correction": "Исправление",
-        "other": "Другое"
-      },
-      "empty_state": "Движения по данному товару не найдены",
-      "try_adjusting_filters": "Попробуйте изменить фильтры",
-      "summary": {
-        "total_movements": "Всего движений",
-        "total_in": "Всего приход",
-        "total_out": "Всего расход",
-        "final_balance": "Конечный баланс"
-      },
-      "tooltips": {
-        "edit": "Редактировать",
-        "delete": "Удалить",
-        "view_only": "Только просмотр"
-      }
-    },
-    "adjustment_modal": {
-      "title": "Корректировка запасов",
-      "adjustment_type": "Тип корректировки",
-      "adjustment_type_quantity": "Только количество",
-      "adjustment_type_cost": "Только стоимость",
-      "adjustment_type_both": "Количество и стоимость",
-      "quantity_change": "Изменение количества",
-      "quantity_change_help": "Введите положительное число для добавления, отрицательное для вычитания",
-      "new_unit_cost": "Новая стоимость единицы (сўм)",
-      "new_unit_cost_help": "Введите новую стоимость единицы для этого товара",
-      "warehouse": "Склад",
-      "location": "Местоположение",
-      "reason": "Причина",
-      "notes": "Примечания (опционально)",
-      "notes_placeholder": "Добавьте подробности об этой корректировке...",
-      "current_quantity": "Текущее количество",
-      "current_cost": "Текущая стоимость единицы (сўм)",
-      "new_quantity": "Новое количество",
-      "new_quantity_preview": "Новое количество:",
-      "invalid_negative": "(Неверно - не может быть отрицательным)",
-      "characters_remaining": "символов",
-      "submit": "Создать корректировку",
-      "cancel": "Отмена",
-      "creating": "Создание...",
-      "error_prefix": "Ошибка:"
-    },
-    "editor": {
-      "validation": {
-        "name_required": "Требуется имя",
-        "category_required": "Требуется категория",
-        "base_uom_required": "Требуется базовая единица измерения"
-      },
-      "header": {
-        "new": "Новый товар",
-        "edit": "Редактировать товар"
-      },
-      "tabs": {
-        "general": "Основное",
-        "accounting": "Учет",
-        "inventory": "Запасы",
-        "vendors": "Поставщики"
-      },
-      "buttons": {
-        "cancel": "Отмена",
-        "saving": "Сохраняется...",
-        "save": "Сохранить"
-      },
-      "alerts": {
-        "error": "Ошибка сохранения"
-      },
-      "form": {
-        "name_label": "Имя *",
-        "sku_label": "Артикул",
-        "barcode_label": "Штрихкод",
-        "item_class_label": "Класс товара *",
-        "item_class_options": {
-          "raw_material": "Сырье",
-          "wip": "Незавершенное производство",
-          "finished_goods": "Готовая продукция",
-          "service": "Услуга"
-        },
-        "category_label": "Категория *",
-        "category_placeholder": "Выберите...",
-        "description_label": "Описание",
-        "valuation_label": "Метод оценки",
-        "valuation_options": {
-          "fifo": "FIFO (ПОИФО)",
-          "weighted_avg": "Взвешенное среднее",
-          "standard": "Стандартная стоимость"
-        },
-        "valuation_warning": "Невозможно изменить - существуют операции запасов",
-        "gl_section": "Маппинг счетов главной книги",
-        "inventory_asset_label": "Счет актива запасов",
-        "inventory_asset_default": "По умолчанию",
-        "income_label": "Счет доходов",
-        "income_default": "По умолчанию",
-        "cogs_label": "Счет себестоимости / расходов",
-        "cogs_default": "По умолчанию",
-        "base_uom_label": "Базовая единица измерения *",
-        "base_uom_placeholder": "Выберите...",
-        "purchase_uom_label": "Единица измерения покупки",
-        "purchase_uom_default": "Как базовая",
-        "conversion_label": "Коэффициент конверсии (1 ЕИ покупки = X базовой ЕИ)",
-        "conversion_hint": "например, введите 20, если 1 ящик = 20 кг (хранится как коэффициент * 100)",
-        "standard_cost_label": "Стандартная стоимость",
-        "sales_price_label": "Цена продажи",
-        "reorder_point_label": "Точка переупорядочения",
-        "safety_stock_label": "Страховой запас",
-        "preferred_vendor_label": "Предпочтительный поставщик",
-        "preferred_vendor_default": "Нет",
-        "preferred_vendor_hint": "Используется для автоматического создания ПО"
-      }
-    },
-    "item_list": {
-      "no_sku_display": "Артикул отсутствует",
-      "badges": {
-        "out_of_stock": "Нет на складе",
-        "low_stock": "Низко"
-      },
-      "avg_cost_label": "Средняя стоимость:"
-    },
-    "item_profile": {
-      "errors": {
-        "unexpected": "Произошла неожиданная ошибка"
-      },
-      "sections": {
-        "classification": "Классификация",
-        "unit_of_measure": "Единица измерения",
-        "pricing": "Цена и оценка",
-        "gl_accounts": "Счета главной книги",
-        "inventory_settings": "Параметры запасов",
-        "stock_on_hand": "Количество на складе",
-        "total_value": "Общая стоимость"
-      },
-      "labels": {
-        "category": "категория",
-        "purchase": "Покупка:",
-        "sales_price": "Цена продажи",
-        "standard_cost": "Стандартная стоимость",
-        "asset": "Актив",
-        "income": "Доход",
-        "cogs": "Себестоимость/Расходы",
-        "reorder_point": "Точка переупорядочения",
-        "safety_stock": "Страховой запас",
-        "preferred_vendor": "Предпочтительный поставщик"
-      }
-    },
-    "stock_sidebar": {
-      "section_title": "Доступность запасов",
-      "labels": {
-        "total_on_hand": "Всего на складе",
-        "total_value": "Общая стоимость",
-        "committed": "Зарезервировано",
-        "available": "Доступно",
-        "avg_unit_cost": "Средняя стоимость за единицу",
-        "separator": "/",
-        "last_receipt": "Последний приход",
-        "no_receipts": "Приемки отсутствуют"
-      }
-    },
-    "category_management": {
-      "colors": {
-        "slate": "Сланец",
-        "red": "Красный",
-        "orange": "Оранжевый",
-        "amber": "Янтарный",
-        "yellow": "Желтый",
-        "lime": "Лайм",
-        "green": "Зеленый",
-        "emerald": "Изумруд",
-        "teal": "Сине-зеленый",
-        "cyan": "Голубой",
-        "sky": "Небесно-голубой",
-        "blue": "Синий",
-        "indigo": "Индиго",
-        "violet": "Фиолетовый",
-        "purple": "Пурпурный",
-        "fuchsia": "Фуксия",
-        "pink": "Розовый",
-        "rose": "Роза"
-      },
-      "icons": {
-        "box": "Коробка",
-        "package": "Пакет",
-        "boxes": "Коробки",
-        "archive": "Архив",
-        "folder": "Папка",
-        "tag": "Тег",
-        "tags": "Теги",
-        "layers": "Слои",
-        "grid": "Сетка",
-        "layout_grid": "Макет сетки",
-        "cpu": "Процессор",
-        "cog": "Шестеренка",
-        "wrench": "Гаечный ключ",
-        "hammer": "Молоток",
-        "zap": "Молния",
-        "flame": "Пламя",
-        "droplet": "Капля",
-        "leaf": "Лист",
-        "apple": "Яблоко",
-        "carrot": "Морковь"
-      },
-      "validation": {
-        "name_required": "Требуется имя категории"
-      },
-      "messages": {
-        "deactivate_confirm": "Эта категория содержит {count} товар(ов). Деактивировать ее?",
-        "deactivate_warning": "Вы уверены, что хотите деактивировать эту категорию?",
-        "deactivate_failed": "Ошибка деактивации",
-        "deactivate_error": "Ошибка деактивации категории",
-        "reactivate_failed": "Ошибка активации категории"
-      },
-      "header": "Организовать товары по категориям",
-      "show_inactive": "Показать неактивные",
-      "add_button": "Добавить категорию",
       "table": {
-        "name": "Имя",
-        "description": "Описание",
-        "icon": "Значок",
-        "color": "Цвет",
-        "items": "Товары",
-        "status": "Статус",
-        "actions": "Действия"
+        "item": "Товар",
+        "type": "Тип",
+        "on_hand": "В наличии",
+        "price": "Цена",
+        "cost": "Себестоимость"
+      },
+      "types": {
+        "inventory": "Инвентарный",
+        "service": "Услуга",
+        "assembly": "Сборка",
+        "non_inventory": "Неинвентарный"
       },
       "form": {
-        "name_placeholder": "Имя категории",
-        "description_placeholder": "Описание (опционально)",
-        "icon_none": "Нет",
-        "color_none": "Нет",
-        "status_active": "Активно",
-        "status_inactive": "Неактивно"
+        "basic_info": "Основная информация",
+        "financials": "Финансы и Склад",
+        "name": "Название",
+        "name_placeholder": "например, Красное яблоко XL",
+        "sku": "Артикул / Код товара",
+        "sku_placeholder": "SKU-001",
+        "description": "Описание",
+        "description_placeholder": "Подробное описание...",
+        "category": "Категория",
+        "select_category": "Выберите категорию...",
+        "category_required": "Категория обязательна",
+        "sales_price": "Цена продажи (сўм)",
+        "standard_cost": "Стандартная стоимость (сўм)",
+        "reorder_point": "Точка дозаказа",
+        "base_unit": "Базовая единица",
+        "purchase_unit": "Единица закупки",
+        "select_unit": "Выберите единицу",
+        "active": "Товар активен",
+        "bom": "Спецификация (BOM)",
+        "add_component": "Добавить компонент",
+        "select_component": "Выберите компонент...",
+        "no_components": "Компоненты еще не добавлены.",
+        "save_info": "Изменения сразу отразятся на складе.",
+        "create_title": "Создание нового товара",
+        "create_desc": "Определите ваш новый инвентарь, услугу или сборку.",
+        "select_type": "Выберите тип товара",
+        "select_type_desc": "Выберите тип создаваемого товара, чтобы увидеть соответствующие поля.",
+        "inventory_desc": "Складской товар с отслеживанием количества",
+        "service_desc": "Работа или экспертиза",
+        "assembly_desc": "Собрано из других товаров"
       },
-      "empty": "Категории не найдены. Создайте одну для начала."
-    },
-    "uom_management": {
-      "deactivate_confirm": "Эта единица измерения используется {count} товаром(ами). Деактивировать ее?",
-      "show_inactive": "Показать неактивные",
-      "items_header": "Товары"
-    },
-    "master_data_drawer": {
-      "tabs": {
-        "units": "Единицы измерения",
-        "categories": "Категории"
+      "actions": {
+        "edit": "Редактировать",
+        "adjust_qty": "Корректировать кол-во",
+        "build": "Собрать",
+        "stock_level": "Уровень запасов",
+        "reorder_needed": "Нужен дозаказ",
+        "in_stock": "В наличии",
+        "active": "Активен",
+        "inactive": "Неактивен",
+        "archived": "Архивировано",
+        "hide_archived": "Скрыть архивированные",
+        "show_archived": "Показать архивированные"
       },
-      "sheet_title": "Мастер-данные",
-      "description": "Управление единицами измерения и категориями"
+      "no_items_found": "Товары не найдены. Создайте новый, чтобы начать.",
+      "delete_modal": {
+        "title_check": "Удалить товар: {itemName}",
+        "title_confirm": "Подтвердить окончательное удаление",
+        "checking_history": "Проверка истории товара...",
+        "no_history_title": "История не найдена",
+        "no_history_message": "Этот товар не имеет истории транзакций и может быть безопасно удален.",
+        "button_delete_permanently": "Удалить окончательно",
+        "has_history_title": "Товар имеет историю транзакций",
+        "has_history_warning": "Этот товар не может быть безопасно удален, так как он использовался в транзакциях:",
+        "section_purchasing": "История закупок",
+        "count_po_lines": "{count} строк заказа на покупку",
+        "count_bill_lines": "{count} строк счета поставщика",
+        "section_sales": "История продаж",
+        "count_invoice_lines": "{count} строк счета",
+        "section_manufacturing": "История производства",
+        "count_bom_items": "{count} ссылок на спецификацию",
+        "count_production_inputs": "{count} входных материалов производства",
+        "count_production_outputs": "{count} выходных материалов производства",
+        "section_inventory": "История склада",
+        "count_inventory_layers": "{count} слоев запасов (FIFO)",
+        "action_prompt": "Что вы хотите сделать?",
+        "button_archive": "Архивировать товар",
+        "button_archive_desc": "Сохранить всю историю (Безопасно)",
+        "button_clean_delete": "Очистить историю и удалить",
+        "button_clean_delete_desc": "Окончательное удаление всех данных (Опасно)",
+        "confirm_title": "⚠️ Подтвердить окончательное удаление",
+        "confirm_warning": "Это окончательно удалит:",
+        "confirm_warning_item": "Товар: {itemName}",
+        "confirm_warning_history": "ВСЮ историю транзакций, указанную выше",
+        "confirm_warning_cannot_undo": "Это действие НЕВОЗМОЖНО будет отменить.",
+        "confirm_instruction": "Введите DELETE для подтверждения:",
+        "confirm_placeholder": "Введите DELETE",
+        "checkbox_understand": "Я понимаю, что это действие невозможно отменить",
+        "button_confirm_delete": "Подтвердить окончательное удаление",
+        "deleting": "Удаление...",
+        "archiving": "Архивирование...",
+        "success_deleted": "Товар окончательно удален",
+        "success_archived": "Товар архивирован (история сохранена)",
+        "error_failed": "Ошибка при удалении товара"
+      },
+      "history": {
+        "title": "История транзакций",
+        "transaction_types": {
+          "bill": "Счет",
+          "invoice": "Накладная",
+          "production_in": "Производственный ввод",
+          "production_out": "Производственный вывод",
+          "transfer": "Перемещение",
+          "adjustment": "Корректировка",
+          "sales_return": "Возврат продажи",
+          "purchase_return": "Возврат покупки"
+        },
+        "columns": {
+          "date": "Дата",
+          "type": "Тип",
+          "reference": "Ссылка",
+          "partner": "Партнер",
+          "location": "Местоположение",
+          "warehouse": "Склад",
+          "gl_account": "Счет ГК",
+          "qty_change": "Изменение кол-ва",
+          "cost_price": "Цена/Стоимость",
+          "running_balance": "Текущий баланс",
+          "batch": "Партия",
+          "actions": "Действия"
+        },
+        "filters": {
+          "from_date": "С даты",
+          "to_date": "До даты",
+          "movement_type": "Тип движения",
+          "all_movements": "Все движения",
+          "inbound_only": "Только приход",
+          "outbound_only": "Только расход",
+          "production_only": "Только производство",
+          "transfers_only": "Только перемещения",
+          "adjustments_only": "Только корректировки",
+          "clear_filters": "Очистить фильтры"
+        },
+        "buttons": {
+          "adjust_inventory": "Корректировать запасы",
+          "export_csv": "Экспорт в CSV"
+        },
+        "adjustment_reasons": {
+          "physical_count": "Физический подсчет",
+          "damage": "Повреждение",
+          "obsolete": "Устаревание",
+          "theft": "Кража",
+          "correction": "Исправление",
+          "other": "Другое"
+        },
+        "empty_state": "Движения по данному товару не найдены",
+        "try_adjusting_filters": "Попробуйте изменить фильтры",
+        "summary": {
+          "total_movements": "Всего движений",
+          "total_in": "Всего приход",
+          "total_out": "Всего расход",
+          "final_balance": "Конечный баланс"
+        },
+        "tooltips": {
+          "edit": "Редактировать",
+          "delete": "Удалить",
+          "view_only": "Только просмотр"
+        }
+      },
+      "adjustment_modal": {
+        "title": "Корректировка запасов",
+        "adjustment_type": "Тип корректировки",
+        "adjustment_type_quantity": "Только количество",
+        "adjustment_type_cost": "Только стоимость",
+        "adjustment_type_both": "Количество и стоимость",
+        "quantity_change": "Изменение количества",
+        "quantity_change_help": "Введите положительное число для добавления, отрицательное для вычитания",
+        "new_unit_cost": "Новая стоимость единицы (сўм)",
+        "new_unit_cost_help": "Введите новую стоимость единицы для этого товара",
+        "warehouse": "Склад",
+        "location": "Местоположение",
+        "reason": "Причина",
+        "notes": "Примечания (опционально)",
+        "notes_placeholder": "Добавьте подробности об этой корректировке...",
+        "current_quantity": "Текущее количество",
+        "current_cost": "Текущая стоимость единицы (сўм)",
+        "new_quantity": "Новое количество",
+        "new_quantity_preview": "Новое количество:",
+        "invalid_negative": "(Неверно - не может быть отрицательным)",
+        "characters_remaining": "символов",
+        "submit": "Создать корректировку",
+        "cancel": "Отмена",
+        "creating": "Создание...",
+        "error_prefix": "Ошибка:"
+      },
+      "editor": {
+        "validation": {
+          "name_required": "Требуется имя",
+          "category_required": "Требуется категория",
+          "base_uom_required": "Требуется базовая единица измерения"
+        },
+        "header": {
+          "new": "Новый товар",
+          "edit": "Редактировать товар"
+        },
+        "tabs": {
+          "general": "Основное",
+          "accounting": "Учет",
+          "inventory": "Запасы",
+          "vendors": "Поставщики"
+        },
+        "buttons": {
+          "cancel": "Отмена",
+          "saving": "Сохраняется...",
+          "save": "Сохранить"
+        },
+        "alerts": {
+          "error": "Ошибка сохранения"
+        },
+        "form": {
+          "name_label": "Имя *",
+          "sku_label": "Артикул",
+          "barcode_label": "Штрихкод",
+          "item_class_label": "Класс товара *",
+          "item_class_options": {
+            "raw_material": "Сырье",
+            "wip": "Незавершенное производство",
+            "finished_goods": "Готовая продукция",
+            "service": "Услуга"
+          },
+          "category_label": "Категория *",
+          "category_placeholder": "Выберите...",
+          "description_label": "Описание",
+          "valuation_label": "Метод оценки",
+          "valuation_options": {
+            "fifo": "FIFO (ПОИФО)",
+            "weighted_avg": "Взвешенное среднее",
+            "standard": "Стандартная стоимость"
+          },
+          "valuation_warning": "Невозможно изменить - существуют операции запасов",
+          "gl_section": "Маппинг счетов главной книги",
+          "inventory_asset_label": "Счет актива запасов",
+          "inventory_asset_default": "По умолчанию",
+          "income_label": "Счет доходов",
+          "income_default": "По умолчанию",
+          "cogs_label": "Счет себестоимости / расходов",
+          "cogs_default": "По умолчанию",
+          "base_uom_label": "Базовая единица измерения *",
+          "base_uom_placeholder": "Выберите...",
+          "purchase_uom_label": "Единица измерения покупки",
+          "purchase_uom_default": "Как базовая",
+          "conversion_label": "Коэффициент конверсии (1 ЕИ покупки = X базовой ЕИ)",
+          "conversion_hint": "например, введите 20, если 1 ящик = 20 кг (хранится как коэффициент * 100)",
+          "standard_cost_label": "Стандартная стоимость",
+          "sales_price_label": "Цена продажи",
+          "reorder_point_label": "Точка переупорядочения",
+          "safety_stock_label": "Страховой запас",
+          "preferred_vendor_label": "Предпочтительный поставщик",
+          "preferred_vendor_default": "Нет",
+          "preferred_vendor_hint": "Используется для автоматического создания ПО"
+        }
+      },
+      "item_list": {
+        "no_sku_display": "Артикул отсутствует",
+        "badges": {
+          "out_of_stock": "Нет на складе",
+          "low_stock": "Низко"
+        },
+        "avg_cost_label": "Средняя стоимость:"
+      },
+      "item_profile": {
+        "errors": {
+          "unexpected": "Произошла неожиданная ошибка"
+        },
+        "sections": {
+          "classification": "Классификация",
+          "unit_of_measure": "Единица измерения",
+          "pricing": "Цена и оценка",
+          "gl_accounts": "Счета главной книги",
+          "inventory_settings": "Параметры запасов",
+          "stock_on_hand": "Количество на складе",
+          "total_value": "Общая стоимость"
+        },
+        "labels": {
+          "category": "категория",
+          "purchase": "Покупка:",
+          "sales_price": "Цена продажи",
+          "standard_cost": "Стандартная стоимость",
+          "asset": "Актив",
+          "income": "Доход",
+          "cogs": "Себестоимость/Расходы",
+          "reorder_point": "Точка переупорядочения",
+          "safety_stock": "Страховой запас",
+          "preferred_vendor": "Предпочтительный поставщик"
+        }
+      },
+      "stock_sidebar": {
+        "section_title": "Доступность запасов",
+        "labels": {
+          "total_on_hand": "Всего на складе",
+          "total_value": "Общая стоимость",
+          "committed": "Зарезервировано",
+          "available": "Доступно",
+          "avg_unit_cost": "Средняя стоимость за единицу",
+          "separator": "/",
+          "last_receipt": "Последний приход",
+          "no_receipts": "Приемки отсутствуют"
+        }
+      },
+      "category_management": {
+        "colors": {
+          "slate": "Сланец",
+          "red": "Красный",
+          "orange": "Оранжевый",
+          "amber": "Янтарный",
+          "yellow": "Желтый",
+          "lime": "Лайм",
+          "green": "Зеленый",
+          "emerald": "Изумруд",
+          "teal": "Сине-зеленый",
+          "cyan": "Голубой",
+          "sky": "Небесно-голубой",
+          "blue": "Синий",
+          "indigo": "Индиго",
+          "violet": "Фиолетовый",
+          "purple": "Пурпурный",
+          "fuchsia": "Фуксия",
+          "pink": "Розовый",
+          "rose": "Роза"
+        },
+        "icons": {
+          "box": "Коробка",
+          "package": "Пакет",
+          "boxes": "Коробки",
+          "archive": "Архив",
+          "folder": "Папка",
+          "tag": "Тег",
+          "tags": "Теги",
+          "layers": "Слои",
+          "grid": "Сетка",
+          "layout_grid": "Макет сетки",
+          "cpu": "Процессор",
+          "cog": "Шестеренка",
+          "wrench": "Гаечный ключ",
+          "hammer": "Молоток",
+          "zap": "Молния",
+          "flame": "Пламя",
+          "droplet": "Капля",
+          "leaf": "Лист",
+          "apple": "Яблоко",
+          "carrot": "Морковь"
+        },
+        "validation": {
+          "name_required": "Требуется имя категории"
+        },
+        "messages": {
+          "deactivate_confirm": "Эта категория содержит {count} товар(ов). Деактивировать ее?",
+          "deactivate_warning": "Вы уверены, что хотите деактивировать эту категорию?",
+          "deactivate_failed": "Ошибка деактивации",
+          "deactivate_error": "Ошибка деактивации категории",
+          "reactivate_failed": "Ошибка активации категории"
+        },
+        "header": "Организовать товары по категориям",
+        "show_inactive": "Показать неактивные",
+        "add_button": "Добавить категорию",
+        "table": {
+          "name": "Имя",
+          "description": "Описание",
+          "icon": "Значок",
+          "color": "Цвет",
+          "items": "Товары",
+          "status": "Статус",
+          "actions": "Действия"
+        },
+        "form": {
+          "name_placeholder": "Имя категории",
+          "description_placeholder": "Описание (опционально)",
+          "icon_none": "Нет",
+          "color_none": "Нет",
+          "status_active": "Активно",
+          "status_inactive": "Неактивно"
+        },
+        "empty": "Категории не найдены. Создайте одну для начала."
+      },
+      "uom_management": {
+        "deactivate_confirm": "Эта единица измерения используется {count} товаром(ами). Деактивировать ее?",
+        "show_inactive": "Показать неактивные",
+        "items_header": "Товары"
+      },
+      "master_data_drawer": {
+        "tabs": {
+          "units": "Единицы измерения",
+          "categories": "Категории"
+        },
+        "sheet_title": "Мастер-данные",
+        "description": "Управление единицами измерения и категориями"
+      },
+      "gl_account_types": {
+        "inventory_asset": "Актив запасов",
+        "cogs": "Себестоимость продаж",
+        "wip": "Незавершенное производство",
+        "adjustment": "Корректировка",
+        "na": "Н/Д"
+      },
+      "item_routing": {
+        "none": "Нет"
+      }
     },
-    "gl_account_types": {
-      "inventory_asset": "Актив запасов",
-      "cogs": "Себестоимость продаж",
-      "wip": "Незавершенное производство",
-      "adjustment": "Корректировка",
-      "na": "Н/Д"
-    },
-    "item_routing": {
-      "none": "Нет"
+    "nav": {
+      "overview": "Обзор",
+      "items": "Товары",
+      "warehouse": "Склад",
+      "reception": "Приемка",
+      "reconciliation": "Сверка"
     }
   },
   "auth": {
@@ -2446,7 +1339,6 @@
     "quotes": "Коммерческие предложения",
     "invoices": "Счета",
     "estimates": "Сметы",
-    "purchasing": "Закупки",
     "supply_chain": "Цепочка поставок",
     "vendors": "Поставщики",
     "purchase_orders": "Заказы на покупку",
@@ -2454,9 +1346,7 @@
     "inventory_wms": "Склад и WMS",
     "items_services": "Товары и услуги",
     "commissions": "Комиссии",
-    "reception": {
-      "title": "Приемка товаров"
-    },
+    "reception": "Приемка",
     "reconciliation": "Сверка",
     "wms_dashboard": "Панель WMS",
     "transfer": "Перемещение",
@@ -2465,7 +1355,6 @@
     "lookup": "Поиск",
     "production_manufacturing": "Производство",
     "production_dashboard": "Панель производства",
-    "production": "Производство",
     "recipes": "Рецепты",
     "production_wizard": "Мастер производства",
     "production_terminal": "Терминал производства",
@@ -2483,7 +1372,6 @@
     "service_contracts": "Сервисные контракты",
     "service_tickets": "Заявки на обслуживание",
     "service_assets": "Сервисные активы",
-    "finance": "Финансы",
     "chart_of_accounts": "План счетов",
     "general_ledger": "Главная книга",
     "cash_accounts": "Денежные счета",
@@ -2497,93 +1385,516 @@
     "settings": "Настройки",
     "collapse_sidebar": "Свернуть",
     "sales": "Продажи",
-    "warehouse": "Склад",
-    "service": "Сервис",
-    "reception": "Приемка"
-  },
-  "sales": {
-    "nav": {
-      "overview": "Обзор",
-      "pipeline": "Воронка продаж",
-      "leads": "Лиды",
-      "opportunities": "Возможности",
-      "customers": "Клиенты",
-      "quotes": "Коммерческие предложения",
-      "invoices": "Счета",
-      "commissions": "Комиссии"
-    },
-    "customers": {
-      "dashboard": "Панель управления",
-      "select_detail": "Выберите клиента",
-      "select_customer_hint": "Выберите клиента из списка слева, чтобы увидеть историю транзакций и детали профиля.",
-      "title": "Клиенты",
-      "new_customer": "Новый клиент",
-      "search_placeholder": "Поиск клиентов...",
-      "empty_state": "Клиенты не найдены",
-      "outstanding_balance": "Задолженность",
-      "no_outstanding_balance": "Нет задолженности",
-      "scoreboard": {
-        "open_quotes": "Открытые предложения",
-        "unbilled_orders": "Небиллированные заказы",
-        "overdue_ar": "Просроченная дебиторская задолженность",
-        "paid_30_days": "Оплачено (30 дней)"
-      }
-    }
-  },
-  "purchasing": {
-    "nav": {
-      "overview": "Обзор",
-      "vendors": "Поставщики",
-      "purchase_orders": "Заказы на покупку",
-      "bills": "Счета поставщиков"
-    },
-    "vendors": {
-      "title": "Панель управления",
-      "select_vendor": "Выберите поставщика",
-      "select_vendor_hint": "Выберите поставщика из списка слева, чтобы увидеть историю транзакций и детали профиля.",
-      "list": {
-        "title": "Поставщики",
-        "new_vendor": "Новый поставщик",
-        "search_placeholder": "Поиск поставщиков...",
-        "no_results": "Поставщики не найдены",
-        "open_balance": "Открытый баланс",
-        "no_open_balance": "Расчёт произведён"
-      },
-      "scoreboard": {
-        "open_pos": "Открытые заказы",
-        "overdue": "Просроченные счета",
-        "open_bills": "Открытые счета",
-        "paid_30_days": "Оплачено (30 дней)"
-      }
-    }
+    "warehouse": "Склад"
   },
   "wms": {
-    "nav": {
-      "overview": "Обзор",
+    "menu": {
+      "title": "WMS Сканер",
+      "lookup": "Поиск",
       "transfer": "Перемещение",
       "picking": "Комплектация",
-      "cycle_count": "Инвентаризация",
-      "lookup": "Поиск"
+      "count": "Инвентаризация"
+    },
+    "lookup": {
+      "title": "Поиск",
+      "ready": "Готов к сканированию",
+      "scanning": "Сканирование...",
+      "instruction": "Отсканируйте штрихкод товара или код локации",
+      "not_found": "Не найдено",
+      "not_found_message": "Товар или локация не найдены по этому коду",
+      "item_details": "Информация о товаре",
+      "location_details": "Информация о локации",
+      "stock_locations": "Локации хранения",
+      "items_at_location": "Товары в локации",
+      "qoh": "В наличии",
+      "zone": "Зона",
+      "warehouse": "Склад"
+    },
+    "transfer": {
+      "title": "Перемещение товара",
+      "step1": {
+        "title": "Шаг 1: Сканировать товар",
+        "instruction": "Отсканируйте штрихкод товара для перемещения"
+      },
+      "step2": {
+        "title": "Шаг 2: Сканировать место назначения",
+        "instruction": "Отсканируйте код локации назначения"
+      },
+      "step3": {
+        "title": "Шаг 3: Введите количество",
+        "instruction": "Введите количество для перемещения"
+      },
+      "from": "Откуда",
+      "to": "Куда",
+      "quantity": "Количество",
+      "available": "Доступно",
+      "confirm_transfer": "Подтвердить перемещение",
+      "success": "Перемещение завершено",
+      "success_message": "Товар успешно перемещен",
+      "transferring": "Перемещение...",
+      "item": "Товар",
+      "destination": "Место назначения",
+      "source": "Источник"
+    },
+    "picking": {
+      "title": "Лист комплектации",
+      "progress": "Прогресс",
+      "pick_qty": "Количество для комплектации",
+      "pick_from": "Взять из",
+      "next": "Следующий товар",
+      "complete": "Завершить комплектацию",
+      "completed": "Комплектация завершена",
+      "completed_message": "Все товары скомплектованы успешно",
+      "empty": "Нет товаров для комплектации",
+      "loading": "Загрузка листа комплектации..."
+    },
+    "count": {
+      "title": "Инвентаризация",
+      "step1": {
+        "title": "Шаг 1: Сканировать локацию",
+        "instruction": "Отсканируйте штрихкод локации для инвентаризации"
+      },
+      "step2": {
+        "title": "Шаг 2: Сканировать товары",
+        "instruction": "Отсканируйте каждый товар (нажмите + для корректировки)"
+      },
+      "location": "Локация",
+      "submit_count": "Отправить инвентаризацию",
+      "success": "Инвентаризация отправлена",
+      "success_message": "Инвентаризация записана",
+      "submitting": "Отправка...",
+      "counted_items": "Посчитанные товары"
+    },
+    "common": {
+      "back_to_menu": "Вернуться в меню",
+      "error": "Ошибка",
+      "retry": "Повторить",
+      "start_over": "Начать заново"
     }
   },
   "service": {
-    "nav": {
-      "overview": "Обзор",
-      "service_contracts": "Сервисные контракты",
-      "service_tickets": "Заявки на обслуживание",
-      "service_assets": "Сервисные активы"
-    }
-  },
-  "finance": {
-    "nav": {
-      "overview": "Обзор",
-      "chart_of_accounts": "План счетов",
-      "general_ledger": "Главная книга",
-      "cash_accounts": "Денежные счета",
-      "fixed_assets": "Основные средства",
-      "expenses": "Расходы",
-      "financial_reports": "Финансовые отчеты",
-      "payroll": "Зарплата"
+    "dashboard": {
+      "page_title": "Панель полевого сервиса",
+      "page_description": "Мониторинг сервисных операций, заявок и контрактов",
+      "kpi": {
+        "open_tickets": "Открытые заявки",
+        "open_tickets_desc": "Открытые, запланированные и в процессе",
+        "pending_installations": "Ожидающие установки",
+        "pending_installations_desc": "Оборудование ожидает установки",
+        "active_contracts": "Активные контракты",
+        "active_contracts_desc": "Действующие сервисные контракты",
+        "refills_due": "Требуется пополнение",
+        "refills_due_desc": "Контракты с ожидающими пополнениями"
+      },
+      "recent_tickets": "Недавние заявки",
+      "view_all_tickets": "Просмотреть все заявки",
+      "no_tickets": "Заявки не найдены",
+      "upcoming_service": "Предстоящие работы",
+      "next_7_days": "Следующие 7 дней",
+      "no_upcoming": "Нет запланированных работ в течение следующих 7 дней"
+    },
+    "ticket": {
+      "ticket_number": "Заявка №",
+      "customer": "Клиент",
+      "type": {
+        "installation": "Установка",
+        "repair": "Ремонт",
+        "maintenance": "Обслуживание",
+        "support": "Поддержка",
+        "emergency": "Экстренная"
+      },
+      "priority": {
+        "low": "Низкий",
+        "medium": "Средний",
+        "high": "Высокий",
+        "critical": "Критический"
+      },
+      "scheduled_date": "Запланированная дата",
+      "technician": "Техник",
+      "assets": "Активы",
+      "unassigned": "Не назначен",
+      "status": {
+        "open": "Открыта",
+        "scheduled": "Запланирована",
+        "in_progress": "В процессе",
+        "completed": "Завершена",
+        "cancelled": "Отменена"
+      }
+    },
+    "tickets_page": {
+      "title": "Сервисные заявки",
+      "description": "Управление сервисными заявками и полевыми операциями",
+      "new_ticket": "Новая заявка",
+      "loading": "Загрузка заявок..."
+    },
+    "new_ticket_page": {
+      "title": "Создать сервисную заявку",
+      "description": "Создать новую заявку для поддержки клиентов"
+    },
+    "tickets_list": {
+      "filters": {
+        "title": "Фильтры",
+        "status": "Статус",
+        "type": "Тип",
+        "priority": "Приоритет",
+        "all": "Все"
+      },
+      "table": {
+        "ticket_number": "Заявка №",
+        "customer": "Клиент",
+        "title": "Название",
+        "type": "Тип",
+        "priority": "Приоритет",
+        "status": "Статус",
+        "technician": "Техник",
+        "scheduled": "Запланирована",
+        "actions": "Действия"
+      },
+      "status": {
+        "open": "Открыта",
+        "scheduled": "Запланирована",
+        "in_progress": "В процессе",
+        "completed": "Завершена",
+        "cancelled": "Отменена"
+      },
+      "priority": {
+        "low": "Низкий",
+        "medium": "Средний",
+        "high": "Высокий",
+        "critical": "Критический"
+      },
+      "type": {
+        "installation": "Установка",
+        "repair": "Ремонт",
+        "maintenance": "Обслуживание",
+        "support": "Поддержка",
+        "emergency": "Экстренная"
+      },
+      "unassigned": "Не назначен",
+      "view": "Просмотр",
+      "empty": "Заявки не найдены",
+      "showing": "Показано {count} из {total} заявок"
+    },
+    "ticket_form": {
+      "customer_id": "ID клиента",
+      "customer_id_placeholder": "Введите ID клиента",
+      "customer_id_hint": "В продакшене это будет поиск с выпадающим списком",
+      "title": "Название заявки",
+      "title_placeholder": "Краткое описание проблемы",
+      "description": "Описание",
+      "description_placeholder": "Подробное описание проблемы...",
+      "ticket_type": "Тип заявки",
+      "priority": {
+        "low": "Низкий",
+        "medium": "Средний",
+        "high": "Высокий",
+        "critical": "Критический"
+      },
+      "scheduled_date": "Запланированная дата",
+      "assign_technician": "Назначить техника",
+      "unassigned": "Не назначен",
+      "create_ticket": "Создать заявку",
+      "creating": "Создание...",
+      "cancel": "Отмена",
+      "type": {
+        "installation": "Установка",
+        "repair": "Ремонт",
+        "maintenance": "Обслуживание",
+        "support": "Поддержка",
+        "emergency": "Экстренная"
+      },
+      "error": {
+        "required_fields": "Пожалуйста, заполните все обязательные поля",
+        "generic": "Не удалось создать заявку"
+      }
+    },
+    "ticket_detail": {
+      "loading": "Загрузка деталей заявки...",
+      "mark_in_progress": "Отметить в процессе",
+      "complete_ticket": "Завершить заявку",
+      "tabs": {
+        "overview": "Обзор",
+        "timeline": "Временная шкала",
+        "work_details": "Детали работы"
+      },
+      "customer_info": "Информация о клиенте",
+      "customer_name": "Имя клиента",
+      "email": "Email",
+      "phone": "Телефон",
+      "ticket_info": "Информация о заявке",
+      "ticket_type": "Тип заявки",
+      "created_at": "Создано",
+      "scheduled_date": "Запланированная дата",
+      "contract": "Контракт",
+      "description": "Описание",
+      "assigned_technician": "Назначенный техник",
+      "unassigned": "Не назначен",
+      "linked_assets": "Связанные активы",
+      "labor_hours": "Часы работы",
+      "hours": "часов",
+      "parts_used": "Использованные детали",
+      "part_item_id": "Товар №{id}",
+      "completion_notes": "Примечания о завершении",
+      "customer_signature": "Подпись клиента",
+      "service_invoice": "Сервисный счет",
+      "work_details_empty": "Детали работы появятся здесь после завершения заявки",
+      "status": {
+        "open": "Открыта",
+        "scheduled": "Запланирована",
+        "in_progress": "В процессе",
+        "completed": "Завершена",
+        "cancelled": "Отменена"
+      },
+      "priority": {
+        "low": "Низкий",
+        "medium": "Средний",
+        "high": "Высокий",
+        "critical": "Критический"
+      },
+      "error": {
+        "generic": "Произошла ошибка"
+      }
+    },
+    "ticket_timeline": {
+      "created": "Создана",
+      "created_description": "Заявка была создана",
+      "assigned": "Назначена",
+      "assigned_description": "Назначена {name}",
+      "scheduled": "Запланирована",
+      "scheduled_description": "Запланирована на {date}",
+      "in_progress": "В процессе",
+      "in_progress_description": "Работа начата",
+      "completed": "Завершена",
+      "completed_description": "Заявка успешно завершена",
+      "cancelled": "Отменена",
+      "cancelled_description": "Заявка была отменена"
+    },
+    "completion_form": {
+      "title": "Завершить сервисную заявку",
+      "completion_notes": "Примечания о завершении",
+      "completion_notes_placeholder": "Опишите выполненную работу...",
+      "minimum_10_chars": "Требуется минимум 10 символов",
+      "labor_hours": "Часы работы",
+      "labor_hours_hint": "Введите десятичные часы (например, 2.5 для 2 часов 30 минут)",
+      "parts_used": "Использованные детали",
+      "add_part": "Добавить деталь",
+      "no_parts_added": "Детали еще не добавлены",
+      "item_id": "ID товара",
+      "quantity": "Количество",
+      "unit_cost": "Стоимость за единицу (тийин)",
+      "customer_signature": "Подпись клиента",
+      "signature_placeholder": "Имя или подпись клиента",
+      "signature_hint": "Текстовое поле (можно улучшить с помощью планшета для подписи)",
+      "complete_ticket": "Завершить заявку",
+      "completing": "Завершение...",
+      "cancel": "Отмена",
+      "error": {
+        "notes_required": "Требуются примечания о завершении (минимум 10 символов)",
+        "labor_hours_required": "Требуются часы работы",
+        "invalid_parts": "Все детали должны иметь валидный ID товара, количество и стоимость",
+        "generic": "Не удалось завершить заявку"
+      }
+    },
+    "contract": {
+      "page_title": "Сервисные контракты",
+      "page_description": "Управление сервисными контрактами и договорами обслуживания",
+      "create_contract": "Создать контракт",
+      "edit_contract": "Редактировать контракт",
+      "contract_number": "Контракт №",
+      "contract_details": "Детали контракта",
+      "customer": "Клиент",
+      "customer_id_placeholder": "Введите ID клиента (TODO: Добавить выпадающий список)",
+      "contract_type": "Тип контракта",
+      "start_date": "Дата начала",
+      "end_date": "Дата окончания",
+      "billing_frequency": "Частота выставления счетов",
+      "monthly_value": "Месячная стоимость",
+      "next_billing_date": "Следующая дата выставления счета",
+      "source_invoice": "Исходный счет",
+      "assigned_technician": "Назначенный техник",
+      "auto_generate_refills": "Автоматическое создание пополнений",
+      "suspension_reason": "Причина приостановки",
+      "filter_all": "Все контракты",
+      "filter_active": "Активные",
+      "filter_suspended": "Приостановленные",
+      "filter_expired": "Истекшие",
+      "filter_cancelled": "Отмененные",
+      "no_contracts": "Контракты не найдены",
+      "view_contract": "Просмотреть контракт",
+      "suspend_contract": "Приостановить контракт",
+      "renew_contract": "Продлить контракт",
+      "cancel_contract": "Отменить контракт",
+      "edit_refill_items": "Редактировать товары пополнения",
+      "changes_affect_future": "Изменения влияют только на будущие пополнения",
+      "cannot_edit_status": "Невозможно редактировать {status} контракт",
+      "read_only_view": "Режим просмотра",
+      "status": {
+        "active": "Активный",
+        "suspended": "Приостановлен",
+        "expired": "Истек",
+        "cancelled": "Отменен"
+      },
+      "type": {
+        "warranty": "Гарантия",
+        "maintenance": "Обслуживание",
+        "full_service": "Полное обслуживание",
+        "supplies_only": "Только расходные материалы"
+      },
+      "billing_frequency_options": {
+        "monthly": "Ежемесячно",
+        "quarterly": "Ежеквартально (3 месяца)",
+        "semi_annual": "Полугодие (6 месяцев)",
+        "annual": "Ежегодно (12 месяцев)"
+      },
+      "tabs": {
+        "basic_info": "Основная информация",
+        "refill_items": "Товары пополнения",
+        "billing_history": "История выставления счетов",
+        "associated_tickets": "Сервисные заявки"
+      },
+      "refill_items": {
+        "title": "Настройка товаров пополнения",
+        "add_item": "Добавить товар",
+        "item": "Товар",
+        "quantity_per_cycle": "Количество за цикл",
+        "unit_price": "Цена за единицу",
+        "cycle_total": "Итого за цикл",
+        "no_items": "Товары пополнения не настроены",
+        "remove_item": "Удалить товар"
+      },
+      "billing_history": {
+        "title": "История выставления счетов",
+        "invoice_number": "Счет №",
+        "date": "Дата",
+        "amount": "Сумма",
+        "status": "Статус",
+        "no_invoices": "Счета еще не выставлены"
+      },
+      "tickets": {
+        "title": "Связанные сервисные заявки",
+        "no_tickets": "Нет сервисных заявок, связанных с этим контрактом"
+      },
+      "validation": {
+        "customer_required": "Клиент обязателен",
+        "start_date_required": "Дата начала обязательна",
+        "end_date_required": "Дата окончания обязательна"
+      },
+      "actions": {
+        "save": "Сохранить контракт",
+        "cancel": "Отмена",
+        "confirm_suspend": "Вы уверены, что хотите приостановить этот контракт?",
+        "confirm_renew": "Продлить этот контракт?",
+        "confirm_cancel": "Вы уверены, что хотите отменить этот контракт? Это действие нельзя отменить.",
+        "suspend_reason_placeholder": "Введите причину приостановки...",
+        "cancel_reason_placeholder": "Введите причину отмены...",
+        "new_end_date": "Новая дата окончания",
+        "success_created": "Контракт успешно создан",
+        "success_updated": "Контракт успешно обновлен",
+        "success_suspended": "Контракт приостановлен",
+        "success_renewed": "Контракт продлен",
+        "success_cancelled": "Контракт отменен",
+        "error_creating": "Не удалось создать контракт",
+        "error_updating": "Не удалось обновить контракт",
+        "error_suspending": "Не удалось приостановить контракт",
+        "error_renewing": "Не удалось продлить контракт",
+        "error_cancelling": "Не удалось отменить контракт"
+      }
+    },
+    "assets_page": {
+      "title": "Активы клиентов",
+      "description": "Реестр оборудования и история обслуживания",
+      "loading": "Загрузка активов..."
+    },
+    "assets_list": {
+      "filters": {
+        "title": "Фильтры",
+        "customer": "Клиент",
+        "status": "Статус",
+        "warranty": "Гарантия",
+        "serial_number": "Серийный номер",
+        "serial_placeholder": "Поиск по серийному номеру...",
+        "all": "Все"
+      },
+      "status": {
+        "pending_installation": "Ожидает установки",
+        "active": "Активный",
+        "under_service": "На обслуживании",
+        "decommissioned": "Выведен из эксплуатации"
+      },
+      "warranty": {
+        "active": "Гарантия активна",
+        "expired": "Гарантия истекла",
+        "none": "Без гарантии"
+      },
+      "empty": "Активы не найдены",
+      "showing": "Показано {count} из {total} активов"
+    },
+    "assets_card": {
+      "serial": "С/Н",
+      "installed": "Установлено",
+      "contract": "Контракт",
+      "view_details": "Подробнее",
+      "status": {
+        "pending_installation": "Ожидает установки",
+        "active": "Активный",
+        "under_service": "На обслуживании",
+        "decommissioned": "Выведен из эксплуатации"
+      }
+    },
+    "warranty_badge": {
+      "no_warranty": "Без гарантии",
+      "active": "Гарантия активна",
+      "expires": "Истекает",
+      "expired": "Гарантия истекла",
+      "expired_on": "Истекла"
+    },
+    "asset_detail": {
+      "subtitle": "Подробная информация об оборудовании и история обслуживания",
+      "loading": "Загрузка...",
+      "equipment_info": "Информация об оборудовании",
+      "customer_info": "Информация о клиенте",
+      "installation_info": "Детали установки",
+      "warranty_contract": "Гарантия и контракт",
+      "service_history": "История обслуживания",
+      "asset_number": "Номер актива",
+      "serial_number": "Серийный номер",
+      "item_name": "Тип оборудования",
+      "status": {
+        "pending_installation": "Ожидает установки",
+        "active": "Активный",
+        "under_service": "На обслуживании",
+        "decommissioned": "Выведен из эксплуатации"
+      },
+      "customer_name": "Клиент",
+      "email": "Эл. почта",
+      "phone": "Телефон",
+      "installation_address": "Адрес установки",
+      "installation_date": "Дата установки",
+      "source_invoice": "Исходный счет",
+      "warranty_status": "Статус гарантии",
+      "service_contract": "Сервисный контракт",
+      "contract_type": "Тип",
+      "expires": "Истекает",
+      "technician": "Техник",
+      "close": "Закрыть"
+    },
+    "service_history": {
+      "no_history": "История обслуживания пока отсутствует",
+      "view_ticket": "Просмотр заявки",
+      "status": {
+        "open": "Открыта",
+        "scheduled": "Запланирована",
+        "in_progress": "В процессе",
+        "completed": "Завершена",
+        "cancelled": "Отменена"
+      },
+      "type": {
+        "installation": "Установка",
+        "repair": "Ремонт",
+        "maintenance": "Техническое обслуживание",
+        "support": "Поддержка",
+        "emergency": "Срочная"
+      }
     }
   },
   "expenses": {
@@ -3241,91 +2552,6 @@
       "error": "Ошибка"
     }
   },
-  "wms": {
-    "menu": {
-      "title": "WMS Сканер",
-      "lookup": "Поиск",
-      "transfer": "Перемещение",
-      "picking": "Комплектация",
-      "count": "Инвентаризация"
-    },
-    "lookup": {
-      "title": "Поиск",
-      "ready": "Готов к сканированию",
-      "scanning": "Сканирование...",
-      "instruction": "Отсканируйте штрихкод товара или код локации",
-      "not_found": "Не найдено",
-      "not_found_message": "Товар или локация не найдены по этому коду",
-      "item_details": "Информация о товаре",
-      "location_details": "Информация о локации",
-      "stock_locations": "Локации хранения",
-      "items_at_location": "Товары в локации",
-      "qoh": "В наличии",
-      "zone": "Зона",
-      "warehouse": "Склад"
-    },
-    "transfer": {
-      "title": "Перемещение товара",
-      "step1": {
-        "title": "Шаг 1: Сканировать товар",
-        "instruction": "Отсканируйте штрихкод товара для перемещения"
-      },
-      "step2": {
-        "title": "Шаг 2: Сканировать место назначения",
-        "instruction": "Отсканируйте код локации назначения"
-      },
-      "step3": {
-        "title": "Шаг 3: Введите количество",
-        "instruction": "Введите количество для перемещения"
-      },
-      "from": "Откуда",
-      "to": "Куда",
-      "quantity": "Количество",
-      "available": "Доступно",
-      "confirm_transfer": "Подтвердить перемещение",
-      "success": "Перемещение завершено",
-      "success_message": "Товар успешно перемещен",
-      "transferring": "Перемещение...",
-      "item": "Товар",
-      "destination": "Место назначения",
-      "source": "Источник"
-    },
-    "picking": {
-      "title": "Лист комплектации",
-      "progress": "Прогресс",
-      "pick_qty": "Количество для комплектации",
-      "pick_from": "Взять из",
-      "next": "Следующий товар",
-      "complete": "Завершить комплектацию",
-      "completed": "Комплектация завершена",
-      "completed_message": "Все товары скомплектованы успешно",
-      "empty": "Нет товаров для комплектации",
-      "loading": "Загрузка листа комплектации..."
-    },
-    "count": {
-      "title": "Инвентаризация",
-      "step1": {
-        "title": "Шаг 1: Сканировать локацию",
-        "instruction": "Отсканируйте штрихкод локации для инвентаризации"
-      },
-      "step2": {
-        "title": "Шаг 2: Сканировать товары",
-        "instruction": "Отсканируйте каждый товар (нажмите + для корректировки)"
-      },
-      "location": "Локация",
-      "submit_count": "Отправить инвентаризацию",
-      "success": "Инвентаризация отправлена",
-      "success_message": "Инвентаризация записана",
-      "submitting": "Отправка...",
-      "counted_items": "Посчитанные товары"
-    },
-    "common": {
-      "back_to_menu": "Вернуться в меню",
-      "error": "Ошибка",
-      "retry": "Повторить",
-      "start_over": "Начать заново"
-    }
-  },
   "crm": {
     "title": "CRM и Воронка продаж",
     "leads": {
@@ -3535,431 +2761,6 @@
       "settings": "Настройки",
       "view": "Просмотр",
       "actions": "Действия"
-    }
-  },
-  "service": {
-    "dashboard": {
-      "page_title": "Панель полевого сервиса",
-      "page_description": "Мониторинг сервисных операций, заявок и контрактов",
-      "kpi": {
-        "open_tickets": "Открытые заявки",
-        "open_tickets_desc": "Открытые, запланированные и в процессе",
-        "pending_installations": "Ожидающие установки",
-        "pending_installations_desc": "Оборудование ожидает установки",
-        "active_contracts": "Активные контракты",
-        "active_contracts_desc": "Действующие сервисные контракты",
-        "refills_due": "Требуется пополнение",
-        "refills_due_desc": "Контракты с ожидающими пополнениями"
-      },
-      "recent_tickets": "Недавние заявки",
-      "view_all_tickets": "Просмотреть все заявки",
-      "no_tickets": "Заявки не найдены",
-      "upcoming_service": "Предстоящие работы",
-      "next_7_days": "Следующие 7 дней",
-      "no_upcoming": "Нет запланированных работ в течение следующих 7 дней"
-    },
-    "ticket": {
-      "ticket_number": "Заявка №",
-      "customer": "Клиент",
-      "type": {
-        "installation": "Установка",
-        "repair": "Ремонт",
-        "maintenance": "Обслуживание",
-        "support": "Поддержка",
-        "emergency": "Экстренная"
-      },
-      "priority": {
-        "low": "Низкий",
-        "medium": "Средний",
-        "high": "Высокий",
-        "critical": "Критический"
-      },
-      "scheduled_date": "Запланированная дата",
-      "technician": "Техник",
-      "assets": "Активы",
-      "unassigned": "Не назначен",
-      "status": {
-        "open": "Открыта",
-        "scheduled": "Запланирована",
-        "in_progress": "В процессе",
-        "completed": "Завершена",
-        "cancelled": "Отменена"
-      }
-    },
-    "tickets_page": {
-      "title": "Сервисные заявки",
-      "description": "Управление сервисными заявками и полевыми операциями",
-      "new_ticket": "Новая заявка",
-      "loading": "Загрузка заявок..."
-    },
-    "new_ticket_page": {
-      "title": "Создать сервисную заявку",
-      "description": "Создать новую заявку для поддержки клиентов"
-    },
-    "tickets_list": {
-      "filters": {
-        "title": "Фильтры",
-        "status": "Статус",
-        "type": "Тип",
-        "priority": "Приоритет",
-        "all": "Все"
-      },
-      "table": {
-        "ticket_number": "Заявка №",
-        "customer": "Клиент",
-        "title": "Название",
-        "type": "Тип",
-        "priority": "Приоритет",
-        "status": "Статус",
-        "technician": "Техник",
-        "scheduled": "Запланирована",
-        "actions": "Действия"
-      },
-      "status": {
-        "open": "Открыта",
-        "scheduled": "Запланирована",
-        "in_progress": "В процессе",
-        "completed": "Завершена",
-        "cancelled": "Отменена"
-      },
-      "priority": {
-        "low": "Низкий",
-        "medium": "Средний",
-        "high": "Высокий",
-        "critical": "Критический"
-      },
-      "type": {
-        "installation": "Установка",
-        "repair": "Ремонт",
-        "maintenance": "Обслуживание",
-        "support": "Поддержка",
-        "emergency": "Экстренная"
-      },
-      "unassigned": "Не назначен",
-      "view": "Просмотр",
-      "empty": "Заявки не найдены",
-      "showing": "Показано {count} из {total} заявок"
-    },
-    "ticket_form": {
-      "customer_id": "ID клиента",
-      "customer_id_placeholder": "Введите ID клиента",
-      "customer_id_hint": "В продакшене это будет поиск с выпадающим списком",
-      "title": "Название заявки",
-      "title_placeholder": "Краткое описание проблемы",
-      "description": "Описание",
-      "description_placeholder": "Подробное описание проблемы...",
-      "ticket_type": "Тип заявки",
-      "priority": {
-        "low": "Низкий",
-        "medium": "Средний",
-        "high": "Высокий",
-        "critical": "Критический"
-      },
-      "scheduled_date": "Запланированная дата",
-      "assign_technician": "Назначить техника",
-      "unassigned": "Не назначен",
-      "create_ticket": "Создать заявку",
-      "creating": "Создание...",
-      "cancel": "Отмена",
-      "type": {
-        "installation": "Установка",
-        "repair": "Ремонт",
-        "maintenance": "Обслуживание",
-        "support": "Поддержка",
-        "emergency": "Экстренная"
-      },
-      "error": {
-        "required_fields": "Пожалуйста, заполните все обязательные поля",
-        "generic": "Не удалось создать заявку"
-      }
-    },
-    "ticket_detail": {
-      "loading": "Загрузка деталей заявки...",
-      "mark_in_progress": "Отметить в процессе",
-      "complete_ticket": "Завершить заявку",
-      "tabs": {
-        "overview": "Обзор",
-        "timeline": "Временная шкала",
-        "work_details": "Детали работы"
-      },
-      "customer_info": "Информация о клиенте",
-      "customer_name": "Имя клиента",
-      "email": "Email",
-      "phone": "Телефон",
-      "ticket_info": "Информация о заявке",
-      "ticket_type": "Тип заявки",
-      "created_at": "Создано",
-      "scheduled_date": "Запланированная дата",
-      "contract": "Контракт",
-      "description": "Описание",
-      "assigned_technician": "Назначенный техник",
-      "unassigned": "Не назначен",
-      "linked_assets": "Связанные активы",
-      "labor_hours": "Часы работы",
-      "hours": "часов",
-      "parts_used": "Использованные детали",
-      "part_item_id": "Товар №{id}",
-      "completion_notes": "Примечания о завершении",
-      "customer_signature": "Подпись клиента",
-      "service_invoice": "Сервисный счет",
-      "work_details_empty": "Детали работы появятся здесь после завершения заявки",
-      "status": {
-        "open": "Открыта",
-        "scheduled": "Запланирована",
-        "in_progress": "В процессе",
-        "completed": "Завершена",
-        "cancelled": "Отменена"
-      },
-      "priority": {
-        "low": "Низкий",
-        "medium": "Средний",
-        "high": "Высокий",
-        "critical": "Критический"
-      },
-      "error": {
-        "generic": "Произошла ошибка"
-      }
-    },
-    "ticket_timeline": {
-      "created": "Создана",
-      "created_description": "Заявка была создана",
-      "assigned": "Назначена",
-      "assigned_description": "Назначена {name}",
-      "scheduled": "Запланирована",
-      "scheduled_description": "Запланирована на {date}",
-      "in_progress": "В процессе",
-      "in_progress_description": "Работа начата",
-      "completed": "Завершена",
-      "completed_description": "Заявка успешно завершена",
-      "cancelled": "Отменена",
-      "cancelled_description": "Заявка была отменена"
-    },
-    "completion_form": {
-      "title": "Завершить сервисную заявку",
-      "completion_notes": "Примечания о завершении",
-      "completion_notes_placeholder": "Опишите выполненную работу...",
-      "minimum_10_chars": "Требуется минимум 10 символов",
-      "labor_hours": "Часы работы",
-      "labor_hours_hint": "Введите десятичные часы (например, 2.5 для 2 часов 30 минут)",
-      "parts_used": "Использованные детали",
-      "add_part": "Добавить деталь",
-      "no_parts_added": "Детали еще не добавлены",
-      "item_id": "ID товара",
-      "quantity": "Количество",
-      "unit_cost": "Стоимость за единицу (тийин)",
-      "customer_signature": "Подпись клиента",
-      "signature_placeholder": "Имя или подпись клиента",
-      "signature_hint": "Текстовое поле (можно улучшить с помощью планшета для подписи)",
-      "complete_ticket": "Завершить заявку",
-      "completing": "Завершение...",
-      "cancel": "Отмена",
-      "error": {
-        "notes_required": "Требуются примечания о завершении (минимум 10 символов)",
-        "labor_hours_required": "Требуются часы работы",
-        "invalid_parts": "Все детали должны иметь валидный ID товара, количество и стоимость",
-        "generic": "Не удалось завершить заявку"
-      }
-    },
-    "contract": {
-      "page_title": "Сервисные контракты",
-      "page_description": "Управление сервисными контрактами и договорами обслуживания",
-      "create_contract": "Создать контракт",
-      "edit_contract": "Редактировать контракт",
-      "contract_number": "Контракт №",
-      "contract_details": "Детали контракта",
-      "customer": "Клиент",
-      "customer_id_placeholder": "Введите ID клиента (TODO: Добавить выпадающий список)",
-      "contract_type": "Тип контракта",
-      "start_date": "Дата начала",
-      "end_date": "Дата окончания",
-      "billing_frequency": "Частота выставления счетов",
-      "monthly_value": "Месячная стоимость",
-      "next_billing_date": "Следующая дата выставления счета",
-      "source_invoice": "Исходный счет",
-      "assigned_technician": "Назначенный техник",
-      "auto_generate_refills": "Автоматическое создание пополнений",
-      "suspension_reason": "Причина приостановки",
-      "filter_all": "Все контракты",
-      "filter_active": "Активные",
-      "filter_suspended": "Приостановленные",
-      "filter_expired": "Истекшие",
-      "filter_cancelled": "Отмененные",
-      "no_contracts": "Контракты не найдены",
-      "view_contract": "Просмотреть контракт",
-      "suspend_contract": "Приостановить контракт",
-      "renew_contract": "Продлить контракт",
-      "cancel_contract": "Отменить контракт",
-      "edit_refill_items": "Редактировать товары пополнения",
-      "changes_affect_future": "Изменения влияют только на будущие пополнения",
-      "cannot_edit_status": "Невозможно редактировать {status} контракт",
-      "read_only_view": "Режим просмотра",
-      "status": {
-        "active": "Активный",
-        "suspended": "Приостановлен",
-        "expired": "Истек",
-        "cancelled": "Отменен"
-      },
-      "type": {
-        "warranty": "Гарантия",
-        "maintenance": "Обслуживание",
-        "full_service": "Полное обслуживание",
-        "supplies_only": "Только расходные материалы"
-      },
-      "billing_frequency_options": {
-        "monthly": "Ежемесячно",
-        "quarterly": "Ежеквартально (3 месяца)",
-        "semi_annual": "Полугодие (6 месяцев)",
-        "annual": "Ежегодно (12 месяцев)"
-      },
-      "tabs": {
-        "basic_info": "Основная информация",
-        "refill_items": "Товары пополнения",
-        "billing_history": "История выставления счетов",
-        "associated_tickets": "Сервисные заявки"
-      },
-      "refill_items": {
-        "title": "Настройка товаров пополнения",
-        "add_item": "Добавить товар",
-        "item": "Товар",
-        "quantity_per_cycle": "Количество за цикл",
-        "unit_price": "Цена за единицу",
-        "cycle_total": "Итого за цикл",
-        "no_items": "Товары пополнения не настроены",
-        "remove_item": "Удалить товар"
-      },
-      "billing_history": {
-        "title": "История выставления счетов",
-        "invoice_number": "Счет №",
-        "date": "Дата",
-        "amount": "Сумма",
-        "status": "Статус",
-        "no_invoices": "Счета еще не выставлены"
-      },
-      "tickets": {
-        "title": "Связанные сервисные заявки",
-        "no_tickets": "Нет сервисных заявок, связанных с этим контрактом"
-      },
-      "validation": {
-        "customer_required": "Клиент обязателен",
-        "start_date_required": "Дата начала обязательна",
-        "end_date_required": "Дата окончания обязательна"
-      },
-      "actions": {
-        "save": "Сохранить контракт",
-        "cancel": "Отмена",
-        "confirm_suspend": "Вы уверены, что хотите приостановить этот контракт?",
-        "confirm_renew": "Продлить этот контракт?",
-        "confirm_cancel": "Вы уверены, что хотите отменить этот контракт? Это действие нельзя отменить.",
-        "suspend_reason_placeholder": "Введите причину приостановки...",
-        "cancel_reason_placeholder": "Введите причину отмены...",
-        "new_end_date": "Новая дата окончания",
-        "success_created": "Контракт успешно создан",
-        "success_updated": "Контракт успешно обновлен",
-        "success_suspended": "Контракт приостановлен",
-        "success_renewed": "Контракт продлен",
-        "success_cancelled": "Контракт отменен",
-        "error_creating": "Не удалось создать контракт",
-        "error_updating": "Не удалось обновить контракт",
-        "error_suspending": "Не удалось приостановить контракт",
-        "error_renewing": "Не удалось продлить контракт",
-        "error_cancelling": "Не удалось отменить контракт"
-      }
-    },
-    "assets_page": {
-      "title": "Активы клиентов",
-      "description": "Реестр оборудования и история обслуживания",
-      "loading": "Загрузка активов..."
-    },
-    "assets_list": {
-      "filters": {
-        "title": "Фильтры",
-        "customer": "Клиент",
-        "status": "Статус",
-        "warranty": "Гарантия",
-        "serial_number": "Серийный номер",
-        "serial_placeholder": "Поиск по серийному номеру...",
-        "all": "Все"
-      },
-      "status": {
-        "pending_installation": "Ожидает установки",
-        "active": "Активный",
-        "under_service": "На обслуживании",
-        "decommissioned": "Выведен из эксплуатации"
-      },
-      "warranty": {
-        "active": "Гарантия активна",
-        "expired": "Гарантия истекла",
-        "none": "Без гарантии"
-      },
-      "empty": "Активы не найдены",
-      "showing": "Показано {count} из {total} активов"
-    },
-    "assets_card": {
-      "serial": "С/Н",
-      "installed": "Установлено",
-      "contract": "Контракт",
-      "view_details": "Подробнее",
-      "status": {
-        "pending_installation": "Ожидает установки",
-        "active": "Активный",
-        "under_service": "На обслуживании",
-        "decommissioned": "Выведен из эксплуатации"
-      }
-    },
-    "warranty_badge": {
-      "no_warranty": "Без гарантии",
-      "active": "Гарантия активна",
-      "expires": "Истекает",
-      "expired": "Гарантия истекла",
-      "expired_on": "Истекла"
-    },
-    "asset_detail": {
-      "subtitle": "Подробная информация об оборудовании и история обслуживания",
-      "loading": "Загрузка...",
-      "equipment_info": "Информация об оборудовании",
-      "customer_info": "Информация о клиенте",
-      "installation_info": "Детали установки",
-      "warranty_contract": "Гарантия и контракт",
-      "service_history": "История обслуживания",
-      "asset_number": "Номер актива",
-      "serial_number": "Серийный номер",
-      "item_name": "Тип оборудования",
-      "status": {
-        "pending_installation": "Ожидает установки",
-        "active": "Активный",
-        "under_service": "На обслуживании",
-        "decommissioned": "Выведен из эксплуатации"
-      },
-      "customer_name": "Клиент",
-      "email": "Эл. почта",
-      "phone": "Телефон",
-      "installation_address": "Адрес установки",
-      "installation_date": "Дата установки",
-      "source_invoice": "Исходный счет",
-      "warranty_status": "Статус гарантии",
-      "service_contract": "Сервисный контракт",
-      "contract_type": "Тип",
-      "expires": "Истекает",
-      "technician": "Техник",
-      "close": "Закрыть"
-    },
-    "service_history": {
-      "no_history": "История обслуживания пока отсутствует",
-      "view_ticket": "Просмотр заявки",
-      "status": {
-        "open": "Открыта",
-        "scheduled": "Запланирована",
-        "in_progress": "В процессе",
-        "completed": "Завершена",
-        "cancelled": "Отменена"
-      },
-      "type": {
-        "installation": "Установка",
-        "repair": "Ремонт",
-        "maintenance": "Техническое обслуживание",
-        "support": "Поддержка",
-        "emergency": "Срочная"
-      }
     }
   },
   "crm_board": {

@@ -8,8 +8,15 @@ import ItemProfile from '@/components/inventory/item-center/ItemProfile';
 import ItemEditor from '@/components/inventory/item-center/ItemEditor';
 import MasterDataDrawer from '@/components/inventory/item-center/MasterDataDrawer';
 import { InventoryScoreboard } from '@/components/inventory/InventoryScoreboard';
-import { LayoutDashboard, Database, Package } from 'lucide-react';
+import { Home, Database, Package, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
 import { useTranslations } from 'next-intl';
 
 interface ItemCenterLayoutProps {
@@ -104,20 +111,26 @@ export function ItemCenterLayout({
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Fixed Header */}
                 <div className="h-14 border-b border-slate-200 bg-white flex items-center justify-between px-6 shrink-0 z-10">
-                    <Button variant="ghost" size="sm" onClick={() => router.push('/')} className="gap-2 text-muted-foreground pl-0 hover:pl-2 transition-all">
-                        <LayoutDashboard className="h-4 w-4" />
-                        <span>{t('dashboard')}</span>
-                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="gap-2">
+                                <Home className="h-4 w-4" />
+                                <ChevronDown className="h-3 w-3 opacity-50" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-48">
+                            <DropdownMenuItem onClick={() => router.push('/')} className="gap-2 cursor-pointer">
+                                <Home className="h-4 w-4" />
+                                <span>{t('dashboard')}</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => setShowMasterData(true)} className="gap-2 cursor-pointer">
+                                <Database className="h-4 w-4" />
+                                <span>{t('master_data')}</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                     <div className="flex-1" />
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowMasterData(true)}
-                        className="gap-2"
-                    >
-                        <Database className="h-4 w-4" />
-                        {t('master_data')}
-                    </Button>
                 </div>
 
                 {/* Main Content Area - Scrollable */}
