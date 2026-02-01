@@ -181,10 +181,6 @@ export function CustomerCenterLayout({
 
             {/* Right Column: Details & Stats */}
             <div className="flex-1 flex flex-col overflow-hidden">
-                {/* Fixed Header - Space for future content */}
-                <div className="h-14 border-b border-slate-200 bg-white flex items-center px-6 shrink-0 z-10">
-                </div>
-
                 {/* Main Content Area - Scrollable */}
                 <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6">
                     <div className="max-w-6xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
