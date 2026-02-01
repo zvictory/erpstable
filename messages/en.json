@@ -1715,7 +1715,82 @@
     "payroll": "Payroll",
     "system": "System",
     "settings": "Settings",
-    "collapse_sidebar": "Collapse"
+    "collapse_sidebar": "Collapse",
+    "sales": "Sales",
+    "warehouse": "Warehouse",
+    "service": "Service",
+    "reception": "Reception"
+  },
+  "sales": {
+    "nav": {
+      "overview": "Overview",
+      "pipeline": "Pipeline",
+      "leads": "Leads",
+      "opportunities": "Opportunities",
+      "customers": "Customers",
+      "quotes": "Quotes",
+      "invoices": "Invoices",
+      "commissions": "Commissions"
+    }
+  },
+  "purchasing": {
+    "nav": {
+      "overview": "Overview",
+      "vendors": "Vendors",
+      "purchase_orders": "Purchase Orders",
+      "bills": "Bills"
+    }
+  },
+  "inventory": {
+    "nav": {
+      "overview": "Overview",
+      "items_services": "Items & Services",
+      "reception": "Reception",
+      "reconciliation": "Reconciliation"
+    }
+  },
+  "production": {
+    "nav": {
+      "overview": "Overview",
+      "recipes": "Recipes",
+      "production_wizard": "Wizard",
+      "production_terminal": "Terminal",
+      "production_chain": "Chain",
+      "manufacturing_lines": "Lines",
+      "mixing_station": "Mixing",
+      "sublimation": "Sublimation",
+      "quality_control": "Quality",
+      "maintenance": "Maintenance"
+    }
+  },
+  "wms": {
+    "nav": {
+      "overview": "Overview",
+      "transfer": "Transfer",
+      "picking": "Picking",
+      "cycle_count": "Cycle Count",
+      "lookup": "Lookup"
+    }
+  },
+  "service": {
+    "nav": {
+      "overview": "Overview",
+      "service_contracts": "Contracts",
+      "service_tickets": "Tickets",
+      "service_assets": "Assets"
+    }
+  },
+  "finance": {
+    "nav": {
+      "overview": "Overview",
+      "chart_of_accounts": "Chart of Accounts",
+      "general_ledger": "General Ledger",
+      "cash_accounts": "Cash Accounts",
+      "fixed_assets": "Fixed Assets",
+      "expenses": "Expenses",
+      "financial_reports": "Reports",
+      "payroll": "Payroll"
+    }
   },
   "expenses": {
     "title": "Expense Management",

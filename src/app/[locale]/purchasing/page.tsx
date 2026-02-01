@@ -1,16 +1,16 @@
 import { auth } from '@/auth';
-import { getProductionOverviewMetrics } from '@/app/actions/domain-metrics';
+import { getPurchasingOverviewMetrics } from '@/app/actions/domain-metrics';
 import { DomainNavigation } from '@/components/navigation/DomainNavigation';
 import { DOMAIN_NAV_CONFIG } from '@/lib/domain-nav-config';
 import { Link } from '@/navigation';
-import { Plus, Factory, CheckCircle, Clock } from 'lucide-react';
+import { Plus, ShoppingCart, Building2, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ProductionOverviewPage() {
+export default async function PurchasingOverviewPage() {
   const session = await auth();
-  const metrics = await getProductionOverviewMetrics();
+  const metrics = await getPurchasingOverviewMetrics();
 
   if (!session?.user) {
     return null;
@@ -18,47 +18,47 @@ export default async function ProductionOverviewPage() {
 
   const kpiCards = [
     {
-      title: 'Active Production Runs',
-      value: metrics.activeRuns.toString(),
-      change: '+3 started today',
-      icon: Factory,
-      color: 'bg-blue-100 text-blue-700'
+      title: 'Active Vendors',
+      value: metrics.activeVendors.toString(),
+      change: '+5%',
+      icon: Building2,
+      color: 'bg-purple-100 text-purple-700'
     },
     {
-      title: 'Quality Pass Rate',
-      value: `${metrics.qualityPassRate}%`,
-      change: '+0.3% vs last week',
-      icon: CheckCircle,
-      color: 'bg-green-100 text-green-700'
+      title: 'This Month Spend',
+      value: `$${(metrics.monthlySpend / 1000).toFixed(0)}K`,
+      change: '+15%',
+      icon: DollarSign,
+      color: 'bg-red-100 text-red-700'
     },
     {
-      title: 'Pending Jobs',
-      value: metrics.pendingJobs.toString(),
-      change: '2 overdue',
-      icon: Clock,
+      title: 'Pending Bills',
+      value: metrics.pendingBills.toString(),
+      change: '+2',
+      icon: ShoppingCart,
       color: 'bg-amber-100 text-amber-700'
     },
   ];
 
   const quickActions = [
-    { label: 'Start Production', href: '/production/wizard', icon: Plus },
-    { label: 'View Recipes', href: '/production/recipes', icon: Plus },
-    { label: 'Production Terminal', href: '/production/terminal', icon: Plus },
+    { label: 'New Purchase Order', href: '/purchasing/orders', icon: Plus },
+    { label: 'New Vendor', href: '/purchasing/vendors', icon: Plus },
+    { label: 'View Bills', href: '/purchasing/bills', icon: Plus },
   ];
 
   return (
     <div className="space-y-6">
       {/* Domain Navigation Tabs */}
       <DomainNavigation
-        items={DOMAIN_NAV_CONFIG.production}
-        domain="production"
+        items={DOMAIN_NAV_CONFIG.purchasing}
+        domain="purchasing"
         userRole={session.user.role}
       />
 
       {/* Page Header */}
       <div className="px-6">
-        <h1 className="text-3xl font-bold text-slate-900">Production Overview</h1>
-        <p className="text-slate-600 mt-1">Monitor production runs, quality, and manufacturing operations</p>
+        <h1 className="text-3xl font-bold text-slate-900">Purchasing Overview</h1>
+        <p className="text-slate-600 mt-1">Manage vendors, purchase orders, and supplier invoices</p>
       </div>
 
       {/* KPI Cards */}
@@ -71,7 +71,7 @@ export default async function ProductionOverviewPage() {
                 <div>
                   <p className="text-sm text-slate-600">{card.title}</p>
                   <p className="text-3xl font-bold text-slate-900 mt-2">{card.value}</p>
-                  <p className="text-sm text-green-600 mt-2">{card.change}</p>
+                  <p className="text-sm text-green-600 mt-2">{card.change} from last month</p>
                 </div>
                 <div className={`p-3 rounded-lg ${card.color}`}>
                   <Icon className="w-6 h-6" />

@@ -1540,7 +1540,82 @@
     "payroll": "Ish haqi",
     "system": "Sistema",
     "settings": "Sozlamalar",
-    "collapse_sidebar": "Yig'ish"
+    "collapse_sidebar": "Yig'ish",
+    "sales": "Savdo",
+    "warehouse": "Ombor",
+    "service": "Xizmat",
+    "reception": "Qabul qilish"
+  },
+  "sales": {
+    "nav": {
+      "overview": "Umumiy ko'rinish",
+      "pipeline": "Savdo voronkasi",
+      "leads": "Lidlar",
+      "opportunities": "Imkoniyatlar",
+      "customers": "Mijozlar",
+      "quotes": "Takliflar",
+      "invoices": "Hisob-fakturalar",
+      "commissions": "Komissiya"
+    }
+  },
+  "purchasing": {
+    "nav": {
+      "overview": "Umumiy ko'rinish",
+      "vendors": "Yetkazib beruvchilar",
+      "purchase_orders": "Xarid buyurtmalari",
+      "bills": "Yetkazib beruvchi hisobnomalari"
+    }
+  },
+  "inventory": {
+    "nav": {
+      "overview": "Umumiy ko'rinish",
+      "items_services": "Tovarlar va xizmatlar",
+      "reception": "Qabul qilish",
+      "reconciliation": "Muvofiqlash"
+    }
+  },
+  "production": {
+    "nav": {
+      "overview": "Umumiy ko'rinish",
+      "recipes": "Retseptlar",
+      "production_wizard": "Ishlab chiqarish ustasi",
+      "production_terminal": "Ishlab chiqarish terminali",
+      "production_chain": "Ishlab chiqarish zanjiri",
+      "manufacturing_lines": "Ishlab chiqarish liniyalari",
+      "mixing_station": "Aralashtirish stansiyasi",
+      "sublimation": "Sublimatsiya",
+      "quality_control": "Sifat nazorati",
+      "maintenance": "Uskunaga texnik xizmat"
+    }
+  },
+  "wms": {
+    "nav": {
+      "overview": "Umumiy ko'rinish",
+      "transfer": "Ko'chirish",
+      "picking": "Yig'ish",
+      "cycle_count": "Inventarizatsiya",
+      "lookup": "Qidiruv"
+    }
+  },
+  "service": {
+    "nav": {
+      "overview": "Umumiy ko'rinish",
+      "service_contracts": "Xizmat shartnomalari",
+      "service_tickets": "Xizmat so'rovlari",
+      "service_assets": "Xizmat aktivlari"
+    }
+  },
+  "finance": {
+    "nav": {
+      "overview": "Umumiy ko'rinish",
+      "chart_of_accounts": "Hisoblar rejasi",
+      "general_ledger": "Bosh kitob",
+      "cash_accounts": "Naqd pul hisoblari",
+      "fixed_assets": "Asosiy vositalar",
+      "expenses": "Xarajatlar",
+      "financial_reports": "Moliyaviy hisobotlar",
+      "payroll": "Ish haqi"
+    }
   },
   "expenses": {
     "title": "Xarajatlarni Boshqarish",

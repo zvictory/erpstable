@@ -1,6 +1,9 @@
+import { auth } from '@/auth';
 import { getDeals, getPipelineStats } from '@/app/actions/crm';
 import KanbanBoard from '@/components/crm/KanbanBoard';
 import { PipelineStatsCards } from '@/components/sales/pipeline/PipelineStatsCards';
+import { DomainNavigation } from '@/components/navigation/DomainNavigation';
+import { DOMAIN_NAV_CONFIG } from '@/lib/domain-nav-config';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -9,6 +12,7 @@ import { getTranslations } from 'next-intl/server';
 export const dynamic = 'force-dynamic';
 
 export default async function PipelinePage() {
+  const session = await auth();
   const t = await getTranslations('crm.pipeline');
   const [deals, stats] = await Promise.all([
     getDeals(),
@@ -16,7 +20,13 @@ export default async function PipelinePage() {
   ]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <>
+      <DomainNavigation
+        items={DOMAIN_NAV_CONFIG.sales}
+        domain="sales"
+        userRole={session?.user?.role}
+      />
+      <div className="min-h-screen flex flex-col bg-slate-50">
       {/* Header */}
       <div className="bg-white border-b">
         <div className="max-w-[1600px] mx-auto px-6 py-6">
@@ -47,5 +57,6 @@ export default async function PipelinePage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

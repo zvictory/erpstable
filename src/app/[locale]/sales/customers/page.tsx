@@ -1,9 +1,12 @@
 
 import React from 'react';
+import { auth } from '@/auth';
 import { getCustomerCenterData, getCustomerKPIs } from '@/app/actions/sales';
 import { getItems } from '@/app/actions/items';
 import { CustomerCenterLayout } from '@/components/sales/customer-center/CustomerCenterLayout';
 import { ModuleGuard } from '@/components/guards/ModuleGuard';
+import { DomainNavigation } from '@/components/navigation/DomainNavigation';
+import { DOMAIN_NAV_CONFIG } from '@/lib/domain-nav-config';
 import { db } from '../../../../../db';
 import { taxRates } from '../../../../../db/schema/finance';
 import { users as usersTable } from '../../../../../db/schema/auth';
@@ -21,6 +24,7 @@ interface PageProps {
 }
 
 export default async function CustomersPage({ searchParams }: PageProps) {
+    const session = await auth();
     const selectedId = searchParams.customerId ? parseInt(searchParams.customerId) : undefined;
 
     // Fetch data in parallel
@@ -35,16 +39,23 @@ export default async function CustomersPage({ searchParams }: PageProps) {
     const { customers, selectedCustomer } = customerData;
 
     return (
-        <ModuleGuard module="SALES">
-            <CustomerCenterLayout
-                customers={customers as any}
-                selectedCustomer={selectedCustomer as any}
-                items={items as any}
-                taxRates={activeTaxRates as any}
-                initialSelectedId={selectedId}
-                kpis={kpis}
-                users={users as any}
+        <>
+            <DomainNavigation
+                items={DOMAIN_NAV_CONFIG.sales}
+                domain="sales"
+                userRole={session?.user?.role}
             />
-        </ModuleGuard>
+            <ModuleGuard module="SALES">
+                <CustomerCenterLayout
+                    customers={customers as any}
+                    selectedCustomer={selectedCustomer as any}
+                    items={items as any}
+                    taxRates={activeTaxRates as any}
+                    initialSelectedId={selectedId}
+                    kpis={kpis}
+                    users={users as any}
+                />
+            </ModuleGuard>
+        </>
     );
 }

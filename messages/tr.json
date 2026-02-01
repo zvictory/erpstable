@@ -1618,7 +1618,82 @@
     "payroll": "Bordro",
     "system": "Sistem",
     "settings": "Ayarlar",
-    "collapse_sidebar": "Daralt"
+    "collapse_sidebar": "Daralt",
+    "sales": "Satış",
+    "warehouse": "Depo",
+    "service": "Hizmet",
+    "reception": "Alım"
+  },
+  "sales": {
+    "nav": {
+      "overview": "Genel Bakış",
+      "pipeline": "Satış Hunisi",
+      "leads": "Potansiyel Müşteriler",
+      "opportunities": "Fırsatlar",
+      "customers": "Müşteriler",
+      "quotes": "Teklifler",
+      "invoices": "Faturalar",
+      "commissions": "Komisyonlar"
+    }
+  },
+  "purchasing": {
+    "nav": {
+      "overview": "Genel Bakış",
+      "vendors": "Tedarikçiler",
+      "purchase_orders": "Satınalma Siparişleri",
+      "bills": "Tedarikçi Faturaları"
+    }
+  },
+  "inventory": {
+    "nav": {
+      "overview": "Genel Bakış",
+      "items_services": "Ürünler ve Hizmetler",
+      "reception": "Alım",
+      "reconciliation": "Mutabakat"
+    }
+  },
+  "production": {
+    "nav": {
+      "overview": "Genel Bakış",
+      "recipes": "Reçeteler",
+      "production_wizard": "Üretim Sihirbazı",
+      "production_terminal": "Üretim Terminali",
+      "production_chain": "Üretim Zinciri",
+      "manufacturing_lines": "Üretim Hatları",
+      "mixing_station": "Karıştırma İstasyonu",
+      "sublimation": "Süblime",
+      "quality_control": "Kalite Kontrol",
+      "maintenance": "Ekipman Bakımı"
+    }
+  },
+  "wms": {
+    "nav": {
+      "overview": "Genel Bakış",
+      "transfer": "Transfer",
+      "picking": "Toplama",
+      "cycle_count": "Envanter Sayımı",
+      "lookup": "Arama"
+    }
+  },
+  "service": {
+    "nav": {
+      "overview": "Genel Bakış",
+      "service_contracts": "Hizmet Sözleşmeleri",
+      "service_tickets": "Hizmet Talepleri",
+      "service_assets": "Hizmet Varlıkları"
+    }
+  },
+  "finance": {
+    "nav": {
+      "overview": "Genel Bakış",
+      "chart_of_accounts": "Hesap Planı",
+      "general_ledger": "Genel Muhasebe",
+      "cash_accounts": "Nakit Hesapları",
+      "fixed_assets": "Sabit Kıymetler",
+      "expenses": "Giderler",
+      "financial_reports": "Finansal Raporlar",
+      "payroll": "Bordro"
+    }
   },
   "expenses": {
     "title": "Gider Yönetimi",

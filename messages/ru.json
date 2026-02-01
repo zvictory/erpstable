@@ -2283,7 +2283,82 @@
     "payroll": "Зарплата",
     "system": "Система",
     "settings": "Настройки",
-    "collapse_sidebar": "Свернуть"
+    "collapse_sidebar": "Свернуть",
+    "sales": "Продажи",
+    "warehouse": "Склад",
+    "service": "Сервис",
+    "reception": "Приемка"
+  },
+  "sales": {
+    "nav": {
+      "overview": "Обзор",
+      "pipeline": "Воронка продаж",
+      "leads": "Лиды",
+      "opportunities": "Возможности",
+      "customers": "Клиенты",
+      "quotes": "Коммерческие предложения",
+      "invoices": "Счета",
+      "commissions": "Комиссии"
+    }
+  },
+  "purchasing": {
+    "nav": {
+      "overview": "Обзор",
+      "vendors": "Поставщики",
+      "purchase_orders": "Заказы на покупку",
+      "bills": "Счета поставщиков"
+    }
+  },
+  "inventory": {
+    "nav": {
+      "overview": "Обзор",
+      "items_services": "Товары и услуги",
+      "reception": "Приемка",
+      "reconciliation": "Сверка"
+    }
+  },
+  "production": {
+    "nav": {
+      "overview": "Обзор",
+      "recipes": "Рецепты",
+      "production_wizard": "Мастер производства",
+      "production_terminal": "Терминал производства",
+      "production_chain": "Цепочка производства",
+      "manufacturing_lines": "Линии производства",
+      "mixing_station": "Станция смешивания",
+      "sublimation": "Сублимация",
+      "quality_control": "Контроль качества",
+      "maintenance": "Обслуживание оборудования"
+    }
+  },
+  "wms": {
+    "nav": {
+      "overview": "Обзор",
+      "transfer": "Перемещение",
+      "picking": "Комплектация",
+      "cycle_count": "Инвентаризация",
+      "lookup": "Поиск"
+    }
+  },
+  "service": {
+    "nav": {
+      "overview": "Обзор",
+      "service_contracts": "Сервисные контракты",
+      "service_tickets": "Заявки на обслуживание",
+      "service_assets": "Сервисные активы"
+    }
+  },
+  "finance": {
+    "nav": {
+      "overview": "Обзор",
+      "chart_of_accounts": "План счетов",
+      "general_ledger": "Главная книга",
+      "cash_accounts": "Денежные счета",
+      "fixed_assets": "Основные средства",
+      "expenses": "Расходы",
+      "financial_reports": "Финансовые отчеты",
+      "payroll": "Зарплата"
+    }
   },
   "expenses": {
     "title": "Управление расходами",
