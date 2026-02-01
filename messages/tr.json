@@ -1273,12 +1273,217 @@
       "creating": "Oluşturuluyor...",
       "error_prefix": "Hata:"
     },
+    "editor": {
+      "validation": {
+        "name_required": "Ad gereklidir",
+        "category_required": "Kategori gereklidir",
+        "base_uom_required": "Temel ölçü birimi gereklidir"
+      },
+      "header": {
+        "new": "Yeni Ürün",
+        "edit": "Ürünü Düzenle"
+      },
+      "tabs": {
+        "general": "Genel",
+        "accounting": "Muhasebe",
+        "inventory": "Stok",
+        "vendors": "Satıcılar"
+      },
+      "buttons": {
+        "cancel": "İptal",
+        "saving": "Kaydediliyor...",
+        "save": "Kaydet"
+      },
+      "alerts": {
+        "error": "Kaydetme başarısız oldu"
+      },
+      "form": {
+        "name_label": "Ad *",
+        "sku_label": "SKU",
+        "barcode_label": "Barkod",
+        "item_class_label": "Ürün Sınıfı *",
+        "item_class_options": {
+          "raw_material": "Ham Madde",
+          "wip": "Devam Eden Üretim",
+          "finished_goods": "Bitmiş Mal",
+          "service": "Hizmet"
+        },
+        "category_label": "Kategori *",
+        "category_placeholder": "Seçiniz...",
+        "description_label": "Açıklama",
+        "valuation_label": "Değerleme Yöntemi",
+        "valuation_options": {
+          "fifo": "FIFO (İlk Giren, İlk Çıkan)",
+          "weighted_avg": "Ağırlıklı Ortalama",
+          "standard": "Standart Maliyet"
+        },
+        "valuation_warning": "Değiştirilemez - stok işlemleri mevcuttur",
+        "gl_section": "Genel Muhasebe Hesap Eşleştirmesi",
+        "inventory_asset_label": "Stok Varlığı Hesabı",
+        "inventory_asset_default": "Varsayılan",
+        "income_label": "Gelir Hesabı",
+        "income_default": "Varsayılan",
+        "cogs_label": "COGS / Gider Hesabı",
+        "cogs_default": "Varsayılan",
+        "base_uom_label": "Temel Ölçü Birimi *",
+        "base_uom_placeholder": "Seçiniz...",
+        "purchase_uom_label": "Satın Alma Ölçü Birimi",
+        "purchase_uom_default": "Temel ile Aynı",
+        "conversion_label": "Dönüştürme Faktörü (1 Satın Alma ÖB = X Temel ÖB)",
+        "conversion_hint": "örneğin, 1 Koli = 20 kg ise 20 girin (faktör * 100 olarak depolanır)",
+        "standard_cost_label": "Standart Maliyet",
+        "sales_price_label": "Satış Fiyatı",
+        "reorder_point_label": "Yeniden Sipariş Noktası",
+        "safety_stock_label": "Emniyet Stoğu",
+        "preferred_vendor_label": "Tercih Edilen Satıcı",
+        "preferred_vendor_default": "Hiçbiri",
+        "preferred_vendor_hint": "Otomatik PO oluşturma için kullanılır"
+      }
+    },
+    "item_list": {
+      "no_sku_display": "SKU yok",
+      "badges": {
+        "out_of_stock": "Stokta yok",
+        "low_stock": "Düşük"
+      },
+      "avg_cost_label": "Ort. Maliyet:"
+    },
+    "item_profile": {
+      "errors": {
+        "unexpected": "Beklenmeyen bir hata oluştu"
+      },
+      "sections": {
+        "classification": "Sınıflandırma",
+        "unit_of_measure": "Ölçü Birimi",
+        "pricing": "Fiyatlandırma & Değerleme",
+        "gl_accounts": "Genel Muhasebe Hesapları",
+        "inventory_settings": "Stok Ayarları",
+        "stock_on_hand": "Eldeki Stok Miktarı",
+        "total_value": "Toplam Değer"
+      },
+      "labels": {
+        "category": "kategori",
+        "purchase": "Satın Alma:",
+        "sales_price": "Satış Fiyatı",
+        "standard_cost": "Standart Maliyet",
+        "asset": "Varlık",
+        "income": "Gelir",
+        "cogs": "COGS/Gider",
+        "reorder_point": "Yeniden Sipariş Noktası",
+        "safety_stock": "Emniyet Stoğu",
+        "preferred_vendor": "Tercih Edilen Satıcı"
+      }
+    },
+    "stock_sidebar": {
+      "section_title": "Stok Mevcudiyeti",
+      "labels": {
+        "total_on_hand": "Toplam Eldeki",
+        "total_value": "Toplam Değer",
+        "committed": "Ayrılmış",
+        "available": "Mevcut",
+        "avg_unit_cost": "Ort. Birim Maliyeti",
+        "separator": "/",
+        "last_receipt": "Son Alış",
+        "no_receipts": "Alış yok"
+      }
+    },
+    "category_management": {
+      "colors": {
+        "slate": "Arduvaz",
+        "red": "Kırmızı",
+        "orange": "Turuncu",
+        "amber": "Kehribar",
+        "yellow": "Sarı",
+        "lime": "Kireç",
+        "green": "Yeşil",
+        "emerald": "Zümrüt",
+        "teal": "Deniz Yeşili",
+        "cyan": "Camgöbeği",
+        "sky": "Gökyüzü",
+        "blue": "Mavi",
+        "indigo": "İndigo",
+        "violet": "Menekşe",
+        "purple": "Mor",
+        "fuchsia": "Fuşya",
+        "pink": "Pembe",
+        "rose": "Gül"
+      },
+      "icons": {
+        "box": "Kutu",
+        "package": "Paket",
+        "boxes": "Kutular",
+        "archive": "Arşiv",
+        "folder": "Klasör",
+        "tag": "Etiket",
+        "tags": "Etiketler",
+        "layers": "Katmanlar",
+        "grid": "Izgara",
+        "layout_grid": "Düzen Izgarası",
+        "cpu": "CPU",
+        "cog": "Dişli Çark",
+        "wrench": "İngiliz Anahtarı",
+        "hammer": "Çekiç",
+        "zap": "Şimşek",
+        "flame": "Alev",
+        "droplet": "Damla",
+        "leaf": "Yaprak",
+        "apple": "Elma",
+        "carrot": "Havuç"
+      },
+      "validation": {
+        "name_required": "Kategori adı gereklidir"
+      },
+      "messages": {
+        "deactivate_confirm": "Bu kategorinin {count} ürünü vardır. Devre dışı bırakmak istiyor musunuz?",
+        "deactivate_warning": "Bu kategoriyi devre dışı bırakmak istediğinizden emin misiniz?",
+        "deactivate_failed": "Devre dışı bırakma başarısız oldu",
+        "deactivate_error": "Kategori devre dışı bırakma başarısız oldu",
+        "reactivate_failed": "Kategori etkinleştirme başarısız oldu"
+      },
+      "header": "Ürünleri kategoriler halinde düzenleyin",
+      "show_inactive": "İnaktifi göster",
+      "add_button": "Kategori Ekle",
+      "table": {
+        "name": "Ad",
+        "description": "Açıklama",
+        "icon": "İkon",
+        "color": "Renk",
+        "items": "Ürünler",
+        "status": "Durum",
+        "actions": "İşlemler"
+      },
+      "form": {
+        "name_placeholder": "Kategori adı",
+        "description_placeholder": "Açıklama (isteğe bağlı)",
+        "icon_none": "Hiçbiri",
+        "color_none": "Hiçbiri",
+        "status_active": "Aktif",
+        "status_inactive": "İnaktif"
+      },
+      "empty": "Kategori bulunamadı. Başlamak için bir tane oluşturun."
+    },
+    "uom_management": {
+      "deactivate_confirm": "Bu ölçü birimi {count} ürün tarafından kullanılmaktadır. Devre dışı bırakmak istiyor musunuz?",
+      "show_inactive": "İnaktifi göster",
+      "items_header": "Ürünler"
+    },
+    "master_data_drawer": {
+      "tabs": {
+        "units": "Ölçü Birimleri",
+        "categories": "Kategoriler"
+      },
+      "sheet_title": "Ana Veri",
+      "description": "Ölçü birimlerini ve kategorileri yönetin"
+    },
     "gl_account_types": {
       "inventory_asset": "Stok Varlığı",
       "cogs": "Satılan Malın Maliyeti",
       "wip": "Devam Eden Üretim",
       "adjustment": "Düzeltme",
       "na": "Y/A"
+    },
+    "item_routing": {
+      "none": "Hiçbiri"
     }
   },
   "auth": {
@@ -1685,14 +1890,6 @@
         "open_bills": "Açık Faturalar",
         "paid_30_days": "Ödenen (30 gün)"
       }
-    }
-  },
-  "inventory": {
-    "nav": {
-      "overview": "Genel Bakış",
-      "items_services": "Ürünler ve Hizmetler",
-      "reception": "Alım",
-      "reconciliation": "Mutabakat"
     }
   },
   "wms": {

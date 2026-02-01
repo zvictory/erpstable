@@ -819,7 +819,7 @@ export async function createLandedCost(input: {
                     updates.push({
                         itemId: item.id,
                         allocation,
-                        assetAccount: item.assetAccountCode || ACCOUNTS.INVENTORY_ASSET
+                        assetAccount: item.assetAccountCode || ACCOUNTS.INVENTORY_RAW
                     });
                 }
             }

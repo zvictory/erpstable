@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Package, Calculator, Warehouse, Users, Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { getItemById, createItemV2, updateItemV2 } from '@/app/actions/items';
 
@@ -49,13 +50,6 @@ interface ItemEditorProps {
     onSuccess: () => void;
 }
 
-const tabs = [
-    { id: 'general', label: 'General', icon: Package },
-    { id: 'accounting', label: 'Accounting', icon: Calculator },
-    { id: 'inventory', label: 'Inventory', icon: Warehouse },
-    { id: 'vendors', label: 'Vendors', icon: Users },
-] as const;
-
 export default function ItemEditor({
     itemId,
     mode,
@@ -66,10 +60,18 @@ export default function ItemEditor({
     onClose,
     onSuccess,
 }: ItemEditorProps) {
+    const t = useTranslations('inventory.item_center.editor');
     const [activeTab, setActiveTab] = useState<string>('general');
     const [loading, setLoading] = useState(mode === 'edit');
     const [submitting, setSubmitting] = useState(false);
     const [hasLayers, setHasLayers] = useState(false);
+
+    const tabs = [
+        { id: 'general', label: t('tabs.general'), icon: Package },
+        { id: 'accounting', label: t('tabs.accounting'), icon: Calculator },
+        { id: 'inventory', label: t('tabs.inventory'), icon: Warehouse },
+        { id: 'vendors', label: t('tabs.vendors'), icon: Users },
+    ] as const;
 
     const form = useForm<FormData>({
         resolver: zodResolver(itemSchema),
@@ -135,7 +137,7 @@ export default function ItemEditor({
             if (res.success) {
                 onSuccess();
             } else {
-                alert(res.error || 'Failed to save');
+                alert(res.error || t('alerts.error'));
             }
         } catch (error) {
             console.error(error);
@@ -157,21 +159,21 @@ export default function ItemEditor({
             {/* Header */}
             <div className="flex justify-between items-center p-4 border-b border-slate-200">
                 <h2 className="text-lg font-bold text-slate-900">
-                    {mode === 'create' ? 'New Item' : 'Edit Item'}
+                    {mode === 'create' ? t('header.new') : t('header.edit')}
                 </h2>
                 <div className="flex gap-2">
                     <button
                         onClick={onClose}
                         className="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50"
                     >
-                        Cancel
+                        {t('buttons.cancel')}
                     </button>
                     <button
                         onClick={handleSubmit(onSubmit)}
                         disabled={submitting}
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
                     >
-                        {submitting ? 'Saving...' : 'Save'}
+                        {submitting ? t('buttons.saving') : t('buttons.save')}
                     </button>
                 </div>
             </div>
@@ -200,41 +202,41 @@ export default function ItemEditor({
                 {activeTab === 'general' && (
                     <div className="space-y-4 max-w-xl">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Name *</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.name_label')}</label>
                             <input {...register('name')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
                             {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">SKU</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.sku_label')}</label>
                                 <input {...register('sku')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Barcode</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.barcode_label')}</label>
                                 <input {...register('barcode')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Item Class *</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.item_class_label')}</label>
                                 <select {...register('itemClass')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
-                                    <option value="RAW_MATERIAL">Raw Material</option>
-                                    <option value="WIP">Work in Progress</option>
-                                    <option value="FINISHED_GOODS">Finished Goods</option>
-                                    <option value="SERVICE">Service</option>
+                                    <option value="RAW_MATERIAL">{t('form.item_class_options.raw_material')}</option>
+                                    <option value="WIP">{t('form.item_class_options.wip')}</option>
+                                    <option value="FINISHED_GOODS">{t('form.item_class_options.finished_goods')}</option>
+                                    <option value="SERVICE">{t('form.item_class_options.service')}</option>
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Category *</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.category_label')}</label>
                                 <select {...register('categoryId')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
-                                    <option value="">Select...</option>
+                                    <option value="">{t('form.category_placeholder')}</option>
                                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                 </select>
                                 {errors.categoryId && <p className="text-xs text-red-500 mt-1">{errors.categoryId.message}</p>}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.description_label')}</label>
                             <textarea {...register('description')} rows={3} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
                         </div>
                     </div>
@@ -243,39 +245,39 @@ export default function ItemEditor({
                 {activeTab === 'accounting' && (
                     <div className="space-y-4 max-w-xl">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Valuation Method</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.valuation_label')}</label>
                             <select
                                 {...register('valuationMethod')}
                                 disabled={hasLayers}
                                 className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm disabled:bg-slate-100"
                             >
-                                <option value="FIFO">FIFO (First In, First Out)</option>
-                                <option value="WEIGHTED_AVG">Weighted Average</option>
-                                <option value="STANDARD">Standard Cost</option>
+                                <option value="FIFO">{t('form.valuation_options.fifo')}</option>
+                                <option value="WEIGHTED_AVG">{t('form.valuation_options.weighted_avg')}</option>
+                                <option value="STANDARD">{t('form.valuation_options.standard')}</option>
                             </select>
-                            {hasLayers && <p className="text-xs text-amber-600 mt-1">Cannot change - inventory transactions exist</p>}
+                            {hasLayers && <p className="text-xs text-amber-600 mt-1">{t('form.valuation_warning')}</p>}
                         </div>
                         <div className="pt-4 border-t border-slate-200">
-                            <h4 className="text-sm font-semibold text-slate-900 mb-3">GL Account Mapping</h4>
+                            <h4 className="text-sm font-semibold text-slate-900 mb-3">{t('form.gl_section')}</h4>
                             <div className="space-y-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Inventory Asset Account</label>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.inventory_asset_label')}</label>
                                     <select {...register('assetAccountCode')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
-                                        <option value="">Default</option>
+                                        <option value="">{t('form.inventory_asset_default')}</option>
                                         {accounts.filter(a => a.type === 'Asset').map(a => <option key={a.code} value={a.code}>{a.code} - {a.name}</option>)}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Income Account</label>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.income_label')}</label>
                                     <select {...register('incomeAccountCode')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
-                                        <option value="">Default</option>
+                                        <option value="">{t('form.income_default')}</option>
                                         {accounts.filter(a => a.type === 'Revenue').map(a => <option key={a.code} value={a.code}>{a.code} - {a.name}</option>)}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">COGS / Expense Account</label>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.cogs_label')}</label>
                                     <select {...register('expenseAccountCode')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
-                                        <option value="">Default</option>
+                                        <option value="">{t('form.cogs_default')}</option>
                                         {accounts.filter(a => a.type === 'Expense').map(a => <option key={a.code} value={a.code}>{a.code} - {a.name}</option>)}
                                     </select>
                                 </div>
@@ -288,48 +290,48 @@ export default function ItemEditor({
                     <div className="space-y-4 max-w-xl">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Base UOM *</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.base_uom_label')}</label>
                                 <select {...register('baseUomId')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
-                                    <option value="">Select...</option>
+                                    <option value="">{t('form.base_uom_placeholder')}</option>
                                     {uoms.map(u => <option key={u.id} value={u.id}>{u.name} ({u.code})</option>)}
                                 </select>
                                 {errors.baseUomId && <p className="text-xs text-red-500 mt-1">{errors.baseUomId.message}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Purchase UOM</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.purchase_uom_label')}</label>
                                 <select {...register('purchaseUomId')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
-                                    <option value="">Same as Base</option>
+                                    <option value="">{t('form.purchase_uom_default')}</option>
                                     {uoms.map(u => <option key={u.id} value={u.id}>{u.name} ({u.code})</option>)}
                                 </select>
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Conversion Factor (1 Purchase UOM = X Base UOM)</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.conversion_label')}</label>
                             <input
                                 type="number"
                                 step="0.01"
                                 {...register('purchaseUomConversionFactor')}
                                 className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm"
                             />
-                            <p className="text-xs text-slate-500 mt-1">e.g., Enter 20 if 1 Crate = 20 kg (stored as factor * 100)</p>
+                            <p className="text-xs text-slate-500 mt-1">{t('form.conversion_hint')}</p>
                         </div>
                         <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Standard Cost</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.standard_cost_label')}</label>
                                 <input type="number" step="0.01" {...register('standardCost')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Sales Price</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.sales_price_label')}</label>
                                 <input type="number" step="0.01" {...register('salesPrice')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Reorder Point</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.reorder_point_label')}</label>
                                 <input type="number" {...register('reorderPoint')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Safety Stock</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.safety_stock_label')}</label>
                                 <input type="number" {...register('safetyStock')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
                             </div>
                         </div>
@@ -339,12 +341,12 @@ export default function ItemEditor({
                 {activeTab === 'vendors' && (
                     <div className="space-y-4 max-w-xl">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Preferred Vendor</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">{t('form.preferred_vendor_label')}</label>
                             <select {...register('preferredVendorId')} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm">
-                                <option value="">None</option>
+                                <option value="">{t('form.preferred_vendor_default')}</option>
                                 {vendors.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                             </select>
-                            <p className="text-xs text-slate-500 mt-1">Used for automatic PO generation</p>
+                            <p className="text-xs text-slate-500 mt-1">{t('form.preferred_vendor_hint')}</p>
                         </div>
                     </div>
                 )}

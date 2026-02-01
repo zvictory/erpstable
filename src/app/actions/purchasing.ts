@@ -633,7 +633,7 @@ export async function createVendorBill(data: any) {
                 const accountTotals = new Map<string, number>();
 
                 for (const item of val.items) {
-                    const itemData = itemsMap.get(Number(item.itemId))!;
+                    const itemData = itemsMap.get(Number(item.itemId))! as any;
                     const qty = parseFloat(item.quantity as any) || 0;
                     const price = parseFloat(item.unitPrice as any) || 0;
                     const lineAmount = Math.round(qty * price * 100);
@@ -941,7 +941,7 @@ export async function updateVendorBill(billId: number, data: any) {
             const accountTotals = new Map<string, number>();
 
             for (const item of val.items) {
-                const itemData = itemsMap.get(Number(item.itemId))!;
+                const itemData = itemsMap.get(Number(item.itemId))! as any;
                 const qty = Number(item.quantity);
                 const price = Number(item.unitPrice);
                 const lineAmount = Math.round(qty * price * 100);
@@ -1069,12 +1069,13 @@ export async function deleteVendorBill(billId: number) {
             await tx.delete(vendorBillLines).where(eq(vendorBillLines.billId, billId));
 
             // 4. Get affected item IDs before deleting layers
-            const affectedLayers = await tx.select({
+            const affectedLayers = (await tx.select({
                 itemId: inventoryLayers.itemId
             }).from(inventoryLayers).where(
                 sql`${inventoryLayers.batchNumber} LIKE ${'BILL-' + billId + '-%'}`
-            );
-            const uniqueItemIds = [...new Set(affectedLayers.map((l: any) => l.itemId))];
+            )) as Array<{ itemId: number }>;
+            const uniqueItemIds = [...new Set(affectedLayers.map((l) => l.itemId))];
+
 
             // 5. Delete Inventory Layers (CRITICAL FIX)
             await tx.run(sql`
@@ -1713,7 +1714,7 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
                 const accountTotals = new Map<string, number>();
 
                 for (const line of billLines) {
-                    const itemData = itemsMap.get(line.itemId);
+                    const itemData = itemsMap.get(line.itemId) as any;
                     if (!itemData) {
                         throw new Error(`Item ${line.itemId} not found`);
                     }

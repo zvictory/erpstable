@@ -1368,6 +1368,208 @@
       "creating": "Creating...",
       "error_prefix": "Error:"
     },
+    "editor": {
+      "validation": {
+        "name_required": "Name is required",
+        "category_required": "Category is required",
+        "base_uom_required": "Base UOM is required"
+      },
+      "header": {
+        "new": "New Item",
+        "edit": "Edit Item"
+      },
+      "tabs": {
+        "general": "General",
+        "accounting": "Accounting",
+        "inventory": "Inventory",
+        "vendors": "Vendors"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "saving": "Saving...",
+        "save": "Save"
+      },
+      "alerts": {
+        "error": "Failed to save"
+      },
+      "form": {
+        "name_label": "Name *",
+        "sku_label": "SKU",
+        "barcode_label": "Barcode",
+        "item_class_label": "Item Class *",
+        "item_class_options": {
+          "raw_material": "Raw Material",
+          "wip": "Work in Progress",
+          "finished_goods": "Finished Goods",
+          "service": "Service"
+        },
+        "category_label": "Category *",
+        "category_placeholder": "Select...",
+        "description_label": "Description",
+        "valuation_label": "Valuation Method",
+        "valuation_options": {
+          "fifo": "FIFO (First In, First Out)",
+          "weighted_avg": "Weighted Average",
+          "standard": "Standard Cost"
+        },
+        "valuation_warning": "Cannot change - inventory transactions exist",
+        "gl_section": "GL Account Mapping",
+        "inventory_asset_label": "Inventory Asset Account",
+        "inventory_asset_default": "Default",
+        "income_label": "Income Account",
+        "income_default": "Default",
+        "cogs_label": "COGS / Expense Account",
+        "cogs_default": "Default",
+        "base_uom_label": "Base UOM *",
+        "base_uom_placeholder": "Select...",
+        "purchase_uom_label": "Purchase UOM",
+        "purchase_uom_default": "Same as Base",
+        "conversion_label": "Conversion Factor (1 Purchase UOM = X Base UOM)",
+        "conversion_hint": "e.g., Enter 20 if 1 Crate = 20 kg (stored as factor * 100)",
+        "standard_cost_label": "Standard Cost",
+        "sales_price_label": "Sales Price",
+        "reorder_point_label": "Reorder Point",
+        "safety_stock_label": "Safety Stock",
+        "preferred_vendor_label": "Preferred Vendor",
+        "preferred_vendor_default": "None",
+        "preferred_vendor_hint": "Used for automatic PO generation"
+      }
+    },
+    "item_list": {
+      "no_sku_display": "No SKU",
+      "badges": {
+        "out_of_stock": "Out",
+        "low_stock": "Low"
+      },
+      "avg_cost_label": "Avg Cost:"
+    },
+    "item_profile": {
+      "errors": {
+        "unexpected": "An unexpected error occurred"
+      },
+      "sections": {
+        "classification": "Classification",
+        "unit_of_measure": "Unit of Measure",
+        "pricing": "Pricing & Valuation",
+        "gl_accounts": "GL Accounts",
+        "inventory_settings": "Inventory Settings",
+        "stock_on_hand": "Quantity on Hand",
+        "total_value": "Total Value"
+      },
+      "labels": {
+        "category": "category",
+        "purchase": "Purchase:",
+        "sales_price": "Sales Price",
+        "standard_cost": "Standard Cost",
+        "asset": "Asset",
+        "income": "Income",
+        "cogs": "COGS/Expense",
+        "reorder_point": "Reorder Point",
+        "safety_stock": "Safety Stock",
+        "preferred_vendor": "Preferred Vendor"
+      }
+    },
+    "stock_sidebar": {
+      "section_title": "Stock Availability",
+      "labels": {
+        "total_on_hand": "Total On Hand",
+        "total_value": "Total Value",
+        "committed": "Committed",
+        "available": "Available",
+        "avg_unit_cost": "Avg Unit Cost",
+        "separator": "/",
+        "last_receipt": "Last Receipt",
+        "no_receipts": "No receipts"
+      }
+    },
+    "category_management": {
+      "colors": {
+        "slate": "Slate",
+        "red": "Red",
+        "orange": "Orange",
+        "amber": "Amber",
+        "yellow": "Yellow",
+        "lime": "Lime",
+        "green": "Green",
+        "emerald": "Emerald",
+        "teal": "Teal",
+        "cyan": "Cyan",
+        "sky": "Sky",
+        "blue": "Blue",
+        "indigo": "Indigo",
+        "violet": "Violet",
+        "purple": "Purple",
+        "fuchsia": "Fuchsia",
+        "pink": "Pink",
+        "rose": "Rose"
+      },
+      "icons": {
+        "box": "Box",
+        "package": "Package",
+        "boxes": "Boxes",
+        "archive": "Archive",
+        "folder": "Folder",
+        "tag": "Tag",
+        "tags": "Tags",
+        "layers": "Layers",
+        "grid": "Grid",
+        "layout_grid": "LayoutGrid",
+        "cpu": "CPU",
+        "cog": "Cog",
+        "wrench": "Wrench",
+        "hammer": "Hammer",
+        "zap": "Zap",
+        "flame": "Flame",
+        "droplet": "Droplet",
+        "leaf": "Leaf",
+        "apple": "Apple",
+        "carrot": "Carrot"
+      },
+      "validation": {
+        "name_required": "Category name is required"
+      },
+      "messages": {
+        "deactivate_confirm": "This category has {count} item(s). Deactivate it?",
+        "deactivate_warning": "Are you sure you want to deactivate this category?",
+        "deactivate_failed": "Failed to deactivate",
+        "deactivate_error": "Failed to deactivate category",
+        "reactivate_failed": "Failed to reactivate category"
+      },
+      "header": "Organize items by category",
+      "show_inactive": "Show inactive",
+      "add_button": "Add Category",
+      "table": {
+        "name": "Name",
+        "description": "Description",
+        "icon": "Icon",
+        "color": "Color",
+        "items": "Items",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "form": {
+        "name_placeholder": "Category name",
+        "description_placeholder": "Description (optional)",
+        "icon_none": "None",
+        "color_none": "None",
+        "status_active": "Active",
+        "status_inactive": "Inactive"
+      },
+      "empty": "No categories found. Create one to get started."
+    },
+    "uom_management": {
+      "deactivate_confirm": "This UOM is used by {count} item(s). Deactivate it?",
+      "show_inactive": "Show inactive",
+      "items_header": "Items"
+    },
+    "master_data_drawer": {
+      "tabs": {
+        "units": "Units of Measure",
+        "categories": "Categories"
+      },
+      "sheet_title": "Master Data",
+      "description": "Manage units of measure and categories"
+    },
     "gl_account_types": {
       "inventory_asset": "Inventory Asset",
       "cogs": "COGS",
@@ -1782,14 +1984,6 @@
         "open_bills": "Open Bills",
         "paid_30_days": "Paid (30 days)"
       }
-    }
-  },
-  "inventory": {
-    "nav": {
-      "overview": "Overview",
-      "items_services": "Items & Services",
-      "reception": "Reception",
-      "reconciliation": "Reconciliation"
     }
   },
   "wms": {

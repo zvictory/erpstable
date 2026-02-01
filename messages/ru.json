@@ -1858,12 +1858,217 @@
       "creating": "Создание...",
       "error_prefix": "Ошибка:"
     },
+    "editor": {
+      "validation": {
+        "name_required": "Требуется имя",
+        "category_required": "Требуется категория",
+        "base_uom_required": "Требуется базовая единица измерения"
+      },
+      "header": {
+        "new": "Новый товар",
+        "edit": "Редактировать товар"
+      },
+      "tabs": {
+        "general": "Основное",
+        "accounting": "Учет",
+        "inventory": "Запасы",
+        "vendors": "Поставщики"
+      },
+      "buttons": {
+        "cancel": "Отмена",
+        "saving": "Сохраняется...",
+        "save": "Сохранить"
+      },
+      "alerts": {
+        "error": "Ошибка сохранения"
+      },
+      "form": {
+        "name_label": "Имя *",
+        "sku_label": "Артикул",
+        "barcode_label": "Штрихкод",
+        "item_class_label": "Класс товара *",
+        "item_class_options": {
+          "raw_material": "Сырье",
+          "wip": "Незавершенное производство",
+          "finished_goods": "Готовая продукция",
+          "service": "Услуга"
+        },
+        "category_label": "Категория *",
+        "category_placeholder": "Выберите...",
+        "description_label": "Описание",
+        "valuation_label": "Метод оценки",
+        "valuation_options": {
+          "fifo": "FIFO (ПОИФО)",
+          "weighted_avg": "Взвешенное среднее",
+          "standard": "Стандартная стоимость"
+        },
+        "valuation_warning": "Невозможно изменить - существуют операции запасов",
+        "gl_section": "Маппинг счетов главной книги",
+        "inventory_asset_label": "Счет актива запасов",
+        "inventory_asset_default": "По умолчанию",
+        "income_label": "Счет доходов",
+        "income_default": "По умолчанию",
+        "cogs_label": "Счет себестоимости / расходов",
+        "cogs_default": "По умолчанию",
+        "base_uom_label": "Базовая единица измерения *",
+        "base_uom_placeholder": "Выберите...",
+        "purchase_uom_label": "Единица измерения покупки",
+        "purchase_uom_default": "Как базовая",
+        "conversion_label": "Коэффициент конверсии (1 ЕИ покупки = X базовой ЕИ)",
+        "conversion_hint": "например, введите 20, если 1 ящик = 20 кг (хранится как коэффициент * 100)",
+        "standard_cost_label": "Стандартная стоимость",
+        "sales_price_label": "Цена продажи",
+        "reorder_point_label": "Точка переупорядочения",
+        "safety_stock_label": "Страховой запас",
+        "preferred_vendor_label": "Предпочтительный поставщик",
+        "preferred_vendor_default": "Нет",
+        "preferred_vendor_hint": "Используется для автоматического создания ПО"
+      }
+    },
+    "item_list": {
+      "no_sku_display": "Артикул отсутствует",
+      "badges": {
+        "out_of_stock": "Нет на складе",
+        "low_stock": "Низко"
+      },
+      "avg_cost_label": "Средняя стоимость:"
+    },
+    "item_profile": {
+      "errors": {
+        "unexpected": "Произошла неожиданная ошибка"
+      },
+      "sections": {
+        "classification": "Классификация",
+        "unit_of_measure": "Единица измерения",
+        "pricing": "Цена и оценка",
+        "gl_accounts": "Счета главной книги",
+        "inventory_settings": "Параметры запасов",
+        "stock_on_hand": "Количество на складе",
+        "total_value": "Общая стоимость"
+      },
+      "labels": {
+        "category": "категория",
+        "purchase": "Покупка:",
+        "sales_price": "Цена продажи",
+        "standard_cost": "Стандартная стоимость",
+        "asset": "Актив",
+        "income": "Доход",
+        "cogs": "Себестоимость/Расходы",
+        "reorder_point": "Точка переупорядочения",
+        "safety_stock": "Страховой запас",
+        "preferred_vendor": "Предпочтительный поставщик"
+      }
+    },
+    "stock_sidebar": {
+      "section_title": "Доступность запасов",
+      "labels": {
+        "total_on_hand": "Всего на складе",
+        "total_value": "Общая стоимость",
+        "committed": "Зарезервировано",
+        "available": "Доступно",
+        "avg_unit_cost": "Средняя стоимость за единицу",
+        "separator": "/",
+        "last_receipt": "Последний приход",
+        "no_receipts": "Приемки отсутствуют"
+      }
+    },
+    "category_management": {
+      "colors": {
+        "slate": "Сланец",
+        "red": "Красный",
+        "orange": "Оранжевый",
+        "amber": "Янтарный",
+        "yellow": "Желтый",
+        "lime": "Лайм",
+        "green": "Зеленый",
+        "emerald": "Изумруд",
+        "teal": "Сине-зеленый",
+        "cyan": "Голубой",
+        "sky": "Небесно-голубой",
+        "blue": "Синий",
+        "indigo": "Индиго",
+        "violet": "Фиолетовый",
+        "purple": "Пурпурный",
+        "fuchsia": "Фуксия",
+        "pink": "Розовый",
+        "rose": "Роза"
+      },
+      "icons": {
+        "box": "Коробка",
+        "package": "Пакет",
+        "boxes": "Коробки",
+        "archive": "Архив",
+        "folder": "Папка",
+        "tag": "Тег",
+        "tags": "Теги",
+        "layers": "Слои",
+        "grid": "Сетка",
+        "layout_grid": "Макет сетки",
+        "cpu": "Процессор",
+        "cog": "Шестеренка",
+        "wrench": "Гаечный ключ",
+        "hammer": "Молоток",
+        "zap": "Молния",
+        "flame": "Пламя",
+        "droplet": "Капля",
+        "leaf": "Лист",
+        "apple": "Яблоко",
+        "carrot": "Морковь"
+      },
+      "validation": {
+        "name_required": "Требуется имя категории"
+      },
+      "messages": {
+        "deactivate_confirm": "Эта категория содержит {count} товар(ов). Деактивировать ее?",
+        "deactivate_warning": "Вы уверены, что хотите деактивировать эту категорию?",
+        "deactivate_failed": "Ошибка деактивации",
+        "deactivate_error": "Ошибка деактивации категории",
+        "reactivate_failed": "Ошибка активации категории"
+      },
+      "header": "Организовать товары по категориям",
+      "show_inactive": "Показать неактивные",
+      "add_button": "Добавить категорию",
+      "table": {
+        "name": "Имя",
+        "description": "Описание",
+        "icon": "Значок",
+        "color": "Цвет",
+        "items": "Товары",
+        "status": "Статус",
+        "actions": "Действия"
+      },
+      "form": {
+        "name_placeholder": "Имя категории",
+        "description_placeholder": "Описание (опционально)",
+        "icon_none": "Нет",
+        "color_none": "Нет",
+        "status_active": "Активно",
+        "status_inactive": "Неактивно"
+      },
+      "empty": "Категории не найдены. Создайте одну для начала."
+    },
+    "uom_management": {
+      "deactivate_confirm": "Эта единица измерения используется {count} товаром(ами). Деактивировать ее?",
+      "show_inactive": "Показать неактивные",
+      "items_header": "Товары"
+    },
+    "master_data_drawer": {
+      "tabs": {
+        "units": "Единицы измерения",
+        "categories": "Категории"
+      },
+      "sheet_title": "Мастер-данные",
+      "description": "Управление единицами измерения и категориями"
+    },
     "gl_account_types": {
       "inventory_asset": "Актив запасов",
       "cogs": "Себестоимость продаж",
       "wip": "Незавершенное производство",
       "adjustment": "Корректировка",
       "na": "Н/Д"
+    },
+    "item_routing": {
+      "none": "Нет"
     }
   },
   "auth": {
@@ -2350,14 +2555,6 @@
         "open_bills": "Открытые счета",
         "paid_30_days": "Оплачено (30 дней)"
       }
-    }
-  },
-  "inventory": {
-    "nav": {
-      "overview": "Обзор",
-      "items_services": "Товары и услуги",
-      "reception": "Приемка",
-      "reconciliation": "Сверка"
     }
   },
   "wms": {

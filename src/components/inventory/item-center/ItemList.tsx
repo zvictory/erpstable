@@ -37,6 +37,7 @@ const tabs = [
 
 export default function ItemList({ byClass, selectedId, onSelect, onNewItem }: ItemListProps) {
     const t = useTranslations('inventory.item_center');
+    const tItemList = useTranslations('inventory.item_center.item_list');
     const [activeTab, setActiveTab] = useState<keyof typeof byClass>('RAW_MATERIAL');
     const [search, setSearch] = useState('');
 
@@ -155,15 +156,15 @@ export default function ItemList({ byClass, selectedId, onSelect, onNewItem }: I
                                             <div className="flex justify-between items-center">
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-[11px] font-mono text-slate-400 uppercase tracking-tighter">
-                                                        {item.sku || 'No SKU'}
+                                                        {item.sku || tItemList('no_sku_display')}
                                                     </span>
                                                     {isOutOfStock ? (
                                                         <span className="flex items-center gap-1 text-[9px] font-bold text-rose-500 bg-rose-50 px-1 border border-rose-100 rounded uppercase tracking-wider">
-                                                            <XCircle size={8} /> Out
+                                                            <XCircle size={8} /> {tItemList('badges.out_of_stock')}
                                                         </span>
                                                     ) : isLowStock ? (
                                                         <span className="flex items-center gap-1 text-[9px] font-bold text-amber-500 bg-amber-50 px-1 border border-amber-100 rounded uppercase tracking-wider">
-                                                            <AlertTriangle size={8} /> Low
+                                                            <AlertTriangle size={8} /> {tItemList('badges.low_stock')}
                                                         </span>
                                                     ) : null}
                                                 </div>
@@ -174,7 +175,7 @@ export default function ItemList({ byClass, selectedId, onSelect, onNewItem }: I
                                         </div>
                                     </div>
                                     <div className="mt-2 text-[11px] text-slate-400 flex items-center gap-1 ml-[52px]">
-                                        <span className="font-medium opacity-60 uppercase text-[9px] tracking-widest text-slate-500">Avg Cost:</span>
+                                        <span className="font-medium opacity-60 uppercase text-[9px] tracking-widest text-slate-500">{tItemList('avg_cost_label')}</span>
                                         <span className="font-numbers text-slate-600 font-semibold">{formatNumber(item.avgCost / 100)}</span>
                                     </div>
                                 </div>

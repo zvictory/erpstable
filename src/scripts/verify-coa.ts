@@ -33,8 +33,8 @@ async function verifyCOA() {
 
     try {
         // Query all required accounts
-        const existingAccounts = await db.select().from(glAccounts)
-            .where(inArray(glAccounts.code, accountCodes));
+        const existingAccounts = (await db.select().from(glAccounts)
+            .where(inArray(glAccounts.code, accountCodes))) as Array<{ code: string; type: string; name: string }>;
 
         const existingMap = new Map(existingAccounts.map(acc => [acc.code, acc]));
 

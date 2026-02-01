@@ -211,7 +211,7 @@ export async function createInvoice(data: z.infer<typeof createInvoiceSchema>) {
 
         // 3. Prepare lines for calculation with discounts
         const linesForCalc = validated.lines.map((line: any) => {
-            const tr = line.taxRateId ? taxRateMap.get(line.taxRateId) : undefined;
+            const tr = line.taxRateId ? (taxRateMap.get(line.taxRateId) as any) : undefined;
             return {
                 quantity: line.quantity,
                 unitPrice: line.rate,

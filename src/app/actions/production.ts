@@ -657,17 +657,7 @@ interface ChainNode {
 export async function getProductionChain(runId: number): Promise<ChainNode | null> {
     try {
         // Use recursive CTE to build dependency tree
-        const chainData = await db.all<{
-            run_id: number;
-            run_number: string | null;
-            item_name: string;
-            item_class: string;
-            qty_produced: number;
-            uom_code: string;
-            run_date: number;
-            level: number;
-            parent_run_id: number | null;
-        }>(sql`
+        const chainData = await db.all(sql`
             WITH RECURSIVE chain AS (
                 -- Base case: the target run
                 SELECT
@@ -710,7 +700,17 @@ export async function getProductionChain(runId: number): Promise<ChainNode | nul
             )
             SELECT * FROM chain
             ORDER BY level DESC, run_number
-        `);
+        `) as Array<{
+            run_id: number;
+            run_number: string | null;
+            item_name: string;
+            item_class: string;
+            qty_produced: number;
+            uom_code: string;
+            run_date: number;
+            level: number;
+            parent_run_id: number | null;
+        }>;
 
         if (!chainData || chainData.length === 0) {
             return null;
@@ -832,11 +832,11 @@ export async function generateProductionChain(input: unknown) {
         const warnings: string[] = [];
         const visited = new Set<number>();
 
-        async function buildStageTree(
+        const buildStageTree = async (
             itemId: number,
             requiredQty: number,
             stageNum: number
-        ): Promise<void> {
+        ): Promise<void> => {
             // Circular dependency check
             if (visited.has(itemId)) {
                 throw new Error(`Circular recipe dependency detected for item ${itemId}`);
@@ -921,7 +921,7 @@ export async function generateProductionChain(input: unknown) {
                 outputQuantity: requiredQty,
                 expectedYieldPct: recipe.expectedYieldPct,
             });
-        }
+        };
 
         // Start recursive tree building from target
         await buildStageTree(val.targetItemId, val.targetQuantity, stages.length + 1);
@@ -1353,7 +1353,7 @@ export async function completeProductionStep(input: unknown) {
         await logAuditEvent({
             entity: 'production_run_step',
             entityId: `${val.runId}-${val.stepNumber}`,
-            action: 'COMPLETE',
+            action: 'UPDATE',
             changes: {
                 after: {
                     actualOutputQty: val.actualOutputQty,

@@ -27,7 +27,8 @@ export function DowntimeModal({ line, onClose }: DowntimeModalProps) {
   const loadReasonCodes = async () => {
     const result = await getDowntimeReasonCodes();
     if (result.success && result.reasonCodes) {
-      const uniqueCategories = [...new Set(result.reasonCodes.map(r => r.category))];
+      const reasonCodes = result.reasonCodes as Array<{ category: string }>;
+      const uniqueCategories = [...new Set(reasonCodes.map(r => r.category))];
       setCategories(uniqueCategories);
     }
   };

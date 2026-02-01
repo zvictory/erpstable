@@ -1195,12 +1195,217 @@
       "creating": "Yaratyapman...",
       "error_prefix": "Xato:"
     },
+    "editor": {
+      "validation": {
+        "name_required": "Nomi kerak",
+        "category_required": "Kategoriya kerak",
+        "base_uom_required": "Asosiy o'lchov birligi kerak"
+      },
+      "header": {
+        "new": "Yangi mahsulot",
+        "edit": "Mahsulotni tahrirlash"
+      },
+      "tabs": {
+        "general": "Umumiy",
+        "accounting": "Buxgalteriya",
+        "inventory": "Inventarizatsiya",
+        "vendors": "Yetkazib beruvchilar"
+      },
+      "buttons": {
+        "cancel": "Bekor qilish",
+        "saving": "Saqlanmoqda...",
+        "save": "Saqlash"
+      },
+      "alerts": {
+        "error": "Saqlanmadi"
+      },
+      "form": {
+        "name_label": "Nomi *",
+        "sku_label": "SKU",
+        "barcode_label": "Shtrikh-kod",
+        "item_class_label": "Mahsulot sinfi *",
+        "item_class_options": {
+          "raw_material": "Xom ashyo",
+          "wip": "Ishlab chiqarilayotgan mahsulot",
+          "finished_goods": "Tayyor mahsulot",
+          "service": "Xizmat"
+        },
+        "category_label": "Kategoriya *",
+        "category_placeholder": "Tanlang...",
+        "description_label": "Tavsifi",
+        "valuation_label": "Baholash usuli",
+        "valuation_options": {
+          "fifo": "FIFO (Birinchi kirdi, birinchi chiqdi)",
+          "weighted_avg": "Vazn o'rtachasi",
+          "standard": "Standart qiymat"
+        },
+        "valuation_warning": "O'zgartirilmaydi - inventarizatsiya tranzaksiyalari mavjud",
+        "gl_section": "GL hisob xaritasi",
+        "inventory_asset_label": "Inventarizatsiya aktivi hisobi",
+        "inventory_asset_default": "Standart",
+        "income_label": "Daromad hisobi",
+        "income_default": "Standart",
+        "cogs_label": "COGS / Xarajat hisobi",
+        "cogs_default": "Standart",
+        "base_uom_label": "Asosiy o'lchov birligi *",
+        "base_uom_placeholder": "Tanlang...",
+        "purchase_uom_label": "Sotib olish o'lchov birligi",
+        "purchase_uom_default": "Asosiy singari",
+        "conversion_label": "Konversiya koeffitsiyenti (1 sotib olish o'b = X asosiy o'b)",
+        "conversion_hint": "masalan, 1 sandiq = 20 kg bo'lsa, 20 ni kiriting (saqlanadi koeffitsiyent * 100 sifatida)",
+        "standard_cost_label": "Standart qiymat",
+        "sales_price_label": "Sotish narxi",
+        "reorder_point_label": "Qayta buyurtma nuqtasi",
+        "safety_stock_label": "Xavfsizlik zaxirasi",
+        "preferred_vendor_label": "Afzal yetkazib beruvchi",
+        "preferred_vendor_default": "Yo'q",
+        "preferred_vendor_hint": "Avtomatik PO yaratish uchun ishlatiladi"
+      }
+    },
+    "item_list": {
+      "no_sku_display": "SKU yo'q",
+      "badges": {
+        "out_of_stock": "Qolmadi",
+        "low_stock": "Kam"
+      },
+      "avg_cost_label": "O'rtacha qiymat:"
+    },
+    "item_profile": {
+      "errors": {
+        "unexpected": "Kutilmagan xato yuz berdi"
+      },
+      "sections": {
+        "classification": "Tasnifi",
+        "unit_of_measure": "O'lchov birligi",
+        "pricing": "Narx va baholash",
+        "gl_accounts": "GL hisoblar",
+        "inventory_settings": "Inventarizatsiya parametrlari",
+        "stock_on_hand": "Qolgan miqdori",
+        "total_value": "Jami qiymat"
+      },
+      "labels": {
+        "category": "kategoriya",
+        "purchase": "Sotib olish:",
+        "sales_price": "Sotish narxi",
+        "standard_cost": "Standart qiymat",
+        "asset": "Aktiv",
+        "income": "Daromad",
+        "cogs": "COGS/Xarajat",
+        "reorder_point": "Qayta buyurtma nuqtasi",
+        "safety_stock": "Xavfsizlik zaxirasi",
+        "preferred_vendor": "Afzal yetkazib beruvchi"
+      }
+    },
+    "stock_sidebar": {
+      "section_title": "Inventar mavjudligi",
+      "labels": {
+        "total_on_hand": "Jami qolgan",
+        "total_value": "Jami qiymat",
+        "committed": "Ajratilgan",
+        "available": "Mavjud",
+        "avg_unit_cost": "O'rtacha birlik qiymati",
+        "separator": "/",
+        "last_receipt": "Oxirgi qabul",
+        "no_receipts": "Qabuli yo'q"
+      }
+    },
+    "category_management": {
+      "colors": {
+        "slate": "Shifer",
+        "red": "Qizil",
+        "orange": "Apelsin",
+        "amber": "Kahramon",
+        "yellow": "Sariq",
+        "lime": "Ohak",
+        "green": "Yashil",
+        "emerald": "Zomarrad",
+        "teal": "Qo'ng'iroq ko'k",
+        "cyan": "Ko'k",
+        "sky": "Osmon",
+        "blue": "Ko'k",
+        "indigo": "Indigo",
+        "violet": "Qo'ng'ir siyoh",
+        "purple": "Binafsha",
+        "fuchsia": "Fuksiya",
+        "pink": "Pushti",
+        "rose": "Gulrux"
+      },
+      "icons": {
+        "box": "Quti",
+        "package": "Paket",
+        "boxes": "Qutilari",
+        "archive": "Arxiv",
+        "folder": "Papka",
+        "tag": "Teg",
+        "tags": "Teglar",
+        "layers": "Qatlamlar",
+        "grid": "Seton",
+        "layout_grid": "Maketni seton",
+        "cpu": "Processor",
+        "cog": "Tishli g'ildirак",
+        "wrench": "Kalit",
+        "hammer": "Bolg'a",
+        "zap": "Chaqnash",
+        "flame": "Alanga",
+        "droplet": "Tomchi",
+        "leaf": "Barg",
+        "apple": "Olma",
+        "carrot": "Sabzi"
+      },
+      "validation": {
+        "name_required": "Kategoriya nomi kerak"
+      },
+      "messages": {
+        "deactivate_confirm": "Bu kategoriyada {count} ta mahsulot bor. Noaktiv qilmoqchimisiz?",
+        "deactivate_warning": "Siz rostdan ham bu kategoriyani noaktiv qilmoqchimisiz?",
+        "deactivate_failed": "Noaktiv qilish muvaffaq bo'lmadi",
+        "deactivate_error": "Kategoriyani noaktiv qilish muvaffaq bo'lmadi",
+        "reactivate_failed": "Kategoriyani faollashtirish muvaffaq bo'lmadi"
+      },
+      "header": "Mahsulotlarni kategoriyalar bo'yicha tartibga solish",
+      "show_inactive": "Noaktivni ko'rsatish",
+      "add_button": "Kategoriya qo'shish",
+      "table": {
+        "name": "Nomi",
+        "description": "Tavsifi",
+        "icon": "Nishona",
+        "color": "Rang",
+        "items": "Mahsulotlar",
+        "status": "Holati",
+        "actions": "Harakatlar"
+      },
+      "form": {
+        "name_placeholder": "Kategoriya nomi",
+        "description_placeholder": "Tavsifi (ixtiyoriy)",
+        "icon_none": "Yo'q",
+        "color_none": "Yo'q",
+        "status_active": "Aktiv",
+        "status_inactive": "Noaktiv"
+      },
+      "empty": "Kategoriya topilmadi. Boshlash uchun birini yarating."
+    },
+    "uom_management": {
+      "deactivate_confirm": "Bu o'lchov birligi {count} ta mahsulot tomonidan qo'llaniladi. Noaktiv qilmoqchimisiz?",
+      "show_inactive": "Noaktivni ko'rsatish",
+      "items_header": "Mahsulotlar"
+    },
+    "master_data_drawer": {
+      "tabs": {
+        "units": "O'lchov birliklari",
+        "categories": "Kategoriyalar"
+      },
+      "sheet_title": "Asosiy ma'lumotlar",
+      "description": "O'lchov birliklari va kategoriyalarni boshqarish"
+    },
     "gl_account_types": {
       "inventory_asset": "Inventarizatsiya aktivi",
       "cogs": "Sotilgan tovarlar qiymati",
       "wip": "Ishlab chiqarilayotgan mahsulot",
       "adjustment": "Tuzatish",
       "na": "Mavjud emas"
+    },
+    "item_routing": {
+      "none": "Yo'q"
     }
   },
   "auth": {
@@ -1607,14 +1812,6 @@
         "open_bills": "Ochiq schyotlar",
         "paid_30_days": "To'langan (30 kun)"
       }
-    }
-  },
-  "inventory": {
-    "nav": {
-      "overview": "Umumiy ko'rinish",
-      "items_services": "Tovarlar va xizmatlar",
-      "reception": "Qabul qilish",
-      "reconciliation": "Muvofiqlash"
     }
   },
   "wms": {
