@@ -1804,6 +1804,20 @@
       "sublimation": "Sublimation",
       "quality_control": "Quality",
       "maintenance": "Maintenance"
+    },
+    "overview": {
+      "title": "Production Overview",
+      "subtitle": "Monitor production runs, quality, and manufacturing operations",
+      "active_runs": "Active Production Runs",
+      "started_today": "+3 started today",
+      "quality_pass_rate": "Quality Pass Rate",
+      "vs_last_week": "+0.3% vs last week",
+      "pending_jobs": "Pending Jobs",
+      "overdue": "2 overdue",
+      "quick_actions": "Quick Actions",
+      "start_production": "Start Production",
+      "view_recipes": "View Recipes",
+      "production_terminal": "Production Terminal"
     }
   },
   "wms": {

@@ -1629,6 +1629,20 @@
       "sublimation": "Sublimatsiya",
       "quality_control": "Sifat nazorati",
       "maintenance": "Uskunaga texnik xizmat"
+    },
+    "overview": {
+      "title": "Ishlab chiqarish umumiy ko'rinishi",
+      "subtitle": "Ishlab chiqarish jarayonlarini, sifatni va ishlab chiqarish operatsiyalarini kuzatish",
+      "active_runs": "Faol ishlab chiqarish jarayonlari",
+      "started_today": "+3 bugun boshlandi",
+      "quality_pass_rate": "Sifat o'tkazish darajasi",
+      "vs_last_week": "+0,3% o'tgan hafta bilan solishtirsa",
+      "pending_jobs": "Kutayotgan ishlar",
+      "overdue": "2 muddati o'tgan",
+      "quick_actions": "Tez harakatlar",
+      "start_production": "Ishlab chiqarishni boshlash",
+      "view_recipes": "Retseptlarni ko'rish",
+      "production_terminal": "Ishlab chiqarish terminali"
     }
   },
   "wms": {
