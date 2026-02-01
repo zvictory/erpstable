@@ -1564,6 +1564,12 @@
   "navigation": {
     "dashboard": "Kontrol Paneli",
     "overview": "Genel Bakış",
+    "inventory": "Depo",
+    "purchasing": "Satın Alma",
+    "production": "Üretim",
+    "wms": "Depo Yönetimi",
+    "service": "Servis",
+    "finance": "Finans",
     "commercial": "Ticari",
     "sales_crm": "Satış ve CRM",
     "pipeline": "Satış Hunisi",

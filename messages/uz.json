@@ -1486,6 +1486,12 @@
   "navigation": {
     "dashboard": "Boshqaruv paneli",
     "overview": "Umumiy ko'rinish",
+    "inventory": "Omborxona",
+    "purchasing": "Sotib olish",
+    "production": "Ishlab chiqarish",
+    "wms": "Omborxona boshqaruvi",
+    "service": "Xizmat ko'rsatish",
+    "finance": "Moliya",
     "commercial": "Savdo",
     "sales_crm": "Savdo va CRM",
     "pipeline": "Savdo voronkasi",
