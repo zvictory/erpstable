@@ -161,7 +161,7 @@ export function VendorCenterLayout({
         paidLast30: { count: 0, total: 0 }
     };
 
-    const t = useTranslations('dashboard.page');
+    const t = useTranslations('purchasing.vendors');
 
     return (
         <div className="flex h-screen bg-slate-50 overflow-hidden relative">
@@ -221,8 +221,8 @@ export function VendorCenterLayout({
                                 <div className="bg-slate-50 p-6 rounded-full mb-4">
                                     <LayoutDashboard className="h-16 w-16 opacity-10" />
                                 </div>
-                                <h3 className="text-lg font-medium text-slate-900 mb-1">{t('select_detail' as any) || 'Выберите поставщика'}</h3>
-                                <p className="text-sm max-w-xs text-center">{t('select_vendor_hint' as any) || 'Выберите поставщика из списка слева, чтобы увидеть историю транзакций и детали профиля.'}</p>
+                                <h3 className="text-lg font-medium text-slate-900 mb-1">{t('select_vendor')}</h3>
+                                <p className="text-sm max-w-xs text-center">{t('select_vendor_hint')}</p>
                             </div>
                         )}
                     </div>

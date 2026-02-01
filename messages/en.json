@@ -1745,6 +1745,25 @@
       "vendors": "Vendors",
       "purchase_orders": "Purchase Orders",
       "bills": "Bills"
+    },
+    "vendors": {
+      "title": "Dashboard",
+      "select_vendor": "Select a vendor",
+      "select_vendor_hint": "Select a vendor from the list on the left to see transaction history and profile details.",
+      "list": {
+        "title": "Vendors",
+        "new_vendor": "New Vendor",
+        "search_placeholder": "Search vendors...",
+        "no_results": "No vendors found",
+        "open_balance": "Open balance",
+        "no_open_balance": "Settled"
+      },
+      "scoreboard": {
+        "open_pos": "Open POs",
+        "overdue": "Overdue Bills",
+        "open_bills": "Open Bills",
+        "paid_30_days": "Paid (30 days)"
+      }
     }
   },
   "inventory": {

@@ -1570,6 +1570,25 @@
       "vendors": "Yetkazib beruvchilar",
       "purchase_orders": "Xarid buyurtmalari",
       "bills": "Yetkazib beruvchi hisobnomalari"
+    },
+    "vendors": {
+      "title": "Boshqaruv paneli",
+      "select_vendor": "Yetkazib beruvchini tanlang",
+      "select_vendor_hint": "Chap tarafdagi ro'yxatdan yetkazib beruvchini tanlang va tranzaksiya tarixini hamda profil ma'lumotlarini ko'ring.",
+      "list": {
+        "title": "Yetkazib beruvchilar",
+        "new_vendor": "Yangi yetkazib beruvchi",
+        "search_placeholder": "Yetkazib beruvchilarni qidiring...",
+        "no_results": "Yetkazib beruvchilar topilmadi",
+        "open_balance": "Ochiq balans",
+        "no_open_balance": "To'landi"
+      },
+      "scoreboard": {
+        "open_pos": "Ochiq buyurtmalar",
+        "overdue": "Muddati o'tgan schyotlar",
+        "open_bills": "Ochiq schyotlar",
+        "paid_30_days": "To'langan (30 kun)"
+      }
     }
   },
   "inventory": {

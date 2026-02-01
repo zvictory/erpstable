@@ -1648,6 +1648,25 @@
       "vendors": "Tedarikçiler",
       "purchase_orders": "Satınalma Siparişleri",
       "bills": "Tedarikçi Faturaları"
+    },
+    "vendors": {
+      "title": "Kontrol Paneli",
+      "select_vendor": "Bir tedarikçi seçin",
+      "select_vendor_hint": "Sol taraftaki listeden bir tedarikçi seçerek işlem geçmişini ve profil ayrıntılarını görün.",
+      "list": {
+        "title": "Tedarikçiler",
+        "new_vendor": "Yeni Tedarikçi",
+        "search_placeholder": "Tedarikçileri ara...",
+        "no_results": "Tedarikçi bulunamadı",
+        "open_balance": "Açık bakiye",
+        "no_open_balance": "Kapatıldı"
+      },
+      "scoreboard": {
+        "open_pos": "Açık Siparişler",
+        "overdue": "Vadesi Geçmiş Faturalar",
+        "open_bills": "Açık Faturalar",
+        "paid_30_days": "Ödenen (30 gün)"
+      }
     }
   },
   "inventory": {
