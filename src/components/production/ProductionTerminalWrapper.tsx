@@ -2,7 +2,10 @@
 
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useSession } from 'next-auth/react';
 import { ModuleGuard } from '@/components/guards/ModuleGuard';
+import { DomainNavigation } from '@/components/navigation/DomainNavigation';
+import { DOMAIN_NAV_CONFIG } from '@/lib/domain-nav-config';
 import ProductionTerminal from '@/components/production/ProductionTerminal';
 import MultiStepProductionTerminal from '@/components/production/MultiStepProductionTerminal';
 import { Button } from '@/components/ui/button';
@@ -17,6 +20,7 @@ type TerminalMode = 'single-step' | 'multi-step';
 
 export default function ProductionTerminalWrapper({ rawMaterials, finishedGoods }: ProductionTerminalWrapperProps) {
     const t = useTranslations('production');
+    const { data: session } = useSession();
     const [mode, setMode] = useState<TerminalMode>('single-step');
 
     // Combine all items for multi-step terminal
@@ -27,7 +31,13 @@ export default function ProductionTerminalWrapper({ rawMaterials, finishedGoods 
 
     return (
         <ModuleGuard module="PRODUCTION">
-            <div className="p-8 bg-slate-50 min-h-screen">
+            <div className="space-y-6">
+                <DomainNavigation
+                    items={DOMAIN_NAV_CONFIG.production}
+                    domain="production"
+                    userRole={session?.user?.role}
+                />
+                <div className="p-8 bg-slate-50 min-h-screen">
                 {/* Mode Selector */}
                 <div className="mb-6 flex items-center justify-center gap-2">
                     <Button
@@ -65,6 +75,7 @@ export default function ProductionTerminalWrapper({ rawMaterials, finishedGoods 
                 ) : (
                     <MultiStepProductionTerminal items={allItems} />
                 )}
+                </div>
             </div>
         </ModuleGuard>
     );
