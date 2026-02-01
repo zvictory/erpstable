@@ -90,6 +90,16 @@ Excluded: node_modules, .git, temporary files
 - Ready state confirmed
 ```
 
+### 6. HTTPS/SSL Configuration ✅
+```bash
+- Installed and configured Nginx reverse proxy
+- HTTP port 80 → HTTPS redirect
+- HTTPS port 443 → localhost:3002 reverse proxy
+- Let's Encrypt wildcard certificate (valid, auto-renewing)
+- Security headers and compression enabled
+- Certificate expires: April 20, 2026
+```
+
 ---
 
 ## Verification Results
@@ -107,6 +117,15 @@ Port: 3002
 SELECT COUNT(*) FROM users;       -- 5 records
 SELECT COUNT(*) FROM items;       -- 3 records
 SELECT COUNT(*) FROM vendors;     -- 3 records
+```
+
+### HTTPS/SSL ✅
+```bash
+curl -I https://laza.erpstable.com
+# Expected: HTTP/2 302 redirect to /ru/login
+Status: ✅ Secure connection established
+Certificate: ✅ Valid Let's Encrypt wildcard
+Auto-renewal: ✅ Configured
 ```
 
 ### PM2 Process ✅
@@ -149,12 +168,25 @@ OS: Ubuntu 24.04.3 LTS
 
 ## How to Access
 
-### Web Application
-**URL:** http://laza.erpstable.com:3002
+### Web Application (RECOMMENDED)
+**URL:** https://laza.erpstable.com
+
+**Protocol:** HTTPS (Secure)
+**Port:** 443 (standard)
+**Security:** Let's Encrypt certificate (auto-renewing)
+**Status:** ✅ Live and secure
 
 **Login:**
 - Use admin credentials configured in database
 - Application loads all 4 languages (en, uz, ru, tr)
+- All traffic is automatically encrypted and redirected to HTTPS
+
+### Alternative Access (Internal Only)
+**URL:** http://laza.erpstable.com:3002
+
+**Protocol:** HTTP (unencrypted, for debugging only)
+**Port:** 3002 (direct Node.js)
+**Note:** Use HTTPS endpoint above for production access
 
 ### Command Line Access
 
@@ -232,6 +264,9 @@ ssh root@laza.erpstable.com "pm2 status"
 - ✅ Application responding on port 3002
 - ✅ Previous version backed up
 - ✅ All 4 languages configured
+- ✅ Nginx reverse proxy running
+- ✅ HTTPS/SSL certificate valid
+- ✅ HTTP to HTTPS redirect active
 
 ---
 
