@@ -1562,6 +1562,7 @@
     }
   },
   "navigation": {
+    "home": "Kontrol Paneli",
     "dashboard": "Kontrol Paneli",
     "overview": "Genel Bakış",
     "inventory": "Depo",

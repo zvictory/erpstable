@@ -1484,6 +1484,7 @@
     }
   },
   "navigation": {
+    "home": "Boshqaruv paneli",
     "dashboard": "Boshqaruv paneli",
     "overview": "Umumiy ko'rinish",
     "inventory": "Omborxona",

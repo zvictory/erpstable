@@ -5,7 +5,7 @@ import { Link, usePathname } from '@/navigation';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { UserRole } from '@/auth.config';
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon, Home } from 'lucide-react';
 
 export interface DomainNavItem {
   href: string;
@@ -41,20 +41,30 @@ export function DomainNavigation({ items, domain, userRole }: DomainNavigationPr
         {visibleItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href);
+          const isHome = item.labelKey === 'home';
 
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md whitespace-nowrap transition-colors',
-                active
+                isHome
+                  ? 'flex items-center justify-center p-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors'
+                  : 'flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md whitespace-nowrap transition-colors',
+                !isHome && (active
                   ? 'bg-indigo-50 text-indigo-700 border-b-2 border-indigo-600'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100')
               )}
+              title={isHome ? t(item.labelKey) : undefined}
             >
-              {Icon && <Icon className="w-4 h-4 flex-shrink-0" />}
-              <span>{t(item.labelKey)}</span>
+              {isHome ? (
+                <Home className="w-5 h-5 flex-shrink-0" />
+              ) : (
+                <>
+                  {Icon && <Icon className="w-4 h-4 flex-shrink-0" />}
+                  <span>{t(item.labelKey)}</span>
+                </>
+              )}
             </Link>
           );
         })}

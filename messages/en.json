@@ -1657,6 +1657,7 @@
     }
   },
   "navigation": {
+    "home": "Home",
     "approvals": "Approvals",
     "commissions": "Commissions",
     "dashboard": "Dashboard",

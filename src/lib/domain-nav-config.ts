@@ -15,6 +15,11 @@ const SERVICE_ROLES = [UserRole.ADMIN, UserRole.PLANT_MANAGER];
 export const DOMAIN_NAV_CONFIG = {
   sales: [
     {
+      href: '/',
+      labelKey: 'home',
+      allowedRoles: COMMON_COMMERCIAL_ROLES,
+    },
+    {
       href: '/sales',
       labelKey: 'overview',
       allowedRoles: COMMON_COMMERCIAL_ROLES,

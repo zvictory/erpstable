@@ -11,7 +11,7 @@ import CustomerForm from '@/components/sales/CustomerForm';
 import { deleteInvoice } from '@/app/actions/sales';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import DeleteInvoiceModal from '@/components/sales/DeleteInvoiceModal';
-import { LayoutDashboard, Users, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Users, Plus, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
 
@@ -181,12 +181,8 @@ export function CustomerCenterLayout({
 
             {/* Right Column: Details & Stats */}
             <div className="flex-1 flex flex-col overflow-hidden">
-                {/* Fixed Header */}
+                {/* Fixed Header - Space for future content */}
                 <div className="h-14 border-b border-slate-200 bg-white flex items-center px-6 shrink-0 z-10">
-                    <Button variant="ghost" size="sm" onClick={() => router.push('/')} className="gap-2 text-muted-foreground pl-0 hover:pl-2 transition-all">
-                        <LayoutDashboard className="h-4 w-4" />
-                        <span>{t('dashboard')}</span>
-                    </Button>
                 </div>
 
                 {/* Main Content Area - Scrollable */}
