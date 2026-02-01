@@ -38,7 +38,7 @@ export const NAVIGATION_CONFIG: NavItemConfig[] = [
     allowedRoles: [UserRole.ACCOUNTANT, UserRole.PLANT_MANAGER, UserRole.ADMIN],
   },
   {
-    href: '/purchasing',
+    href: '/purchasing/vendors',
     labelKey: 'purchasing',
     icon: ShoppingCart,
     allowedRoles: [UserRole.ACCOUNTANT, UserRole.PLANT_MANAGER, UserRole.ADMIN],

@@ -58,7 +58,7 @@ export const DOMAIN_NAV_CONFIG = {
 
   purchasing: [
     {
-      href: '/purchasing',
+      href: '/purchasing/vendors',
       labelKey: 'overview',
       allowedRoles: COMMON_COMMERCIAL_ROLES,
     },
