@@ -1695,34 +1695,6 @@
       "reconciliation": "Mutabakat"
     }
   },
-  "production": {
-    "nav": {
-      "overview": "Genel Bakış",
-      "recipes": "Reçeteler",
-      "production_wizard": "Üretim Sihirbazı",
-      "production_terminal": "Üretim Terminali",
-      "production_chain": "Üretim Zinciri",
-      "manufacturing_lines": "Üretim Hatları",
-      "mixing_station": "Karıştırma İstasyonu",
-      "sublimation": "Süblime",
-      "quality_control": "Kalite Kontrol",
-      "maintenance": "Ekipman Bakımı"
-    },
-    "overview": {
-      "title": "Üretim Genel Bakışı",
-      "subtitle": "Üretim çalışmalarını, kaliteyi ve üretim operasyonlarını izleyin",
-      "active_runs": "Aktif Üretim Çalışmaları",
-      "started_today": "+3 bugün başladı",
-      "quality_pass_rate": "Kalite Geçiş Oranı",
-      "vs_last_week": "+%0,3 geçen haftaya karşı",
-      "pending_jobs": "Bekleyen İşler",
-      "overdue": "2 gecikmiş",
-      "quick_actions": "Hızlı İşlemler",
-      "start_production": "Üretimi Başlat",
-      "view_recipes": "Reçeteleri Görüntüle",
-      "production_terminal": "Üretim Terminali"
-    }
-  },
   "wms": {
     "nav": {
       "overview": "Genel Bakış",
@@ -2898,6 +2870,32 @@
     }
   },
   "production": {
+    "nav": {
+      "overview": "Genel Bakış",
+      "recipes": "Reçeteler",
+      "production_wizard": "Üretim Sihirbazı",
+      "production_terminal": "Üretim Terminali",
+      "production_chain": "Üretim Zinciri",
+      "manufacturing_lines": "Üretim Hatları",
+      "mixing_station": "Karıştırma İstasyonu",
+      "sublimation": "Süblime",
+      "quality_control": "Kalite Kontrol",
+      "maintenance": "Ekipman Bakımı"
+    },
+    "overview": {
+      "title": "Üretim Genel Bakışı",
+      "subtitle": "Üretim çalışmalarını, kaliteyi ve üretim operasyonlarını izleyin",
+      "active_runs": "Aktif Üretim Çalışmaları",
+      "started_today": "+3 bugün başladı",
+      "quality_pass_rate": "Kalite Geçiş Oranı",
+      "vs_last_week": "+%0,3 geçen haftaya karşı",
+      "pending_jobs": "Bekleyen İşler",
+      "overdue": "2 gecikmiş",
+      "quick_actions": "Hızlı İşlemler",
+      "start_production": "Üretimi Başlat",
+      "view_recipes": "Reçeteleri Görüntüle",
+      "production_terminal": "Üretim Terminali"
+    },
     "detail": {
       "title": "Üretim Çalışması #{id}",
       "tabs": {

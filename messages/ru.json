@@ -2360,34 +2360,6 @@
       "reconciliation": "Сверка"
     }
   },
-  "production": {
-    "nav": {
-      "overview": "Обзор",
-      "recipes": "Рецепты",
-      "production_wizard": "Мастер производства",
-      "production_terminal": "Терминал производства",
-      "production_chain": "Цепочка производства",
-      "manufacturing_lines": "Линии производства",
-      "mixing_station": "Станция смешивания",
-      "sublimation": "Сублимация",
-      "quality_control": "Контроль качества",
-      "maintenance": "Обслуживание оборудования"
-    },
-    "overview": {
-      "title": "Обзор производства",
-      "subtitle": "Мониторинг производственных запусков, качества и производственных операций",
-      "active_runs": "Активные производственные запуски",
-      "started_today": "+3 начато сегодня",
-      "quality_pass_rate": "Процент качественных изделий",
-      "vs_last_week": "+0,3% по сравнению с прошлой неделей",
-      "pending_jobs": "Ожидающие работы",
-      "overdue": "2 просрочены",
-      "quick_actions": "Быстрые действия",
-      "start_production": "Начать производство",
-      "view_recipes": "Просмотреть рецепты",
-      "production_terminal": "Терминал производства"
-    }
-  },
   "wms": {
     "nav": {
       "overview": "Обзор",
@@ -2610,6 +2582,32 @@
     }
   },
   "production": {
+    "nav": {
+      "overview": "Обзор",
+      "recipes": "Рецепты",
+      "production_wizard": "Мастер производства",
+      "production_terminal": "Терминал производства",
+      "production_chain": "Цепочка производства",
+      "manufacturing_lines": "Линии производства",
+      "mixing_station": "Станция смешивания",
+      "sublimation": "Сублимация",
+      "quality_control": "Контроль качества",
+      "maintenance": "Обслуживание оборудования"
+    },
+    "overview": {
+      "title": "Обзор производства",
+      "subtitle": "Мониторинг производственных запусков, качества и производственных операций",
+      "active_runs": "Активные производственные запуски",
+      "started_today": "+3 начато сегодня",
+      "quality_pass_rate": "Процент качественных изделий",
+      "vs_last_week": "+0,3% по сравнению с прошлой неделей",
+      "pending_jobs": "Ожидающие работы",
+      "overdue": "2 просрочены",
+      "quick_actions": "Быстрые действия",
+      "start_production": "Начать производство",
+      "view_recipes": "Просмотреть рецепты",
+      "production_terminal": "Терминал производства"
+    },
     "detail": {
       "title": "Производственный Запуск #{id}",
       "tabs": {
