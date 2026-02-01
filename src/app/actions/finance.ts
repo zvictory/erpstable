@@ -545,7 +545,7 @@ export async function getChartOfAccounts() {
         });
 
         // Merge
-        return accounts.map(acc => {
+        return accounts.map((acc: any) => {
             const rawBalance = balanceMap.get(acc.code) || 0;
             let displayBalance = rawBalance;
 
@@ -577,7 +577,7 @@ export async function getGLImpact(transactionId: string | number) {
         );
 
         // Fetch lines and account names for each entry
-        const result = await Promise.all(entries.map(async (je) => {
+        const result = await Promise.all(entries.map(async (je: any) => {
             const lines = await db.select({
                 line: journalEntryLines,
                 account: glAccounts
@@ -589,7 +589,7 @@ export async function getGLImpact(transactionId: string | number) {
                 id: je.id,
                 date: je.date,
                 description: je.description,
-                lines: lines.map(({ line, account }) => ({
+                lines: lines.map(({ line, account }: any) => ({
                     accountCode: line.accountCode,
                     accountName: account.name,
                     debit: line.debit,
@@ -638,7 +638,7 @@ export async function getAccountRegister(
             );
 
         // Convert to format that matches original code structure
-        const lines = lineData.map(({ line, entry }) => ({
+        const lines = lineData.map(({ line, entry }: any) => ({
             ...line,
             journalEntry: entry
         }));

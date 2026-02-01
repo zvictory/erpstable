@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/Badge';
 import {
   ChevronLeft,
   ChevronRight,
@@ -65,6 +65,14 @@ export function InspectionWizard({ inspection, tests }: InspectionWizardProps) {
 
   const results = form.watch('results');
 
+  // Helper to safely format numbers (prevent Infinity/NaN display)
+  const formatNumber = (value: number | null | undefined): string => {
+    if (value === null || value === undefined || !isFinite(value)) {
+      return '';
+    }
+    return String(value);
+  };
+
   // Calculate pass/fail for each result
   const calculatePassed = (test: any, resultValue: string): boolean | null => {
     if (!resultValue) return null;
@@ -74,7 +82,18 @@ export function InspectionWizard({ inspection, tests }: InspectionWizardProps) {
     } else if (test.testType === 'NUMERIC') {
       const numValue = parseFloat(resultValue);
       if (isNaN(numValue)) return null;
-      return numValue >= (test.minValue ?? -Infinity) && numValue <= (test.maxValue ?? Infinity);
+
+      // Check min value if it exists
+      if (test.minValue !== null && test.minValue !== undefined) {
+        if (numValue < test.minValue) return false;
+      }
+
+      // Check max value if it exists
+      if (test.maxValue !== null && test.maxValue !== undefined) {
+        if (numValue > test.maxValue) return false;
+      }
+
+      return true;
     }
     return null;
   };
@@ -85,11 +104,11 @@ export function InspectionWizard({ inspection, tests }: InspectionWizardProps) {
   // Calculate overall pass/fail
   const overallResult = allTestsComplete
     ? results.every((r) => {
-        const test = tests.find((t) => t.id === r.testId);
-        if (!test) return false;
-        const passed = calculatePassed(test, r.resultValue);
-        return passed === true;
-      })
+      const test = tests.find((t) => t.id === r.testId);
+      if (!test) return false;
+      const passed = calculatePassed(test, r.resultValue);
+      return passed === true;
+    })
     : null;
 
   const handleSubmit = async (data: InspectionFormValues) => {
@@ -134,10 +153,10 @@ export function InspectionWizard({ inspection, tests }: InspectionWizardProps) {
               </div>
               <div>
                 <Label className="text-slate-500">{t('inspection.quantity')}</Label>
-                <p className="font-medium mt-1">{inspection.quantity}</p>
+                <p className="font-medium mt-1">{formatNumber(inspection.quantity)}</p>
               </div>
               <div>
-                <Label className="text-slate-500">{t('inspection.source')}</Label>
+                <Label className="text-slate-500">{t('inspection.source_label')}</Label>
                 <p className="font-medium mt-1">
                   {inspection.sourceType === 'PRODUCTION_RUN'
                     ? t('inspection.source.production')
@@ -228,17 +247,19 @@ export function InspectionWizard({ inspection, tests }: InspectionWizardProps) {
                             type="number"
                             step="any"
                             placeholder={
-                              test.minValue !== null && test.maxValue !== null
-                                ? `${test.minValue} - ${test.maxValue}`
+                              test.minValue !== null && test.maxValue !== null &&
+                                isFinite(test.minValue) && isFinite(test.maxValue)
+                                ? `${formatNumber(test.minValue)} - ${formatNumber(test.maxValue)}`
                                 : ''
                             }
                             {...form.register(`results.${index}.resultValue`)}
                           />
-                          {test.minValue !== null && test.maxValue !== null && (
-                            <p className="text-xs text-slate-500 mt-1">
-                              {t('tests.range')}: {test.minValue} - {test.maxValue} {test.unit}
-                            </p>
-                          )}
+                          {test.minValue !== null && test.maxValue !== null &&
+                            isFinite(test.minValue) && isFinite(test.maxValue) && (
+                              <p className="text-xs text-slate-500 mt-1">
+                                {t('tests.range')}: {formatNumber(test.minValue)} - {formatNumber(test.maxValue)} {test.unit || ''}
+                              </p>
+                            )}
                         </div>
                       )}
                     </div>
@@ -314,7 +335,11 @@ export function InspectionWizard({ inspection, tests }: InspectionWizardProps) {
                         )}
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="font-mono text-sm">{result?.resultValue}</span>
+                        <span className="font-mono text-sm">
+                          {isFinite(parseFloat(result?.resultValue))
+                            ? formatNumber(parseFloat(result?.resultValue))
+                            : result?.resultValue}
+                        </span>
                         {passed === true && (
                           <CheckCircle2 className="h-4 w-4 text-green-600" />
                         )}
@@ -410,11 +435,10 @@ export function InspectionWizard({ inspection, tests }: InspectionWizardProps) {
         {steps.map((s, index) => (
           <div key={s} className="flex items-center flex-1">
             <div
-              className={`flex items-center justify-center w-8 h-8 rounded-full border-2 ${
-                index <= currentStepIndex
-                  ? 'bg-blue-600 border-blue-600 text-white'
-                  : 'bg-white border-slate-300 text-slate-400'
-              }`}
+              className={`flex items-center justify-center w-8 h-8 rounded-full border-2 ${index <= currentStepIndex
+                ? 'bg-blue-600 border-blue-600 text-white'
+                : 'bg-white border-slate-300 text-slate-400'
+                }`}
             >
               {index < currentStepIndex ? (
                 <CheckCircle2 className="h-4 w-4" />
@@ -424,9 +448,8 @@ export function InspectionWizard({ inspection, tests }: InspectionWizardProps) {
             </div>
             {index < steps.length - 1 && (
               <div
-                className={`flex-1 h-1 mx-2 ${
-                  index < currentStepIndex ? 'bg-blue-600' : 'bg-slate-200'
-                }`}
+                className={`flex-1 h-1 mx-2 ${index < currentStepIndex ? 'bg-blue-600' : 'bg-slate-200'
+                  }`}
               />
             )}
           </div>
