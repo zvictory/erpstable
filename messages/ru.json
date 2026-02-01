@@ -2305,6 +2305,23 @@
       "quotes": "Коммерческие предложения",
       "invoices": "Счета",
       "commissions": "Комиссии"
+    },
+    "customers": {
+      "dashboard": "Панель управления",
+      "select_detail": "Выберите клиента",
+      "select_customer_hint": "Выберите клиента из списка слева, чтобы увидеть историю транзакций и детали профиля.",
+      "title": "Клиенты",
+      "new_customer": "Новый клиент",
+      "search_placeholder": "Поиск клиентов...",
+      "empty_state": "Клиенты не найдены",
+      "outstanding_balance": "Задолженность",
+      "no_outstanding_balance": "Нет задолженности",
+      "scoreboard": {
+        "open_quotes": "Открытые предложения",
+        "unbilled_orders": "Небиллированные заказы",
+        "overdue_ar": "Просроченная дебиторская задолженность",
+        "paid_30_days": "Оплачено (30 дней)"
+      }
     }
   },
   "purchasing": {

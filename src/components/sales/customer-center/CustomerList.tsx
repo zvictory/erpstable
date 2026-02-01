@@ -79,7 +79,7 @@ export function CustomerList({ customers, selectedId, onSelect, onNewCustomer }:
                                     )}
                                 </div>
                                 <div className="text-[13px] text-slate-500 truncate">
-                                    {customer.balance > 0 ? 'Outstanding Balance' : 'No outstanding balance'}
+                                    {customer.balance > 0 ? t('outstanding_balance') : t('no_outstanding_balance')}
                                 </div>
                             </div>
                         ))}

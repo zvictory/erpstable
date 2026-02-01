@@ -1562,6 +1562,23 @@
       "quotes": "Takliflar",
       "invoices": "Hisob-fakturalar",
       "commissions": "Komissiya"
+    },
+    "customers": {
+      "dashboard": "Boshqaruv paneli",
+      "select_detail": "Mijozni tanlang",
+      "select_customer_hint": "Chap tarafdagi ro'yxatdan mijozni tanlang va tranzaksiya tarixini hamda profil ma'lumotlarini ko'ring.",
+      "title": "Mijozlar",
+      "new_customer": "Yangi mijoz",
+      "search_placeholder": "Mijozlarni qidiring...",
+      "empty_state": "Mijozlar topilmadi",
+      "outstanding_balance": "Qoldiq balans",
+      "no_outstanding_balance": "Qoldiq balansi yo'q",
+      "scoreboard": {
+        "open_quotes": "Ochiq takliflar",
+        "unbilled_orders": "Fakturalan olmagan buyurtmalar",
+        "overdue_ar": "Muddati o'tgan debitor borji",
+        "paid_30_days": "To'langan (30 kun)"
+      }
     }
   },
   "purchasing": {

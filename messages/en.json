@@ -1737,6 +1737,23 @@
       "quotes": "Quotes",
       "invoices": "Invoices",
       "commissions": "Commissions"
+    },
+    "customers": {
+      "dashboard": "Dashboard",
+      "select_detail": "Select a customer",
+      "select_customer_hint": "Select a customer from the list on the left to see transaction history and profile details.",
+      "title": "Customers",
+      "new_customer": "New Customer",
+      "search_placeholder": "Search customers...",
+      "empty_state": "No customers found",
+      "outstanding_balance": "Outstanding Balance",
+      "no_outstanding_balance": "No outstanding balance",
+      "scoreboard": {
+        "open_quotes": "Open Quotes",
+        "unbilled_orders": "Unbilled Orders",
+        "overdue_ar": "Overdue AR",
+        "paid_30_days": "Paid (30 days)"
+      }
     }
   },
   "purchasing": {

@@ -1640,6 +1640,23 @@
       "quotes": "Teklifler",
       "invoices": "Faturalar",
       "commissions": "Komisyonlar"
+    },
+    "customers": {
+      "dashboard": "Kontrol Paneli",
+      "select_detail": "Bir müşteri seçin",
+      "select_customer_hint": "Sol taraftaki listeden bir müşteri seçerek işlem geçmişini ve profil ayrıntılarını görün.",
+      "title": "Müşteriler",
+      "new_customer": "Yeni Müşteri",
+      "search_placeholder": "Müşterileri ara...",
+      "empty_state": "Müşteri bulunamadı",
+      "outstanding_balance": "Beklemede Olan Bakiye",
+      "no_outstanding_balance": "Beklemede olan bakiye yok",
+      "scoreboard": {
+        "open_quotes": "Açık Teklifler",
+        "unbilled_orders": "Faturalanmamış Siparişler",
+        "overdue_ar": "Vadesi Geçmiş Alacaklar",
+        "paid_30_days": "Ödenen (30 gün)"
+      }
     }
   },
   "purchasing": {
