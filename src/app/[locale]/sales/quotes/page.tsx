@@ -1,14 +1,18 @@
+import { auth } from '@/auth';
 import { db } from '@/db';
 import { invoices } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { DomainNavigation } from '@/components/navigation/DomainNavigation';
+import { DOMAIN_NAV_CONFIG } from '@/lib/domain-nav-config';
 import { formatCurrency } from '@/lib/format';
 import { Plus, FileText } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
 export default async function QuotesPage() {
+  const session = await auth();
   // Get all quotes
   const quotes = await db.query.invoices.findMany({
     where: eq(invoices.type, 'QUOTE'),
@@ -30,7 +34,13 @@ export default async function QuotesPage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
+    <>
+      <DomainNavigation
+        items={DOMAIN_NAV_CONFIG.sales}
+        domain="sales"
+        userRole={session?.user?.role}
+      />
+      <div className="min-h-screen bg-slate-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -146,6 +156,7 @@ export default async function QuotesPage() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }

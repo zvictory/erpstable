@@ -1,11 +1,14 @@
 
 import React from 'react';
+import { auth } from '@/auth';
 import { getCommissionsData, markCommissionPaid } from '@/app/actions/commissions';
 import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/button';
+import { DomainNavigation } from '@/components/navigation/DomainNavigation';
+import { DOMAIN_NAV_CONFIG } from '@/lib/domain-nav-config';
 import { DollarSign, FileText, User, Calendar, CheckCircle2 } from 'lucide-react';
 import { formatCurrency, formatDateRu } from '@/lib/format';
 import Link from 'next/link';
@@ -13,10 +16,17 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export default async function CommissionsPage() {
+    const session = await auth();
     const { commissions: comms, stats } = await getCommissionsData();
 
     return (
-        <div className="p-6 max-w-7xl mx-auto space-y-6">
+        <>
+            <DomainNavigation
+                items={DOMAIN_NAV_CONFIG.sales}
+                domain="sales"
+                userRole={session?.user?.role}
+            />
+            <div className="p-6 max-w-7xl mx-auto space-y-6">
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900">Commissions Report</h1>
@@ -127,6 +137,7 @@ export default async function CommissionsPage() {
                     </Table>
                 </CardContent>
             </Card>
-        </div>
+            </div>
+        </>
     );
 }
