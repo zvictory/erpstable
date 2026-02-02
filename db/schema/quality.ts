@@ -1,6 +1,5 @@
 // db/schema/quality.ts - Quality Control Schema
 import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
-import { relations } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 import { items } from './inventory';
 import { users } from './auth';
@@ -137,7 +136,7 @@ export const inspectionResults = sqliteTable(
 // ============================================================================
 // RELATIONS
 // ============================================================================
-
+// Relations are defined in db/schema/relations.ts to centralize relationship management
 
 // ============================================================================
 // ZOD SCHEMAS & TYPES

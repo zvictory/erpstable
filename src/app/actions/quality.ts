@@ -4,6 +4,7 @@
 import { auth } from '@/auth';
 import { db } from '../../../db';
 import { z } from 'zod';
+import { sanitizeTimestamps } from '@/lib/db-helpers';
 
 import { eq, and, inArray, desc, sql } from 'drizzle-orm';
 import {
@@ -161,7 +162,7 @@ export async function getInspectionById(inspectionId: number) {
 
     return {
       success: true,
-      inspection,
+      inspection: sanitizeTimestamps(inspection),
       tests: applicableTests,
     };
   } catch (error) {
@@ -355,7 +356,7 @@ export async function getPendingInspections() {
       limit: 50,
     });
 
-    return { success: true, inspections: pending };
+    return { success: true, inspections: sanitizeTimestamps(pending) };
   } catch (error) {
     console.error('getPendingInspections error:', error);
     return {
@@ -408,7 +409,7 @@ export async function getInspections(filters?: {
       limit: 100,
     });
 
-    return { success: true, inspections };
+    return { success: true, inspections: sanitizeTimestamps(inspections) };
   } catch (error) {
     console.error('getInspections error:', error);
     return {
