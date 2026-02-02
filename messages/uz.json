@@ -169,6 +169,26 @@
         "overdue": "Muddati o'tgan schyotlar",
         "open_bills": "Ochiq schyotlar",
         "paid_30_days": "To'langan (30 kun)"
+      },
+      "profile": {
+        "edit": "Tahrirlash",
+        "delete": "O'chirish",
+        "new_transaction": "Yangi tranzaksiya",
+        "no_email": "Email yo'q",
+        "no_phone": "Telefon yo'q",
+        "terms_label": "To'lov shartlari",
+        "open_balance": "Ochiq balans",
+        "transactions_title": "Tranzaksiyalar",
+        "no_transactions": "Ko'rsatiladigan tranzaksiyalar yo'q",
+        "total_transactions": "{count} ta tranzaksiya",
+        "no_vendor_selected": "Yetkazib beruvchi tanlanmagan",
+        "select_vendor_hint": "Profil tafsilotlari va tranzaksiya tarixini ko'rish uchun chap tarafdagi ro'yxatdan yetkazib beruvchini tanlang.",
+        "delete_title": "Yetkazib beruvchini o'chirish",
+        "delete_desc": "{name} yetkazib beruvchini o'chirishni xohlaysizmi? Bu amalni bekor qilib bo'lmaydi.",
+        "errors": {
+          "failed_to_delete": "Yetkazib beruvchini o'chirib bo'lmadi",
+          "unexpected": "Kutilmagan xatolik yuz berdi"
+        }
       }
     }
   },

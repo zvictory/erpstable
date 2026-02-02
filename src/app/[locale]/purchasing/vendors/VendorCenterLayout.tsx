@@ -167,6 +167,18 @@ export function VendorCenterLayout({
         <div className="flex h-screen bg-slate-50 overflow-hidden relative">
             {/* Left Column: Vendor List (Full Height) */}
             <div className="w-[380px] border-r border-slate-200 flex flex-col bg-white overflow-hidden shrink-0">
+                {/* Home Icon Button */}
+                <div className="px-4 py-3 border-b border-slate-200 flex items-center">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => router.push('/')}
+                        className="h-8 w-8 hover:bg-slate-100"
+                        title={t('title')}
+                    >
+                        <LayoutDashboard className="h-4 w-4 text-slate-600" />
+                    </Button>
+                </div>
                 <VendorList
                     vendors={vendors}
                     selectedId={selectedId}
@@ -177,14 +189,6 @@ export function VendorCenterLayout({
 
             {/* Right Column: Details & Stats */}
             <div className="flex-1 flex flex-col overflow-hidden">
-                {/* Fixed Header */}
-                <div className="h-14 border-b border-slate-200 bg-white flex items-center px-6 shrink-0 z-10">
-                    <Button variant="ghost" size="sm" onClick={() => router.push('/')} className="gap-2 text-muted-foreground pl-0 hover:pl-2 transition-all">
-                        <LayoutDashboard className="h-4 w-4" />
-                        <span>{t('title')}</span>
-                    </Button>
-                </div>
-
                 {/* Main Content Area - Scrollable */}
                 <div className="flex-1 overflow-y-auto bg-slate-50/50 p-6">
                     <div className="max-w-6xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">

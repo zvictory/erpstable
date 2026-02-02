@@ -169,6 +169,26 @@
         "overdue": "Vadesi Geçmiş Faturalar",
         "open_bills": "Açık Faturalar",
         "paid_30_days": "Ödenen (30 gün)"
+      },
+      "profile": {
+        "edit": "Düzenle",
+        "delete": "Sil",
+        "new_transaction": "Yeni İşlem",
+        "no_email": "E-posta yok",
+        "no_phone": "Telefon yok",
+        "terms_label": "Ödeme Koşulları",
+        "open_balance": "Açık Bakiye",
+        "transactions_title": "İşlemler",
+        "no_transactions": "Görüntülenecek işlem yok",
+        "total_transactions": "{count} işlem",
+        "no_vendor_selected": "Tedarikçi seçilmedi",
+        "select_vendor_hint": "Profil detaylarını ve işlem geçmişini görüntülemek için soldaki listeden bir tedarikçi seçin.",
+        "delete_title": "Tedarikçiyi Sil",
+        "delete_desc": "{name} tedarikçisini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+        "errors": {
+          "failed_to_delete": "Tedarikçi silinemedi",
+          "unexpected": "Beklenmeyen bir hata oluştu"
+        }
       }
     }
   },

@@ -227,6 +227,26 @@
         "overdue": "Overdue Bills",
         "open_bills": "Open Bills",
         "paid_30_days": "Paid (30 days)"
+      },
+      "profile": {
+        "edit": "Edit",
+        "delete": "Delete",
+        "new_transaction": "New Transaction",
+        "no_email": "No email",
+        "no_phone": "No phone",
+        "terms_label": "Payment Terms",
+        "open_balance": "Open Balance",
+        "transactions_title": "Transactions",
+        "no_transactions": "No transactions to display",
+        "total_transactions": "{count, plural, one {# transaction} other {# transactions}}",
+        "no_vendor_selected": "No vendor selected",
+        "select_vendor_hint": "Select a vendor from the list on the left to view profile details and transaction history.",
+        "delete_title": "Delete Vendor",
+        "delete_desc": "Are you sure you want to delete vendor {name}? This action cannot be undone.",
+        "errors": {
+          "failed_to_delete": "Failed to delete vendor",
+          "unexpected": "An unexpected error occurred"
+        }
       }
     }
   },
