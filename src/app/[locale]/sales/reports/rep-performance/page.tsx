@@ -4,8 +4,13 @@ import { db } from '../../../../../../db';
 import { invoices, commissions, commissionRules } from '../../../../../../db/schema/sales';
 import { eq, sql, desc, and, sum, count } from 'drizzle-orm';
 import { users } from '../../../../../../db/schema/auth';
+import { auth } from '@/auth';
+import { DomainNavigation } from '@/components/navigation/DomainNavigation';
+import { DOMAIN_NAV_CONFIG } from '@/lib/domain-nav-config';
 
 export default async function RepPerformancePage() {
+    const session = await auth();
+
     // 1. Fetch Aggregated Data per Rep
     // - Total Sales (Invoiced)
     // - Total Commission Earned (Pending + Paid)
@@ -49,10 +54,16 @@ export default async function RepPerformancePage() {
     });
 
     return (
-        <div className="p-6 space-y-8">
-            <h1 className="text-3xl font-bold text-gray-900">Sales Representative Performance</h1>
+        <>
+            <DomainNavigation
+                items={DOMAIN_NAV_CONFIG.sales}
+                domain="sales"
+                userRole={session?.user?.role}
+            />
+            <div className="p-6 space-y-8">
+                <h1 className="text-3xl font-bold text-gray-900">Sales Representative Performance</h1>
 
-            <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm bg-white">
+                <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm bg-white">
                 <table className="w-full text-sm text-left">
                     <thead className="bg-gray-50 text-gray-700 font-semibold border-b">
                         <tr>
@@ -87,17 +98,18 @@ export default async function RepPerformancePage() {
                         )}
                     </tbody>
                 </table>
-            </div>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-indigo-50 p-6 rounded-xl border border-indigo-100">
-                    <h3 className="font-semibold text-indigo-900 mb-2">Commission Rules</h3>
-                    <p className="text-sm text-indigo-700">
-                        Commission is calculated automatically when an invoice is fully PAID.
-                        The calculation is based on active Commission Rules assigned to each Representative or the global default rule.
-                    </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-indigo-50 p-6 rounded-xl border border-indigo-100">
+                        <h3 className="font-semibold text-indigo-900 mb-2">Commission Rules</h3>
+                        <p className="text-sm text-indigo-700">
+                            Commission is calculated automatically when an invoice is fully PAID.
+                            The calculation is based on active Commission Rules assigned to each Representative or the global default rule.
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }

@@ -2,6 +2,9 @@ import { redirect } from 'next/navigation';
 import CustomerForm from '@/components/sales/CustomerForm';
 import { createCustomer } from '@/app/actions/sales';
 import { getTranslations } from 'next-intl/server';
+import { auth } from '@/auth';
+import { DomainNavigation } from '@/components/navigation/DomainNavigation';
+import { DOMAIN_NAV_CONFIG } from '@/lib/domain-nav-config';
 
 export async function generateMetadata() {
     const t = await getTranslations('sales.customers');
@@ -15,6 +18,8 @@ export default async function NewCustomerPage({
 }: {
     params: { locale: string }
 }) {
+    const session = await auth();
+
     const handleSave = async (data: any) => {
         'use server';
         try {
@@ -36,17 +41,24 @@ export default async function NewCustomerPage({
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 p-6">
-            <div className="mx-auto">
-                <CustomerForm
-                    mode="create"
-                    onSuccess={async () => {
-                        'use server';
-                        redirect(`/${locale}/sales/customers`);
-                    }}
-                    onCancel={handleCancel}
-                />
+        <>
+            <DomainNavigation
+                items={DOMAIN_NAV_CONFIG.sales}
+                domain="sales"
+                userRole={session?.user?.role}
+            />
+            <div className="min-h-screen bg-slate-50 p-6">
+                <div className="mx-auto">
+                    <CustomerForm
+                        mode="create"
+                        onSuccess={async () => {
+                            'use server';
+                            redirect(`/${locale}/sales/customers`);
+                        }}
+                        onCancel={handleCancel}
+                    />
+                </div>
             </div>
-        </div>
+        </>
     );
 }

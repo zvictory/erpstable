@@ -8,12 +8,17 @@ import { eq, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { Plus, Edit, Trash, Check, X } from 'lucide-react';
+import { auth } from '@/auth';
+import { DomainNavigation } from '@/components/navigation/DomainNavigation';
+import { DOMAIN_NAV_CONFIG } from '@/lib/domain-nav-config';
 
 export default async function PriceListsPage({
     searchParams
 }: {
     searchParams: { [key: string]: string | string[] | undefined }
 }) {
+    const session = await auth();
+
     // Check auth? Assuming layout handles it or we add session check here.
     // 'use server' for actions
 
@@ -90,10 +95,16 @@ export default async function PriceListsPage({
     }
 
     return (
-        <div className="p-6 space-y-8">
-            <h1 className="text-3xl font-bold text-gray-900">Price Lists</h1>
+        <>
+            <DomainNavigation
+                items={DOMAIN_NAV_CONFIG.sales}
+                domain="sales"
+                userRole={session?.user?.role}
+            />
+            <div className="p-6 space-y-8">
+                <h1 className="text-3xl font-bold text-gray-900">Price Lists</h1>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Left: List of Pipelines */}
                 <div className="md:col-span-1 space-y-4">
                     <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
@@ -237,6 +248,7 @@ export default async function PriceListsPage({
                     )}
                 </div>
             </div>
-        </div>
+            </div>
+        </>
     );
 }
