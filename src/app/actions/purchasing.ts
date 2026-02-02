@@ -17,7 +17,6 @@ import { auth } from '@/auth';
 import { UserRole } from '@/auth.config';
 import { getPreferences } from './preferences';
 import { getPreferenceBoolean, getPreferenceInteger } from '@/lib/preferences';
-import { generateInspection } from './quality';
 import { createPendingGRN } from './inventory';
 import { logAuditEvent } from '@/lib/audit';
 
@@ -599,7 +598,7 @@ export async function createVendorBill(data: any) {
                         unitCost: unitCostTiyin,
                         receiveDate: val.transactionDate,
                         isDepleted: false,
-                        qcStatus: 'PENDING', // Hold until QC approval
+                        qcStatus: 'NOT_REQUIRED', // QC workflow disabled - auto-available
                     });
 
                     // Capture for QC inspection generation
@@ -716,28 +715,8 @@ export async function createVendorBill(data: any) {
             };
         });
 
-        // Generate QC inspections after transaction completes (only if layers were created)
-        if (result.success && result.inspectionsNeeded) {
-            for (const inspection of inspectionsToGenerate) {
-                const inspectionResult = await generateInspection({
-                    sourceType: 'PURCHASE_RECEIPT',
-                    sourceId: result.billId,
-                    batchNumber: inspection.batchNumber,
-                    itemId: inspection.itemId,
-                    quantity: inspection.quantity,
-                });
-
-                if (inspectionResult.success && !inspectionResult.qcRequired) {
-                    // Update layer to NOT_REQUIRED if no tests found
-                    await db.update(inventoryLayers)
-                        .set({ qcStatus: 'NOT_REQUIRED' })
-                        .where(eq(inventoryLayers.batchNumber, inspection.batchNumber));
-
-                    // Also sync inventory fields since they might be used for availability checks
-                    await updateItemInventoryFields(inspection.itemId, db as any);
-                }
-            }
-        }
+        // QC workflow disabled - inspection generation skipped
+        // All inventory auto-approved on receipt (qcStatus: NOT_REQUIRED)
 
         revalidatePath('/purchasing/vendors');
         return {
@@ -1815,18 +1794,8 @@ export async function approveBill(billId: number, action: 'APPROVE' | 'REJECT') 
             throw new Error(`Invalid action: ${action}`);
         });
 
-        // Generate QC inspections after transaction completes (only for approved bills)
-        if (result.success && action === 'APPROVE' && inspectionsToGenerate.length > 0) {
-            for (const inspection of inspectionsToGenerate) {
-                await generateInspection({
-                    sourceType: 'PURCHASE_RECEIPT',
-                    sourceId: billId,
-                    batchNumber: inspection.batchNumber,
-                    itemId: inspection.itemId,
-                    quantity: inspection.quantity,
-                });
-            }
-        }
+        // QC workflow disabled - inspection generation skipped
+        // All inventory auto-approved on receipt (qcStatus: NOT_REQUIRED)
 
         // Audit log after successful approval/rejection
         if (result.success) {

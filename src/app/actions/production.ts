@@ -12,7 +12,6 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { auth } from '../../../src/auth';
 import { updateItemInventoryFields } from './inventory-tools';
-import { generateInspection } from './quality';
 import { logAuditEvent } from '@/lib/audit';
 
 // --- Validation Schemas ---
@@ -310,24 +309,8 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
             }
         });
 
-        // Generate QC inspection after transaction completes
-        const inspectionResult = await generateInspection({
-            sourceType: 'PRODUCTION_RUN',
-            sourceId: runId,
-            batchNumber: batchNum,
-            itemId: finalOutputItemId,
-            quantity: val.outputQty,
-        });
-
-        if (inspectionResult.success && !inspectionResult.qcRequired) {
-            // Update layer to NOT_REQUIRED if no tests found
-            await db.update(inventoryLayers)
-                .set({ qcStatus: 'NOT_REQUIRED' })
-                .where(eq(inventoryLayers.batchNumber, batchNum));
-
-            // Also sync inventory fields since they might be used for availability checks
-            await updateItemInventoryFields(finalOutputItemId, db as any);
-        }
+        // QC workflow disabled - inspection generation skipped
+        // Production output is auto-available (qcStatus: NOT_REQUIRED)
 
         // Audit log after successful production run
         await logAuditEvent({
@@ -618,16 +601,8 @@ export async function executeRecipe(data: z.infer<typeof recipeProductionSchema>
             return { success: true, productionRunId: run.id };
         });
 
-        // Generate QC inspection after transaction completes
-        if (result.success && batchNum) {
-            await generateInspection({
-                sourceType: 'PRODUCTION_RUN',
-                sourceId: runId,
-                batchNumber: batchNum,
-                itemId: outputItemId,
-                quantity: outputQty,
-            });
-        }
+        // QC workflow disabled - inspection generation skipped
+        // Production output is auto-available (qcStatus: NOT_REQUIRED)
 
         return result;
 

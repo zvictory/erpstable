@@ -121,15 +121,30 @@ export function QualityDashboard({ inspections, filters }: QualityDashboardProps
         <p className="text-slate-500 mt-1">{t('dashboard.subtitle')}</p>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* QC Disabled Notice */}
+      <Card className="bg-blue-50 border-blue-200">
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-medium text-blue-900">QC Workflow Disabled</h3>
+              <p className="text-sm text-blue-800 mt-1">
+                Quality control approval has been disabled. All inventory is automatically available when received.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* KPI Cards - Disabled */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 opacity-50">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('dashboard.pending')}</CardTitle>
             <Clock className="h-4 w-4 text-slate-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{kpis.pending}</div>
+            <div className="text-2xl font-bold">-</div>
             <p className="text-xs text-slate-500 mt-1">{t('dashboard.awaiting_inspection')}</p>
           </CardContent>
         </Card>
@@ -140,7 +155,7 @@ export function QualityDashboard({ inspections, filters }: QualityDashboardProps
             <CheckCircle2 className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{kpis.passedToday}</div>
+            <div className="text-2xl font-bold text-green-600">-</div>
             <p className="text-xs text-slate-500 mt-1">{t('dashboard.approved_today')}</p>
           </CardContent>
         </Card>
@@ -151,7 +166,7 @@ export function QualityDashboard({ inspections, filters }: QualityDashboardProps
             <XCircle className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{kpis.failedToday}</div>
+            <div className="text-2xl font-bold text-red-600">-</div>
             <p className="text-xs text-slate-500 mt-1">{t('dashboard.rejected_today')}</p>
           </CardContent>
         </Card>

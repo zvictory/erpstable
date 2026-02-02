@@ -447,7 +447,8 @@ export async function createInvoice(data: z.infer<typeof createInvoiceSchema>) {
                 const whereConditions = [
                     eq(inventoryLayers.itemId, line.itemId),
                     eq(inventoryLayers.isDepleted, false),
-                    gt(inventoryLayers.remainingQty, 0)
+                    gt(inventoryLayers.remainingQty, 0),
+                    inArray(inventoryLayers.qcStatus, ['APPROVED', 'NOT_REQUIRED']) // Only QC-approved inventory
                 ];
 
                 // Add warehouse filter if specified
