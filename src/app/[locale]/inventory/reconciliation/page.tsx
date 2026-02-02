@@ -23,6 +23,7 @@ export default async function ReconciliationPage() {
         items={DOMAIN_NAV_CONFIG.inventory}
         domain="inventory"
         userRole={session?.user?.role}
+        variant="dropdown"
       />
       <div className="container mx-auto p-6 max-w-7xl">
         <div className="mb-6">

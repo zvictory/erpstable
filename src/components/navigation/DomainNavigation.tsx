@@ -1,11 +1,18 @@
 'use client';
 
 import React from 'react';
-import { Link, usePathname } from '@/navigation';
+import { Link, usePathname, useRouter } from '@/navigation';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { UserRole } from '@/auth.config';
 import { LucideIcon, Home } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export interface DomainNavItem {
   href: string;
@@ -18,11 +25,18 @@ interface DomainNavigationProps {
   items: DomainNavItem[];
   domain: string;
   userRole?: UserRole;
+  variant?: 'tabs' | 'dropdown';
 }
 
-export function DomainNavigation({ items, domain, userRole }: DomainNavigationProps) {
+export function DomainNavigation({
+  items,
+  domain,
+  userRole,
+  variant = 'tabs',
+}: DomainNavigationProps) {
   const t = useTranslations(`${domain}.nav`);
   const pathname = usePathname();
+  const router = useRouter();
 
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
 
@@ -35,6 +49,57 @@ export function DomainNavigation({ items, domain, userRole }: DomainNavigationPr
     return null;
   }
 
+  // Get current label for dropdown
+  const getCurrentLabel = () => {
+    const currentItem = visibleItems.find((item) => isActive(item.href));
+    if (!currentItem) return t(visibleItems[0]?.labelKey || 'home');
+
+    // For home, show the next item's label to avoid just showing "home icon"
+    if (currentItem.labelKey === 'home' && visibleItems.length > 1) {
+      return t(visibleItems[1]?.labelKey || 'home');
+    }
+
+    return t(currentItem.labelKey);
+  };
+
+  // Dropdown variant
+  if (variant === 'dropdown') {
+    return (
+      <div className="border-b border-slate-200 bg-white px-3 py-2">
+        <Select value={pathname} onValueChange={(href) => router.push(href)}>
+          <SelectTrigger className="w-[240px]">
+            <SelectValue>{getCurrentLabel()}</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {visibleItems.map((item) => {
+              const Icon = item.icon;
+              const isHome = item.labelKey === 'home';
+
+              return (
+                <SelectItem key={item.href} value={item.href} className="cursor-pointer">
+                  <div className="flex items-center gap-2">
+                    {isHome ? (
+                      <>
+                        <Home className="w-4 h-4" />
+                        <span>{t(item.labelKey)}</span>
+                      </>
+                    ) : (
+                      <>
+                        {Icon && <Icon className="w-4 h-4" />}
+                        <span>{t(item.labelKey)}</span>
+                      </>
+                    )}
+                  </div>
+                </SelectItem>
+              );
+            })}
+          </SelectContent>
+        </Select>
+      </div>
+    );
+  }
+
+  // Tabs variant (original implementation)
   return (
     <div className="border-b border-slate-200 bg-white">
       <div className="flex items-center gap-0.5 overflow-x-auto px-3 py-2 custom-scrollbar">

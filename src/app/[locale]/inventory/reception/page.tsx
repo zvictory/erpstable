@@ -23,6 +23,7 @@ export default async function ReceptionPage() {
                 items={DOMAIN_NAV_CONFIG.inventory}
                 domain="inventory"
                 userRole={userRole}
+                variant="dropdown"
             />
             <ShellClient userRole={userRole}>
                 <div className="bg-slate-50 min-h-screen">

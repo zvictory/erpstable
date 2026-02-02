@@ -48,11 +48,12 @@ export default async function InventoryOverviewPage() {
 
   return (
     <div className="space-y-6">
-      {/* Domain Navigation Tabs */}
+      {/* Domain Navigation Dropdown */}
       <DomainNavigation
         items={DOMAIN_NAV_CONFIG.inventory}
         domain="inventory"
         userRole={session.user.role}
+        variant="dropdown"
       />
 
       {/* Page Header */}
