@@ -86,6 +86,16 @@ export const DOMAIN_NAV_CONFIG = {
 
   inventory: [
     {
+      href: '/',
+      labelKey: 'home',
+      allowedRoles: [
+        UserRole.ADMIN,
+        UserRole.ACCOUNTANT,
+        UserRole.PLANT_MANAGER,
+        UserRole.FACTORY_WORKER,
+      ],
+    },
+    {
       href: '/inventory',
       labelKey: 'overview',
       allowedRoles: [
