@@ -244,8 +244,8 @@ export function InspectionWizard({ inspection, tests }: InspectionWizardProps) {
                         <div className="mt-2">
                           <Input
                             id={`result-${test.id}`}
-                            type="number"
-                            step="any"
+                            type="text"
+                            inputMode="decimal"
                             placeholder={
                               test.minValue !== null && test.maxValue !== null &&
                                 isFinite(test.minValue) && isFinite(test.maxValue)
