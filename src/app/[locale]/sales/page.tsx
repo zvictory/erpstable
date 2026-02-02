@@ -3,7 +3,7 @@ import { getSalesOverviewMetrics } from '@/app/actions/domain-metrics';
 import { DomainNavigation } from '@/components/navigation/DomainNavigation';
 import { DOMAIN_NAV_CONFIG } from '@/lib/domain-nav-config';
 import { Link } from '@/navigation';
-import { Plus, TrendingUp, Users, FileText } from 'lucide-react';
+import { Plus, Users, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const dynamic = 'force-dynamic';
@@ -24,13 +24,6 @@ export default async function SalesOverviewPage() {
       change: '+12%',
       icon: Users,
       color: 'bg-blue-100 text-blue-700'
-    },
-    {
-      title: 'This Month Revenue',
-      value: `$${(metrics.monthlyRevenue / 1000).toFixed(1)}K`,
-      change: '+8%',
-      icon: TrendingUp,
-      color: 'bg-green-100 text-green-700'
     },
     {
       title: 'Pending Invoices',
