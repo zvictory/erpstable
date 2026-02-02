@@ -1,4 +1,3 @@
-
 import { db } from '../db';
 import {
     // Auth
@@ -48,7 +47,7 @@ import {
     maintenanceEvents,
     downtimeEvents,
 
-    // Master data for resets
+    // Master data - DELETE ALL
     items,
     glAccounts,
     fixedAssets,
@@ -58,14 +57,11 @@ import {
 } from '../db/schema';
 
 async function main() {
-    console.log('🔄 STARTING SYSTEM RESET (Force/Sequential)...');
+    console.log('🔥 COMPLETE DATABASE WIPE - DELETING ALL DATA...');
     const timestamp = new Date();
 
-    // Helper to delete and log
     const deleteTable = async (name: string, table: any) => {
         try {
-            // Try with .returning(), if fails, try .run() or just await
-            // In Drizzle better-sqlite3, await db.delete() returns the result
             const result = await db.delete(table).returning();
             console.log(`✅ Deleted ${name}: ${result.length} rows`);
             return result.length;
@@ -76,35 +72,35 @@ async function main() {
     };
 
     try {
-        console.log('Phase 1: Audit & Sessions...');
+        console.log('\n=== Phase 1: Audit & Sessions ===');
         await deleteTable('passwordResetTokens', passwordResetTokens);
         await deleteTable('auditLogs', auditLogs);
 
-        console.log('Phase 2: Payment Allocations...');
+        console.log('\n=== Phase 2: Payment Allocations ===');
         await deleteTable('vendorPaymentAllocations', vendorPaymentAllocations);
         await deleteTable('paymentAllocations', paymentAllocations);
 
-        console.log('Phase 3: Payments...');
+        console.log('\n=== Phase 3: Payments ===');
         await deleteTable('vendorPayments', vendorPayments);
         await deleteTable('customerPayments', customerPayments);
 
-        console.log('Phase 4: Sales...');
+        console.log('\n=== Phase 4: Sales ===');
         await deleteTable('invoiceLines', invoiceLines);
         await deleteTable('invoices', invoices);
 
-        console.log('Phase 5: Purchasing...');
+        console.log('\n=== Phase 5: Purchasing ===');
         await deleteTable('vendorBillLines', vendorBillLines);
         await deleteTable('purchaseOrderLines', purchaseOrderLines);
         await deleteTable('vendorBills', vendorBills);
         await deleteTable('purchaseOrders', purchaseOrders);
 
-        console.log('Phase 6: Inventory...');
+        console.log('\n=== Phase 6: Inventory ===');
         await deleteTable('stockReservations', stockReservations);
         await deleteTable('inventoryLocationTransfers', inventoryLocationTransfers);
         await deleteTable('inventoryReserves', inventoryReserves);
         await deleteTable('inventoryLayers', inventoryLayers);
 
-        console.log('Phase 7: Manufacturing...');
+        console.log('\n=== Phase 7: Manufacturing ===');
         await deleteTable('processReadings', processReadings);
         await deleteTable('workOrderStepCosts', workOrderStepCosts);
         await deleteTable('workOrderStepStatus', workOrderStepStatus);
@@ -114,45 +110,42 @@ async function main() {
         await deleteTable('maintenanceEvents', maintenanceEvents);
         await deleteTable('downtimeEvents', downtimeEvents);
 
-        console.log('Phase 8: Production...');
+        console.log('\n=== Phase 8: Production ===');
         await deleteTable('productionCosts', productionCosts);
         await deleteTable('productionOutputs', productionOutputs);
         await deleteTable('productionInputs', productionInputs);
         await deleteTable('productionRuns', productionRuns);
 
-        console.log('Phase 9: Finance...');
+        console.log('\n=== Phase 9: Finance ===');
         await deleteTable('depreciationEntries', depreciationEntries);
         await deleteTable('journalEntryLines', journalEntryLines);
         await deleteTable('journalEntries', journalEntries);
 
-        console.log('Phase 10: Master Data Resets...');
-
-        const resetItems = await db.update(items).set({ quantityOnHand: 0, averageCost: 0, updatedAt: timestamp }).returning();
-        console.log(`✅ Reset items: ${resetItems.length} rows`);
-
-        const resetGL = await db.update(glAccounts).set({ balance: 0, updatedAt: timestamp }).returning();
-        console.log(`✅ Reset glAccounts: ${resetGL.length} rows`);
-
-        await db.update(fixedAssets).set({ accumulatedDepreciation: 0, updatedAt: timestamp }).returning();
-        console.log(`✅ Reset fixedAssets`);
-
-        await db.update(maintenanceSchedules).set({ lastCompletedAt: null, updatedAt: timestamp }).returning();
-        console.log(`✅ Reset maintenanceSchedules`);
-
-        // Try to reset customers, skip if schema doesn't match
+        console.log('\n=== Phase 10: Master Data - COMPLETE DELETION ===');
+        await deleteTable('items', items);
+        await deleteTable('customers', customers);
+        await deleteTable('vendors', vendors);
+        await deleteTable('fixedAssets', fixedAssets);
+        await deleteTable('maintenanceSchedules', maintenanceSchedules);
+        
+        // Reset GL accounts to 0 instead of deleting (financial audit trail)
         try {
-            await db.update(customers).set({ lastInteractionAt: null, updatedAt: timestamp }).returning();
-            console.log(`✅ Reset customers`);
+            const resetGL = await db.update(glAccounts).set({ balance: 0, updatedAt: timestamp }).returning();
+            console.log(`✅ Reset GL Accounts: ${resetGL.length} rows (balance → 0)`);
         } catch (e: any) {
-            console.log(`⚠️  Skipped customers reset (schema mismatch): ${e.message}`);
+            console.error(`❌ Failed to reset GL accounts: ${e.message}`);
         }
 
-
-        console.log('\n✅ SYSTEM RESET COMPLETED SUCCESSFULLY');
+        console.log('\n' + '='.repeat(50));
+        console.log('🎉 COMPLETE WIPE FINISHED SUCCESSFULLY');
+        console.log('='.repeat(50));
         console.log('Timestamp:', timestamp.toISOString());
+        console.log('\n✨ Database is now completely empty except:');
+        console.log('   - User accounts (authentication preserved)');
+        console.log('   - GL accounts (structure preserved, balances reset to 0)');
 
     } catch (error) {
-        console.error('❌ SYSTEM RESET FAILED:', error);
+        console.error('\n❌ WIPE FAILED:', error);
         process.exit(1);
     }
 }
