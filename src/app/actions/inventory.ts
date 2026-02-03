@@ -1073,6 +1073,7 @@ export async function getGRNDetail(id: number) {
 /**
  * Delete a Production Input (from transaction history)
  * This removes a production consumption record and reverses its impact on inventory
+ * If the record doesn't exist, it cleans up the orphaned production run
  */
 export async function deleteProductionInput(runId: number, itemId: number) {
     'use server';
@@ -1083,16 +1084,58 @@ export async function deleteProductionInput(runId: number, itemId: number) {
             throw new Error('Unauthorized');
         }
 
-        // Delete the production input
-        const result = await db.delete(productionInputs)
+        // Step 1: Try to delete the production input record
+        const deleteResult = await db.delete(productionInputs)
             .where(and(
                 eq(productionInputs.runId, runId),
                 eq(productionInputs.itemId, itemId)
             ))
             .returning();
 
-        if (result.length === 0) {
-            return { success: false, error: 'Production input not found' };
+        if (deleteResult.length === 0) {
+            // Record doesn't exist - check if this is an orphaned run with no inputs
+            const runWithInputs = await db.query.productionRuns.findFirst({
+                where: eq(productionRuns.id, runId),
+                with: {
+                    inputs: true  // Get all inputs for this run
+                }
+            });
+
+            if (!runWithInputs) {
+                return { success: false, error: 'Production run not found' };
+            }
+
+            // If run has no other inputs, delete the entire run
+            if (!runWithInputs.inputs || runWithInputs.inputs.length === 0) {
+                await db.delete(productionRuns).where(eq(productionRuns.id, runId));
+                return {
+                    success: true,
+                    message: 'Orphaned production run removed (no input record found)'
+                };
+            }
+
+            // Run has other inputs - can't delete just this one
+            return {
+                success: false,
+                error: 'Production input record not found (run has other inputs)'
+            };
+        }
+
+        // Step 2: After deleting the input, check if run is now empty
+        const remainingInputs = await db.query.productionRuns.findFirst({
+            where: eq(productionRuns.id, runId),
+            with: {
+                inputs: true
+            }
+        });
+
+        if (remainingInputs && (!remainingInputs.inputs || remainingInputs.inputs.length === 0)) {
+            // No more inputs for this run - delete the run too
+            await db.delete(productionRuns).where(eq(productionRuns.id, runId));
+            return {
+                success: true,
+                message: 'Production input deleted. Empty production run removed as well.'
+            };
         }
 
         return { success: true, message: 'Production input deleted successfully' };
