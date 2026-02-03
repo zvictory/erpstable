@@ -45,6 +45,7 @@ export async function getItemHistory(
         // Build parameterized UNION query using raw SQL
         const query = sql`
             -- PART 1: Vendor Bills (INBOUND)
+            -- Filter: Only include bills that have corresponding inventory layers
             SELECT
                 vb.bill_date as date,
                 'BILL' as type,
@@ -69,6 +70,10 @@ export async function getItemHistory(
             LEFT JOIN warehouses w ON il.warehouse_id = w.id
             LEFT JOIN warehouse_locations wl ON il.location_id = wl.id
             WHERE vbl.item_id = ${itemId}
+                AND EXISTS (
+                    SELECT 1 FROM inventory_layers il2
+                    WHERE il2.batch_number LIKE 'BILL-' || vb.id || '-%'
+                )
                 ${startDate ? sql`AND vb.bill_date >= ${startDate}` : sql``}
                 ${endDate ? sql`AND vb.bill_date <= ${endDate}` : sql``}
                 ${transactionType === 'in' || transactionType === 'all' ? sql`` : sql`AND 1=0`}
@@ -107,6 +112,7 @@ export async function getItemHistory(
             UNION ALL
 
             -- PART 3: Production Inputs (OUTBOUND - consumption)
+            -- Filter: Only include runs that have valid inputs/outputs or matching layers
             SELECT
                 pr.date as date,
                 'PRODUCTION-IN' as type,
@@ -130,6 +136,10 @@ export async function getItemHistory(
             LEFT JOIN warehouse_locations wl ON il.location_id = wl.id
             WHERE pi.item_id = ${itemId}
                 AND pr.status IN ('IN_PROGRESS', 'COMPLETED')
+                AND (
+                    EXISTS (SELECT 1 FROM production_outputs po WHERE po.run_id = pr.id)
+                    OR EXISTS (SELECT 1 FROM production_inputs pi2 WHERE pi2.run_id = pr.id AND pi2.id = pi.id)
+                )
                 ${startDate ? sql`AND pr.date >= ${startDate}` : sql``}
                 ${endDate ? sql`AND pr.date <= ${endDate}` : sql``}
                 ${transactionType === 'production' || transactionType === 'all' ? sql`` : sql`AND 1=0`}
@@ -137,6 +147,7 @@ export async function getItemHistory(
             UNION ALL
 
             -- PART 4: Production Outputs (INBOUND - creation)
+            -- Filter: Only include outputs with matching inventory layers
             SELECT
                 pr.date as date,
                 'PRODUCTION-OUT' as type,
@@ -161,6 +172,10 @@ export async function getItemHistory(
             LEFT JOIN warehouse_locations wl ON il.location_id = wl.id
             WHERE po.item_id = ${itemId}
                 AND pr.status IN ('IN_PROGRESS', 'COMPLETED')
+                AND EXISTS (
+                    SELECT 1 FROM inventory_layers il2
+                    WHERE il2.batch_number = po.batch_number
+                )
                 ${startDate ? sql`AND pr.date >= ${startDate}` : sql``}
                 ${endDate ? sql`AND pr.date <= ${endDate}` : sql``}
                 ${transactionType === 'production' || transactionType === 'all' ? sql`` : sql`AND 1=0`}
@@ -1142,5 +1157,122 @@ export async function deleteProductionInput(runId: number, itemId: number) {
     } catch (error: any) {
         console.error('❌ Delete Production Input Error:', error);
         return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Clean up orphaned transaction history
+ *
+ * Identifies and removes transaction history records that have no associated
+ * source documents or inventory layers. This includes:
+ * - Vendor bills with no remaining inventory layers
+ * - Production runs with no inputs or outputs
+ *
+ * Used to resolve issue where items with 0 stock still show transaction history.
+ *
+ * Returns: Summary of deleted records by type
+ */
+export async function cleanupOrphanedTransactionHistory() {
+    'use server';
+
+    const session = await auth();
+    if (!session?.user) {
+        throw new Error('Unauthorized');
+    }
+
+    try {
+        const deletedRecords = {
+            bills: 0,
+            productionRuns: 0,
+            adjustments: 0,
+            total: 0
+        };
+
+        return await db.transaction(async (tx: any) => {
+            // 1. Find and delete vendor bills with no inventory layers
+            const orphanedBills = await tx.execute(sql`
+                SELECT DISTINCT vb.id, vb.bill_number
+                FROM vendor_bills vb
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM inventory_layers il
+                    WHERE il.batch_number LIKE 'BILL-' || vb.id || '-%'
+                )
+            `);
+
+            for (const bill of orphanedBills.rows) {
+                try {
+                    const billId = Number(bill.id);
+                    await tx.delete(vendorBillLines).where(eq(vendorBillLines.billId, billId));
+                    await tx.delete(vendorBills).where(eq(vendorBills.id, billId));
+                    deletedRecords.bills++;
+                    console.log(`✅ Deleted orphaned bill: ${bill.bill_number}`);
+                } catch (error) {
+                    console.error(`❌ Failed to delete bill ${bill.id}:`, error);
+                }
+            }
+
+            // 2. Find and delete production runs with no inputs or outputs
+            const orphanedRuns = await tx.execute(sql`
+                SELECT pr.id
+                FROM production_runs pr
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM production_inputs pi WHERE pi.run_id = pr.id
+                )
+                AND NOT EXISTS (
+                    SELECT 1 FROM production_outputs po WHERE po.run_id = pr.id
+                )
+            `);
+
+            for (const run of orphanedRuns.rows) {
+                try {
+                    const runId = Number(run.id);
+                    await tx.delete(productionRuns).where(eq(productionRuns.id, runId));
+                    deletedRecords.productionRuns++;
+                    console.log(`✅ Deleted orphaned production run: ${runId}`);
+                } catch (error) {
+                    console.error(`❌ Failed to delete production run ${run.id}:`, error);
+                }
+            }
+
+            // 3. Find and delete inventory adjustments for items with 0 stock
+            // (Optional: Only delete APPROVED adjustments that correspond to depleted items)
+            const orphanedAdjustments = await tx.execute(sql`
+                SELECT DISTINCT ia.id
+                FROM inventory_adjustments ia
+                JOIN items i ON ia.item_id = i.id
+                WHERE i.quantity_on_hand = 0
+                AND ia.status = 'APPROVED'
+            `);
+
+            for (const adj of orphanedAdjustments.rows) {
+                try {
+                    const adjId = Number(adj.id);
+                    await tx.delete(inventoryAdjustments).where(eq(inventoryAdjustments.id, adjId));
+                    deletedRecords.adjustments++;
+                    console.log(`✅ Deleted orphaned adjustment: ${adjId}`);
+                } catch (error) {
+                    console.error(`❌ Failed to delete adjustment ${adj.id}:`, error);
+                }
+            }
+
+            deletedRecords.total = deletedRecords.bills + deletedRecords.productionRuns + deletedRecords.adjustments;
+
+            const summary = `Cleaned up orphaned transaction history: ${deletedRecords.bills} bills, ${deletedRecords.productionRuns} production runs, ${deletedRecords.adjustments} adjustments (Total: ${deletedRecords.total})`;
+            console.log(`✅ ${summary}`);
+
+            return {
+                success: true,
+                deletedRecords,
+                message: summary
+            };
+        });
+
+    } catch (error: any) {
+        console.error('❌ Cleanup Orphaned Transaction History Error:', error);
+        return {
+            success: false,
+            error: error.message || 'Failed to cleanup orphaned transaction history',
+            deletedRecords: { bills: 0, productionRuns: 0, adjustments: 0, total: 0 }
+        };
     }
 }

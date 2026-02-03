@@ -844,6 +844,22 @@ export async function deleteInvoice(invoiceId: number) {
                 return { success: false, error: 'Invoice not found' };
             }
 
+            // 1.5. Log deletion before removing any data
+            await logAuditEvent({
+                entity: 'invoice',
+                entityId: invoice.id.toString(),
+                action: 'DELETE',
+                changes: {
+                    before: {
+                        invoiceNumber: invoice.invoiceNumber,
+                        customerId: invoice.customerId,
+                        totalAmount: invoice.totalAmount,
+                        status: invoice.status,
+                        date: invoice.date?.toISOString()
+                    }
+                }
+            });
+
             // 2. Reverse inventory consumption (restore to layers)
             const lines = await tx.select().from(invoiceLines).where(eq(invoiceLines.invoiceId, invoiceId));
 

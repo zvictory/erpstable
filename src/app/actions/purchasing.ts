@@ -1032,6 +1032,22 @@ export async function deleteVendorBill(billId: number) {
 
             if (!bill) throw new Error('Bill not found');
 
+            // 1.5. Log deletion before removing any data
+            await logAuditEvent({
+                entity: 'vendor_bill',
+                entityId: bill.id.toString(),
+                action: 'DELETE',
+                changes: {
+                    before: {
+                        billNumber: bill.billNumber,
+                        vendorId: bill.vendorId,
+                        totalAmount: bill.totalAmount,
+                        status: bill.status,
+                        billDate: bill.billDate?.toISOString()
+                    }
+                }
+            });
+
             // 2. Delete GL Entries (Reverse Balances first)
             const glEntries = await tx.select().from(journalEntries).where(eq(journalEntries.transactionId, `bill-${billId}`));
             for (const entry of glEntries) {

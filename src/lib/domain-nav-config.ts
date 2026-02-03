@@ -107,7 +107,7 @@ export const DOMAIN_NAV_CONFIG = {
     },
     {
       href: '/inventory/items',
-      labelKey: 'items_services',
+      labelKey: 'items',
       allowedRoles: [
         UserRole.ADMIN,
         UserRole.ACCOUNTANT,
