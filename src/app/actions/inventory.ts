@@ -70,10 +70,6 @@ export async function getItemHistory(
             LEFT JOIN warehouses w ON il.warehouse_id = w.id
             LEFT JOIN warehouse_locations wl ON il.location_id = wl.id
             WHERE vbl.item_id = ${itemId}
-                AND EXISTS (
-                    SELECT 1 FROM inventory_layers il2
-                    WHERE il2.batch_number LIKE 'BILL-' || vb.id || '-%'
-                )
                 ${startDate ? sql`AND vb.bill_date >= ${startDate}` : sql``}
                 ${endDate ? sql`AND vb.bill_date <= ${endDate}` : sql``}
                 ${transactionType === 'in' || transactionType === 'all' ? sql`` : sql`AND 1=0`}
@@ -136,10 +132,6 @@ export async function getItemHistory(
             LEFT JOIN warehouse_locations wl ON il.location_id = wl.id
             WHERE pi.item_id = ${itemId}
                 AND pr.status IN ('IN_PROGRESS', 'COMPLETED')
-                AND (
-                    EXISTS (SELECT 1 FROM production_outputs po WHERE po.run_id = pr.id)
-                    OR EXISTS (SELECT 1 FROM production_inputs pi2 WHERE pi2.run_id = pr.id AND pi2.id = pi.id)
-                )
                 ${startDate ? sql`AND pr.date >= ${startDate}` : sql``}
                 ${endDate ? sql`AND pr.date <= ${endDate}` : sql``}
                 ${transactionType === 'production' || transactionType === 'all' ? sql`` : sql`AND 1=0`}
@@ -172,10 +164,6 @@ export async function getItemHistory(
             LEFT JOIN warehouse_locations wl ON il.location_id = wl.id
             WHERE po.item_id = ${itemId}
                 AND pr.status IN ('IN_PROGRESS', 'COMPLETED')
-                AND EXISTS (
-                    SELECT 1 FROM inventory_layers il2
-                    WHERE il2.batch_number = po.batch_number
-                )
                 ${startDate ? sql`AND pr.date >= ${startDate}` : sql``}
                 ${endDate ? sql`AND pr.date <= ${endDate}` : sql``}
                 ${transactionType === 'production' || transactionType === 'all' ? sql`` : sql`AND 1=0`}
