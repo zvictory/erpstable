@@ -44,7 +44,7 @@ export const NAVIGATION_CONFIG: NavItemConfig[] = [
     allowedRoles: [UserRole.ACCOUNTANT, UserRole.PLANT_MANAGER, UserRole.ADMIN],
   },
   {
-    href: '/inventory',
+    href: '/inventory/items',
     labelKey: 'inventory',
     icon: Package,
     allowedRoles: [
