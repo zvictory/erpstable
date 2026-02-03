@@ -152,6 +152,19 @@
       "purchase_orders": "Xarid buyurtmalari",
       "bills": "Yetkazib beruvchi hisobnomalari"
     },
+    "documents": {
+      "fields": {
+        "date": "Sana",
+        "type": "Turi",
+        "no_label": "Hujjat raqami",
+        "amount": "Miqdori",
+        "status": "Holati",
+        "action": "Harakat",
+        "edit": "Tahrirlash",
+        "delete": "O'chirish",
+        "view": "Ko'rish"
+      }
+    },
     "vendors": {
       "title": "Boshqaruv paneli",
       "select_vendor": "Yetkazib beruvchini tanlang",
@@ -189,6 +202,31 @@
           "failed_to_delete": "Yetkazib beruvchini o'chirib bo'lmadi",
           "unexpected": "Kutilmagan xatolik yuz berdi"
         }
+      },
+      "tabs": {
+        "transactions": "Tranzaksiyalar",
+        "contacts": "Kontaktlar",
+        "notes": "Eslatmalar"
+      },
+      "table": {
+        "date": "Sana",
+        "type": "Turi",
+        "ref": "Hujjat raqami",
+        "amount": "Miqdori",
+        "status": "Holati"
+      },
+      "active_filter": "Faol filtr",
+      "clear_filter": "Filtrni tozalash",
+      "transaction_types": {
+        "bill": "Schyot",
+        "purchase_order": "Xarid buyurtmasi"
+      },
+      "statuses": {
+        "paid": "To'langan",
+        "open": "Ochiq",
+        "partial": "Qisman to'langan",
+        "closed": "Yopilgan",
+        "cancelled": "Bekor qilingan"
       }
     }
   },

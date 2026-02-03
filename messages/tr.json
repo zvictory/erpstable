@@ -152,6 +152,19 @@
       "purchase_orders": "Satınalma Siparişleri",
       "bills": "Tedarikçi Faturaları"
     },
+    "documents": {
+      "fields": {
+        "date": "Tarih",
+        "type": "Tür",
+        "no_label": "Belge Numarası",
+        "amount": "Tutar",
+        "status": "Durum",
+        "action": "İşlem",
+        "edit": "Düzenle",
+        "delete": "Sil",
+        "view": "Görüntüle"
+      }
+    },
     "vendors": {
       "title": "Kontrol Paneli",
       "select_vendor": "Bir tedarikçi seçin",
@@ -189,6 +202,31 @@
           "failed_to_delete": "Tedarikçi silinemedi",
           "unexpected": "Beklenmeyen bir hata oluştu"
         }
+      },
+      "tabs": {
+        "transactions": "İşlemler",
+        "contacts": "Kişiler",
+        "notes": "Notlar"
+      },
+      "table": {
+        "date": "Tarih",
+        "type": "Tür",
+        "ref": "Belge Numarası",
+        "amount": "Tutar",
+        "status": "Durum"
+      },
+      "active_filter": "Aktif filtre",
+      "clear_filter": "Filtreyi temizle",
+      "transaction_types": {
+        "bill": "Fatura",
+        "purchase_order": "Satınalma Siparişi"
+      },
+      "statuses": {
+        "paid": "Ödendi",
+        "open": "Açık",
+        "partial": "Kısmen Ödendi",
+        "closed": "Kapalı",
+        "cancelled": "İptal Edildi"
       }
     }
   },

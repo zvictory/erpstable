@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { getItemHistory, getItemHistoryBreakdown, exportItemHistoryCSV } from '@/app/actions/inventory';
+import { getItemHistory, getItemHistoryBreakdown, exportItemHistoryCSV, deleteProductionInput } from '@/app/actions/inventory';
 import { clsx } from 'clsx';
 import { Link } from '@/navigation';
 import { useParams, useRouter } from 'next/navigation';
@@ -105,13 +105,23 @@ function getTransactionMetadata(row: HistoryRow): TransactionMetadata {
         };
     }
 
-    // Production: View only
-    if (prefix === 'production-input' || prefix === 'production-output') {
+    // Production Inputs: Can delete (removes consumption from inventory)
+    if (prefix === 'production-input') {
+        return {
+            canEdit: false,
+            canDelete: true,
+            editTooltip: 'Production inputs cannot be edited',
+            deleteTooltip: 'Delete this production consumption',
+        };
+    }
+
+    // Production Outputs: View only
+    if (prefix === 'production-output') {
         return {
             canEdit: false,
             canDelete: false,
-            editTooltip: 'Production transactions cannot be edited',
-            deleteTooltip: 'Production transactions cannot be deleted',
+            editTooltip: 'Production outputs cannot be edited',
+            deleteTooltip: 'Production outputs cannot be deleted',
         };
     }
 
@@ -167,7 +177,8 @@ export default function ItemHistoryTab({
     const [editingBill, setEditingBill] = useState<any>(null);
     const [editingInvoice, setEditingInvoice] = useState<any>(null);
     const [deletingTransaction, setDeletingTransaction] = useState<HistoryRow | null>(null);
-    const [deleteModalType, setDeleteModalType] = useState<'bill' | 'invoice' | null>(null);
+    const [deleteModalType, setDeleteModalType] = useState<'bill' | 'invoice' | 'production-input' | null>(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     // State for adjustment modal
     const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
@@ -251,7 +262,51 @@ export default function ItemHistoryTab({
     const handleDeleteTransaction = (row: HistoryRow) => {
         const [prefix] = row.transaction_id.split('-');
         setDeletingTransaction(row);
-        setDeleteModalType(prefix as 'bill' | 'invoice');
+        setDeleteModalType(prefix as 'bill' | 'invoice' | 'production-input');
+    };
+
+    // Handle confirm delete
+    const handleConfirmDelete = async () => {
+        if (!deletingTransaction) return;
+
+        setDeleteLoading(true);
+        try {
+            const [prefix, id] = deletingTransaction.transaction_id.split('-');
+
+            if (deleteModalType === 'production-input') {
+                // Delete production input
+                const runId = parseInt(id, 10);
+                const result = await deleteProductionInput(runId, itemId);
+
+                if (!result.success) {
+                    alert(result.error || 'Failed to delete production input');
+                    setDeleteLoading(false);
+                    return;
+                }
+
+                // Reload history
+                const startDate = filters.startDate ? new Date(filters.startDate) : undefined;
+                const endDate = filters.endDate ? new Date(filters.endDate) : undefined;
+                const data = await getItemHistory(itemId, {
+                    startDate,
+                    endDate,
+                    transactionType: filters.type,
+                });
+
+                if (Array.isArray(data)) {
+                    setHistory(data as HistoryRow[]);
+                }
+
+                alert('Production input deleted successfully');
+                setDeletingTransaction(null);
+                setDeleteModalType(null);
+            }
+        } catch (err) {
+            console.error('Delete error:', err);
+            alert('Failed to delete transaction');
+        } finally {
+            setDeleteLoading(false);
+        }
     };
 
     // Handle export to CSV
@@ -587,6 +642,52 @@ export default function ItemHistoryTab({
                         router.refresh();
                     }}
                 />
+            )}
+
+            {/* Delete Production Input Confirmation */}
+            {deleteModalType === 'production-input' && deletingTransaction && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+                        <div className="p-6 border-b border-slate-200">
+                            <h2 className="text-lg font-semibold text-slate-900">
+                                Delete Production Consumption
+                            </h2>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <p className="text-slate-600">
+                                Are you sure you want to delete this production consumption?
+                            </p>
+                            <div className="bg-slate-50 p-4 rounded space-y-2 text-sm">
+                                <div><span className="font-medium text-slate-700">Reference:</span> {deletingTransaction.reference}</div>
+                                <div><span className="font-medium text-slate-700">Item:</span> {itemName}</div>
+                                <div><span className="font-medium text-slate-700">Qty:</span> {Math.abs(deletingTransaction.qty_change)} units</div>
+                            </div>
+                            <p className="text-sm text-red-600">
+                                This will reverse the inventory consumption and remove this transaction from the history.
+                            </p>
+                        </div>
+                        <div className="p-6 border-t border-slate-200 flex gap-3 justify-end">
+                            <button
+                                onClick={() => {
+                                    setDeletingTransaction(null);
+                                    setDeleteModalType(null);
+                                }}
+                                className="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+                                disabled={deleteLoading}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleConfirmDelete}
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                disabled={deleteLoading}
+                            >
+                                {deleteLoading && <Loader2 size={14} className="animate-spin" />}
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
 
             {/* Inventory Adjustment Modal */}

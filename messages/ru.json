@@ -254,6 +254,19 @@
       "purchase_orders": "Заказы на покупку",
       "bills": "Счета поставщиков"
     },
+    "documents": {
+      "fields": {
+        "date": "Дата",
+        "type": "Тип",
+        "no_label": "Номер документа",
+        "amount": "Сумма",
+        "status": "Статус",
+        "action": "Действие",
+        "edit": "Редактировать",
+        "delete": "Удалить",
+        "view": "Просмотр"
+      }
+    },
     "vendors": {
       "title": "Панель управления",
       "select_vendor": "Выберите поставщика",
@@ -291,6 +304,31 @@
           "failed_to_delete": "Не удалось удалить поставщика",
           "unexpected": "Произошла непредвиденная ошибка"
         }
+      },
+      "tabs": {
+        "transactions": "Транзакции",
+        "contacts": "Контакты",
+        "notes": "Примечания"
+      },
+      "table": {
+        "date": "Дата",
+        "type": "Тип",
+        "ref": "Номер документа",
+        "amount": "Сумма",
+        "status": "Статус"
+      },
+      "active_filter": "Активный фильтр",
+      "clear_filter": "Очистить фильтр",
+      "transaction_types": {
+        "bill": "Счет",
+        "purchase_order": "Заказ на покупку"
+      },
+      "statuses": {
+        "paid": "Оплачено",
+        "open": "Открыто",
+        "partial": "Частично оплачено",
+        "closed": "Закрыто",
+        "cancelled": "Отменено"
       }
     }
   },

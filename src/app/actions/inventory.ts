@@ -1069,3 +1069,35 @@ export async function getGRNDetail(id: number) {
         return { success: false, error: error.message };
     }
 }
+
+/**
+ * Delete a Production Input (from transaction history)
+ * This removes a production consumption record and reverses its impact on inventory
+ */
+export async function deleteProductionInput(runId: number, itemId: number) {
+    'use server';
+
+    try {
+        const session = await auth();
+        if (!session?.user) {
+            throw new Error('Unauthorized');
+        }
+
+        // Delete the production input
+        const result = await db.delete(productionInputs)
+            .where(and(
+                eq(productionInputs.runId, runId),
+                eq(productionInputs.itemId, itemId)
+            ))
+            .returning();
+
+        if (result.length === 0) {
+            return { success: false, error: 'Production input not found' };
+        }
+
+        return { success: true, message: 'Production input deleted successfully' };
+    } catch (error: any) {
+        console.error('❌ Delete Production Input Error:', error);
+        return { success: false, error: error.message };
+    }
+}

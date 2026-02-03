@@ -210,6 +210,19 @@
       "purchase_orders": "Purchase Orders",
       "bills": "Bills"
     },
+    "documents": {
+      "fields": {
+        "date": "Date",
+        "type": "Type",
+        "no_label": "Document Number",
+        "amount": "Amount",
+        "status": "Status",
+        "action": "Action",
+        "edit": "Edit",
+        "delete": "Delete",
+        "view": "View"
+      }
+    },
     "vendors": {
       "title": "Dashboard",
       "select_vendor": "Select a vendor",
@@ -247,6 +260,31 @@
           "failed_to_delete": "Failed to delete vendor",
           "unexpected": "An unexpected error occurred"
         }
+      },
+      "tabs": {
+        "transactions": "Transactions",
+        "contacts": "Contacts",
+        "notes": "Notes"
+      },
+      "table": {
+        "date": "Date",
+        "type": "Type",
+        "ref": "Document Number",
+        "amount": "Amount",
+        "status": "Status"
+      },
+      "active_filter": "Active filter",
+      "clear_filter": "Clear filter",
+      "transaction_types": {
+        "bill": "Bill",
+        "purchase_order": "Purchase Order"
+      },
+      "statuses": {
+        "paid": "Paid",
+        "open": "Open",
+        "partial": "Partially Paid",
+        "closed": "Closed",
+        "cancelled": "Cancelled"
       }
     }
   },
