@@ -3,8 +3,6 @@ import { auth } from '@/auth';
 import { getItemCenterDataV2 } from '@/app/actions/items';
 import { getInventoryMetrics } from '@/app/actions/inventory-analytics';
 import { ItemCenterLayout } from './ItemCenterLayout';
-import { DomainNavigation } from '@/components/navigation/DomainNavigation';
-import { DOMAIN_NAV_CONFIG } from '@/lib/domain-nav-config';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,25 +24,17 @@ export default async function ItemsPage({ searchParams }: PageProps) {
     ]);
 
     return (
-        <>
-            <DomainNavigation
-                items={DOMAIN_NAV_CONFIG.inventory}
-                domain="inventory"
-                userRole={session?.user?.role}
-                variant="dropdown"
+        <div className="h-full bg-white">
+            <ItemCenterLayout
+                items={data.items}
+                byClass={data.byClass}
+                selectedItem={data.selectedItem}
+                uoms={data.uoms}
+                categories={data.categories}
+                accounts={data.accounts}
+                vendors={data.vendors}
+                inventoryMetrics={metrics}
             />
-            <div className="h-full bg-white">
-                <ItemCenterLayout
-                    items={data.items}
-                    byClass={data.byClass}
-                    selectedItem={data.selectedItem}
-                    uoms={data.uoms}
-                    categories={data.categories}
-                    accounts={data.accounts}
-                    vendors={data.vendors}
-                    inventoryMetrics={metrics}
-                />
-            </div>
-        </>
+        </div>
     );
 }
