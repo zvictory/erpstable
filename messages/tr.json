@@ -227,6 +227,34 @@
         "partial": "Kısmen Ödendi",
         "closed": "Kapalı",
         "cancelled": "İptal Edildi"
+      },
+      "form": {
+        "add_new_vendor": "Yeni Satıcı Ekle",
+        "configure_vendor_desc": "İletişim bilgileri ve ödeme koşulları dahil olmak üzere satıcı ayrıntılarını yapılandırın.",
+        "vendor_settings": "Satıcı Ayarları",
+        "identity": "Kimlik",
+        "display_name": "Adı",
+        "tax_id_stir": "Vergi Kimliği / STIR",
+        "contact_details": "İletişim Bilgileri",
+        "email_address": "E-posta Adresi",
+        "phone_number": "Telefon Numarası",
+        "physical_address": "Fiziksel Adres",
+        "accounting_defaults": "Muhasebe Varsayılanları",
+        "default_terms": "Varsayılan Ödeme Koşulları",
+        "save_vendor": "Satıcıyı Kaydet",
+        "update_vendor": "Satıcıyı Güncelle"
+      },
+      "modal": {
+        "button_cancel": "İptal"
+      },
+      "fields": {
+        "currency": "Para Birimi"
+      },
+      "errors": {
+        "name_required": "Satıcı adı gereklidir",
+        "invalid_email": "Geçersiz e-posta adresi",
+        "failed_to_create": "Satıcı oluşturulamadı",
+        "unexpected": "Beklenmeyen bir hata oluştu"
       }
     }
   },

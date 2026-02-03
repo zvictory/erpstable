@@ -227,6 +227,34 @@
         "partial": "Qisman to'langan",
         "closed": "Yopilgan",
         "cancelled": "Bekor qilingan"
+      },
+      "form": {
+        "add_new_vendor": "Yangi taklif beruvchini qoshing",
+        "configure_vendor_desc": "Taklif beruvchining tafsilotlarini, shu jumladan kontakt ma'lumotlari va to'lovning shartlarini sozlang.",
+        "vendor_settings": "Taklif beruvchi parametrlari",
+        "identity": "Identifikatsiya",
+        "display_name": "Nomi",
+        "tax_id_stir": "Soliq identifikatori / STIR",
+        "contact_details": "Kontakt ma'lumotlari",
+        "email_address": "Elektron pochta manzili",
+        "phone_number": "Telefon raqami",
+        "physical_address": "Jismoniy manzil",
+        "accounting_defaults": "Buxgalteriya parametrlari",
+        "default_terms": "Standart to'lov shartlari",
+        "save_vendor": "Taklif beruvchini saqlash",
+        "update_vendor": "Taklif beruvchini yangilash"
+      },
+      "modal": {
+        "button_cancel": "Bekor qilish"
+      },
+      "fields": {
+        "currency": "Valyuta"
+      },
+      "errors": {
+        "name_required": "Taklif beruvchining nomi majburiy",
+        "invalid_email": "Noto'g'ri elektron pochta manzili",
+        "failed_to_create": "Taklif beruvchini yaratib bo'lmadi",
+        "unexpected": "Kutilmagan xato yuz berdi"
       }
     }
   },

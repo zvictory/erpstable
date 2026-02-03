@@ -285,6 +285,34 @@
         "partial": "Partially Paid",
         "closed": "Closed",
         "cancelled": "Cancelled"
+      },
+      "form": {
+        "add_new_vendor": "Add New Vendor",
+        "configure_vendor_desc": "Configure vendor details including contact information and payment terms.",
+        "vendor_settings": "Vendor Settings",
+        "identity": "Identity",
+        "display_name": "Display Name",
+        "tax_id_stir": "Tax ID / STIR",
+        "contact_details": "Contact Details",
+        "email_address": "Email Address",
+        "phone_number": "Phone Number",
+        "physical_address": "Physical Address",
+        "accounting_defaults": "Accounting Defaults",
+        "default_terms": "Default Payment Terms",
+        "save_vendor": "Save Vendor",
+        "update_vendor": "Update Vendor"
+      },
+      "modal": {
+        "button_cancel": "Cancel"
+      },
+      "fields": {
+        "currency": "Currency"
+      },
+      "errors": {
+        "name_required": "Vendor name is required",
+        "invalid_email": "Invalid email address",
+        "failed_to_create": "Failed to create vendor",
+        "unexpected": "An unexpected error occurred"
       }
     }
   },
