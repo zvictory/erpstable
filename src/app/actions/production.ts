@@ -26,7 +26,10 @@ const runCostSchema = z.object({
 });
 
 const productionRunSchema = z.object({
-    date: z.coerce.date(),
+    date: z.coerce.date()
+        .refine(date => date.getFullYear() >= 2024, {
+            message: 'Production run date must be 2024 or later (received epoch/invalid date)'
+        }),
     type: z.enum(['MIXING', 'SUBLIMATION']),
     status: z.enum(['DRAFT', 'IN_PROGRESS', 'COMPLETED']),
     notes: z.string().optional(),
@@ -48,7 +51,10 @@ const multiStepIngredientSchema = z.object({
 
 const createMultiStepRunSchema = z.object({
     recipeId: z.coerce.number().optional(),
-    date: z.coerce.date(),
+    date: z.coerce.date()
+        .refine(date => date.getFullYear() >= 2024, {
+            message: 'Production run date must be 2024 or later (received epoch/invalid date)'
+        }),
     type: z.enum(['MIXING', 'SUBLIMATION']),
     destinationLocationId: z.coerce.number().optional(),
     steps: z.array(z.object({
