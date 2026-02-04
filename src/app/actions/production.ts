@@ -87,31 +87,32 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
         let destinationLocationId = val.destinationLocationId;
 
         if (!destinationLocationId) {
-            if (val.outputItemId === 0 && val.outputItemName) {
-                // We'll handle this inside the transaction or check if item exists
-            } else if (val.outputItemId > 0) {
-                // Fetch the output item to check its class
-                const outputItem = await db.query.items.findFirst({
-                    where: eq(items.id, val.outputItemId),
-                    columns: { itemClass: true },
+            // Try to find a production location first
+            let productionLocation = await db.query.warehouseLocations.findFirst({
+                where: and(
+                    eq(warehouseLocations.locationType, 'production'),
+                    eq(warehouseLocations.zone, 'WIP')
+                ),
+            });
+
+            // Fallback: find any production location
+            if (!productionLocation) {
+                productionLocation = await db.query.warehouseLocations.findFirst({
+                    where: eq(warehouseLocations.locationType, 'production'),
                 });
-
-                if (outputItem?.itemClass === 'WIP') {
-                    // Get the default WIP staging location
-                    const wipLocation = await db.query.warehouseLocations.findFirst({
-                        where: and(
-                            eq(warehouseLocations.locationType, 'production'),
-                            eq(warehouseLocations.zone, 'WIP')
-                        ),
-                    });
-
-                    if (wipLocation) {
-                        destinationLocationId = wipLocation.id;
-                    }
-                }
             }
-            // For FINISHED_GOODS, could auto-assign to finished goods warehouse
-            // For RAW_MATERIAL, typically not produced so no auto-assignment needed
+
+            // Fallback: find any warehouse location
+            if (!productionLocation) {
+                productionLocation = await db.query.warehouseLocations.findFirst({});
+            }
+
+            if (productionLocation) {
+                destinationLocationId = productionLocation.id;
+            } else {
+                // If no location exists at all, throw an error
+                throw new Error('No warehouse location available. Please create a location first.');
+            }
         }
 
         // 1. Validate Inputs Availability & FIFO Costing
@@ -430,6 +431,50 @@ export async function checkInventoryAvailability(input: unknown) {
             shortage: 0,
             layers: [],
             error: errorMessage || 'Failed to check inventory availability'
+        };
+    }
+}
+
+// --- Get Fruit Inventory Balance ---
+
+export async function getFruitBalance(itemId: number) {
+    try {
+        // Get total available inventory for the fruit
+        const layers = await db.select().from(inventoryLayers)
+            .where(
+                and(
+                    eq(inventoryLayers.itemId, itemId),
+                    inArray(inventoryLayers.qcStatus, ['APPROVED', 'NOT_REQUIRED'])
+                )
+            );
+
+        const totalBalance = layers.reduce((sum, layer) => {
+            if (!layer.isDepleted && layer.remainingQty > 0) {
+                return sum + layer.remainingQty;
+            }
+            return sum;
+        }, 0);
+
+        // Get item details
+        const item = await db.query.items.findFirst({
+            where: eq(items.id, itemId),
+            columns: { name: true, sku: true }
+        });
+
+        return {
+            success: true,
+            itemId,
+            itemName: item?.name || 'Unknown',
+            balance: Math.round(totalBalance * 100) / 100, // Round to 2 decimals
+            hasInventory: totalBalance > 0
+        };
+    } catch (error: any) {
+        return {
+            success: false,
+            itemId,
+            balance: 0,
+            hasInventory: false,
+            error: error.message || 'Failed to fetch fruit balance'
         };
     }
 }

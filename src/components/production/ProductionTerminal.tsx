@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { commitProductionRun, createNextStageRun } from '@/app/actions/production';
+import { commitProductionRun, createNextStageRun, getFruitBalance } from '@/app/actions/production';
 import { useRouter } from 'next/navigation';
 import { Loader2, CheckCircle, ArrowRight, ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -108,6 +108,8 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
     const [showChain, setShowChain] = useState(false);
     const [lastRunId, setLastRunId] = useState<number | null>(null);
     const [previousStagData, setPreviousStagData] = useState<{ outputQty: number; itemName: string } | null>(null);
+    const [fruitBalance, setFruitBalance] = useState<number | null>(null);
+    const [loadingBalance, setLoadingBalance] = useState(false);
 
     // Stage 1: Cleaning
     const cleaningForm = useForm({
@@ -361,10 +363,23 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
                             <label className="block text-sm font-semibold text-slate-700 mb-2">{t('fruit_type')}</label>
                             <select
                                 {...cleaningForm.register('fruitItemId', {
-                                    onChange: (e) => {
-                                        const selectedItem = rawMaterials.find(item => item.id === parseInt(e.target.value));
+                                    onChange: async (e) => {
+                                        const selectedId = parseInt(e.target.value);
+                                        const selectedItem = rawMaterials.find(item => item.id === selectedId);
                                         if (selectedItem) {
                                             cleaningForm.setValue('fruitItemName', selectedItem.name);
+                                            // Fetch fruit balance
+                                            setLoadingBalance(true);
+                                            try {
+                                                const result = await getFruitBalance(selectedId);
+                                                setFruitBalance(result.balance);
+                                            } catch (err) {
+                                                setFruitBalance(null);
+                                            } finally {
+                                                setLoadingBalance(false);
+                                            }
+                                        } else {
+                                            setFruitBalance(null);
                                         }
                                     }
                                 })}
@@ -389,6 +404,31 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
                             />
                         </div>
                     </div>
+
+                    {/* Fruit Balance Display */}
+                    {fruitBalance !== null && (
+                        <div className={`rounded-lg p-4 border ${
+                            fruitBalance > 0
+                                ? 'bg-green-50 border-green-200'
+                                : 'bg-red-50 border-red-200'
+                        }`}>
+                            <div className="text-sm font-semibold mb-1">
+                                {fruitBalance > 0 ? '✅ Available Balance' : '❌ No Inventory'}
+                            </div>
+                            <div className={`text-lg font-bold ${
+                                fruitBalance > 0 ? 'text-green-700' : 'text-red-700'
+                            }`}>
+                                {loadingBalance ? 'Loading...' : `${fruitBalance.toFixed(2)} kg`}
+                            </div>
+                            {fruitBalance > 0 && cleaningForm.getValues('inputQty') && (
+                                <div className="text-xs mt-2">
+                                    {cleaningForm.getValues('inputQty') <= fruitBalance
+                                        ? `✓ Sufficient for ${cleaningForm.getValues('inputQty')} kg`
+                                        : `⚠ Only ${fruitBalance.toFixed(2)} kg available`}
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                         <div className="text-sm text-blue-700 font-semibold mb-2">{t('expected_yield_guidance')}</div>
