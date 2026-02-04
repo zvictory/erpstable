@@ -160,6 +160,13 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
         setIsSubmitting(true);
         setError(null);
         try {
+            // Validate fruit was selected
+            if (!data.fruitItemId || data.fruitItemId === 0) {
+                setError('Please select a fruit type');
+                setIsSubmitting(false);
+                return;
+            }
+
             const result = await commitProductionRun({
                 date: data.date,
                 type: 'MIXING',
@@ -363,21 +370,18 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
                             <label className="block text-sm font-semibold text-slate-700 mb-2">{t('fruit_type')}</label>
                             <select
                                 {...cleaningForm.register('fruitItemId', {
-                                    onChange: async (e) => {
+                                    valueAsNumber: true,
+                                    onChange: (e) => {
                                         const selectedId = parseInt(e.target.value);
                                         const selectedItem = rawMaterials.find(item => item.id === selectedId);
                                         if (selectedItem) {
                                             cleaningForm.setValue('fruitItemName', selectedItem.name);
-                                            // Fetch fruit balance
+                                            // Fetch fruit balance (without await - fire and forget)
                                             setLoadingBalance(true);
-                                            try {
-                                                const result = await getFruitBalance(selectedId);
-                                                setFruitBalance(result.balance);
-                                            } catch (err) {
-                                                setFruitBalance(null);
-                                            } finally {
-                                                setLoadingBalance(false);
-                                            }
+                                            getFruitBalance(selectedId)
+                                                .then(result => setFruitBalance(result.balance))
+                                                .catch(() => setFruitBalance(null))
+                                                .finally(() => setLoadingBalance(false));
                                         } else {
                                             setFruitBalance(null);
                                         }

@@ -394,7 +394,7 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
     } catch (error: any) {
         console.error('Commit Production Error:', error);
         const errorMsg = error.message || 'Failed to commit production run';
-        const fullError = `${errorMsg}\n\nDetails: ${error.toString()}\n\nData: fruitItemId=${data.fruitItemId}, outputQty=${data.outputQty}, destinationLocationId=${destinationLocationId}`;
+        const fullError = `${errorMsg}\n\nDetails: ${error.toString()}\n\nContext: inputs=${JSON.stringify(data.inputs)}, outputQty=${data.outputQty}, destinationLocationId=${destinationLocationId}`;
         console.error('Full error context:', fullError);
         return { success: false, error: fullError };
     }
