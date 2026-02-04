@@ -2136,7 +2136,8 @@
       "mixing_station": "Mixing",
       "sublimation": "Sublimation",
       "quality_control": "Quality",
-      "maintenance": "Maintenance"
+      "maintenance": "Maintenance",
+      "home": "Home"
     },
     "overview": {
       "title": "Production Overview",
