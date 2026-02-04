@@ -127,11 +127,11 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
         await db.transaction(async (tx: any) => {
             // 0. Handle Item Auto-Creation
             if (finalOutputItemId === 0 && val.outputItemName) {
-                // Auto-create FG Item
+                // Auto-create WIP Item
                 const [newItem] = await tx.insert(items).values({
                     name: val.outputItemName,
-                    sku: `FG-${Date.now().toString().slice(-6)}`, // Temporary SKU
-                    itemClass: 'FINISHED_GOODS',
+                    sku: `WIP-${Date.now().toString().slice(-6)}`, // Temporary SKU
+                    itemClass: 'WIP',
                     type: 'Inventory',
                     categoryId: 1, // Default category
                     baseUomId: 18, // Default KG
@@ -283,13 +283,13 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
                 isPosted: true,
             }).returning())[0];
 
-            // Dr Finished Goods
+            // Dr Work-In-Progress
             await tx.insert(journalEntryLines).values({
                 journalEntryId: je.id,
-                accountCode: '1340', // FG
+                accountCode: '1330', // WIP
                 debit: totalRunValue,
                 credit: 0,
-                description: `FG from Run #${run.id}`
+                description: `WIP from Run #${run.id}`
             });
 
             // Cr Raw Materials
@@ -567,13 +567,13 @@ export async function executeRecipe(data: z.infer<typeof recipeProductionSchema>
                 isPosted: true,
             }).returning();
 
-            // Dr Finished Goods
+            // Dr Work-In-Progress
             await tx.insert(journalEntryLines).values({
                 journalEntryId: je.id,
-                accountCode: '1340', // FG
+                accountCode: '1330', // WIP
                 debit: totalRunValue,
                 credit: 0,
-                description: `FG from Run #${run.id}`
+                description: `WIP from Run #${run.id}`
             });
 
             // Cr Raw Materials

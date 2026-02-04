@@ -2354,7 +2354,7 @@
       "add_cost": "+ Add Cost",
       "step_3_title": "Step 3: Output & Yield",
       "step_3_description": "Record final product weight.",
-      "finished_good_item_label": "Finished Good Item",
+      "finished_good_item_label": "WIP Item",
       "select_existing": "Select Existing",
       "create_new_item": "+ Create New Item",
       "new_finished_good_placeholder": "Enter New Finished Good Name",

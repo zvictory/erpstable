@@ -410,7 +410,7 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
                             <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
                                 <div className="w-full">
                                     <div className="flex justify-between items-center mb-2">
-                                        <label className="text-sm font-semibold text-slate-700 block">Finished Good Item</label>
+                                        <label className="text-sm font-semibold text-slate-700 block">WIP Item</label>
                                         <button
                                             type="button"
                                             onClick={() => {

@@ -2711,7 +2711,7 @@
       "add_cost": "+ Maliyet Ekle",
       "step_3_title": "Aşama 3: Çıktı ve Verim",
       "step_3_description": "Son ürün ağırlığını kaydedin.",
-      "finished_good_item_label": "Mamul Ürün",
+      "finished_good_item_label": "WIP Ürün",
       "select_existing": "Mevcut Olanı Seç",
       "create_new_item": "+ Yeni Ürün Oluştur",
       "new_finished_good_placeholder": "Yeni Mamul Ürün Adını Girin",

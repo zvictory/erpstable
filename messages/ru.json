@@ -2485,7 +2485,7 @@
       "add_cost": "+ Добавить затраты",
       "step_3_title": "Этап 3: Выход и выход",
       "step_3_description": "Запишите вес готового продукта.",
-      "finished_good_item_label": "Готовый товар",
+      "finished_good_item_label": "WIP товар",
       "select_existing": "Выбрать существующий",
       "create_new_item": "+ Создать новый товар",
       "new_finished_good_placeholder": "Введите название нового готового товара",

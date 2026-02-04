@@ -2633,7 +2633,7 @@
       "add_cost": "+ Xaraj qoshing",
       "step_3_title": "Bosqich 3: Chiqish va hosil",
       "step_3_description": "Yakuniy mahsulot og'irligini qayd qiling.",
-      "finished_good_item_label": "Yakuniy mahsulot",
+      "finished_good_item_label": "WIP mahsulot",
       "select_existing": "Mavjudni tanlang",
       "create_new_item": "+ Yangi mahsulot yaratish",
       "new_finished_good_placeholder": "Yangi yakuniy mahsulot nomini kiriting",
