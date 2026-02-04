@@ -179,7 +179,7 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
                 mixingForm.setValue('inputFruitType', `Cleaned ${data.fruitItemName}`);
                 mixingForm.setValue('outputQty', data.outputQty); // Start with same qty
             } else {
-                setError('Failed to complete cleaning stage');
+                setError((result as any).error || 'Failed to complete cleaning stage');
             }
         } catch (err: any) {
             setError(err.message || 'Error completing cleaning stage');
@@ -216,7 +216,7 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
                 sublimationForm.setValue('inputFruitType', `Mixed ${data.inputFruitType}`);
                 sublimationForm.setValue('outputQty', Math.round(data.outputQty * 0.15)); // 15% yield estimate
             } else {
-                setError('Failed to complete mixing stage');
+                setError((result as any).error || 'Failed to complete mixing stage');
             }
         } catch (err: any) {
             setError(err.message || 'Error completing mixing stage');
@@ -246,7 +246,7 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
                 setLastRunId(result.runId);
                 setSuccess(true);
             } else {
-                setError('Failed to complete sublimation stage');
+                setError((result as any).error || 'Failed to complete sublimation stage');
             }
         } catch (err: any) {
             setError(err.message || 'Error completing sublimation stage');
