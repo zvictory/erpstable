@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { Loader2, ArrowRight, CheckCircle, Scale, Beaker, Zap, Save, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { ProductionChainTree } from './ProductionChainTree';
+import WasteScaleWidget, { WasteScaleState } from '@/components/manufacturing/stage-execution/WasteScaleWidget';
 
 // --- Form Schema ---
 // Matches server action but adds UI specific fields if needed
@@ -26,6 +27,8 @@ const formSchema = z.object({
     outputItemId: z.coerce.number(),
     outputItemName: z.string().optional(),
     outputQty: z.coerce.number().min(0.001, "Output Qty Required"),
+    wasteQty: z.coerce.number().min(0).default(0),
+    wasteReasons: z.array(z.string()).default([]),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -55,6 +58,7 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
     const [lastRunId, setLastRunId] = useState<number | null>(null);
     const [lastBatchNumber, setLastBatchNumber] = useState<string | null>(null);
     const [showChain, setShowChain] = useState(false);
+    const [wasteState, setWasteState] = useState<WasteScaleState | null>(null);
     const [inventoryWarnings, setInventoryWarnings] = useState<Record<number, {
         available: number;
         required: number;
@@ -92,6 +96,15 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
     // Simple Yield: Total Input Qty vs Output Qty
     const totalInputQty = watchedInputs.reduce((sum, i) => sum + (Number(i.qty) || 0), 0);
     const yieldPercent = totalInputQty > 0 ? (watchedOutput / totalInputQty) * 100 : 0;
+
+    // Handler for waste widget changes
+    function handleWasteChange(state: WasteScaleState) {
+        setWasteState(state);
+        // Auto-update output qty in form
+        form.setValue('outputQty', state.outputQty, { shouldValidate: true });
+        form.setValue('wasteQty', state.wasteQty, { shouldValidate: true });
+        form.setValue('wasteReasons', state.wasteReasons, { shouldValidate: true });
+    }
 
     // Check inventory availability for a specific input
     async function checkInputAvailability(index: number) {
@@ -404,86 +417,55 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
 
                     {step === 3 && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                            <h2 className="text-2xl font-bold text-slate-900">Step 3: Output & Yield</h2>
-                            <p className="text-slate-500">Record final product weight.</p>
+                            <h2 className="text-2xl font-bold text-slate-900">Step 3: Output & Waste Recording</h2>
+                            <p className="text-slate-500">Record waste and calculate final output</p>
 
-                            <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
-                                <div className="w-full">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <label className="text-sm font-semibold text-slate-700 block">WIP Item</label>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                const current = form.getValues('outputItemId');
-                                                if (current === -1) {
-                                                    form.setValue('outputItemId', 0);
-                                                } else {
-                                                    form.setValue('outputItemId', -1);
-                                                }
-                                            }}
-                                            className="text-xs text-blue-600 font-medium hover:underline"
-                                        >
-                                            {form.watch('outputItemId') === -1 ? 'Select Existing' : '+ Create New Item'}
-                                        </button>
-                                    </div>
-
-                                    {form.watch('outputItemId') === -1 ? (
-                                        <input
-                                            {...form.register('outputItemName')}
-                                            className="w-full p-3 border rounded-lg text-lg bg-white"
-                                            placeholder="Enter New Finished Good Name"
-                                            autoFocus
-                                        />
-                                    ) : (
-                                        <select
-                                            {...form.register('outputItemId')}
-                                            className="w-full p-3 border rounded-lg text-lg bg-white"
-                                        >
-                                            <option value="0">Select Output Product</option>
-                                            {finishedGoods.map(i => (
-                                                <option key={i.id} value={i.id}>{i.name} ({i.sku})</option>
-                                            ))}
-                                        </select>
-                                    )}
+                            {/* Output Item Selection */}
+                            <div className="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="text-sm font-semibold text-slate-700 block">WIP Item</label>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const current = form.getValues('outputItemId');
+                                            if (current === -1) {
+                                                form.setValue('outputItemId', 0);
+                                            } else {
+                                                form.setValue('outputItemId', -1);
+                                            }
+                                        }}
+                                        className="text-xs text-blue-600 font-medium hover:underline"
+                                    >
+                                        {form.watch('outputItemId') === -1 ? 'Select Existing' : '+ Create New Item'}
+                                    </button>
                                 </div>
 
-                                <div className="w-full flex gap-4">
-                                    <div className="flex-1">
-                                        <label className="text-sm font-semibold text-slate-700 mb-2 block">Total Input (kg)</label>
-                                        <div className="text-2xl font-mono text-slate-500 bg-slate-200 p-3 rounded-lg text-center">
-                                            {totalInputQty.toFixed(2)}
-                                        </div>
-                                    </div>
-                                    <div className="flex-1">
-                                        <label className="text-sm font-semibold text-slate-700 mb-2 block">Final Output (kg)</label>
-                                        <input
-                                            type="number" step="0.001"
-                                            {...form.register('outputQty')}
-                                            className="w-full p-3 border rounded-lg text-center text-2xl font-bold font-mono text-blue-600 focus:ring-2 focus:ring-blue-200 outline-none"
-                                            placeholder="0.00"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Gauge / Yield Display */}
-                                <div className="w-full mt-4 p-4 bg-white border border-slate-200 rounded-lg">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <span className="text-sm font-medium text-slate-500">Calculated Yield</span>
-                                        <span className={`text-lg font-bold ${yieldPercent < 80 ? 'text-amber-500' : 'text-green-600'}`}>
-                                            {yieldPercent.toFixed(1)}%
-                                        </span>
-                                    </div>
-                                    <div className="w-full bg-slate-100 rounded-full h-3">
-                                        <div
-                                            className={`h-3 rounded-full transition-all duration-500 ${yieldPercent < 80 ? 'bg-amber-400' : 'bg-green-500'}`}
-                                            style={{ width: `${Math.min(yieldPercent, 100)}%` }}
-                                        />
-                                    </div>
-                                    <p className="text-xs text-slate-400 mt-2 text-center">
-                                        {form.watch('type') === 'SUBLIMATION' ? 'Expect ~10-15% Yield for Freeze Drying' : 'Expect ~95-100% Yield for Mixing'}
-                                    </p>
-                                </div>
+                                {form.watch('outputItemId') === -1 ? (
+                                    <input
+                                        {...form.register('outputItemName')}
+                                        className="w-full p-3 border rounded-lg text-lg bg-white"
+                                        placeholder="Enter New WIP Item Name"
+                                        autoFocus
+                                    />
+                                ) : (
+                                    <select
+                                        {...form.register('outputItemId')}
+                                        className="w-full p-3 border rounded-lg text-lg bg-white"
+                                    >
+                                        <option value="0">Select Output Product</option>
+                                        {finishedGoods.map(i => (
+                                            <option key={i.id} value={i.id}>{i.name} ({i.sku})</option>
+                                        ))}
+                                    </select>
+                                )}
                             </div>
+
+                            {/* Waste Scale Widget */}
+                            <WasteScaleWidget
+                                inputQty={totalInputQty}
+                                expectedWastePercent={form.watch('type') === 'SUBLIMATION' ? 85 : 5}
+                                onWasteStateChange={handleWasteChange}
+                            />
                         </div>
                     )}
 

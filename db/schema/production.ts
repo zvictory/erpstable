@@ -124,6 +124,10 @@ export const productionOutputs = sqliteTable('production_outputs', {
     // New batch number generated for this output
     batchNumber: text('batch_number').notNull(),
 
+    // Waste tracking
+    wasteQty: real('waste_qty').default(0).notNull(),
+    wasteReasons: text('waste_reasons'), // JSON string: '["contamination","trimming"]'
+
     ...timestampFields,
 });
 

@@ -39,6 +39,10 @@ const productionRunSchema = z.object({
     outputQty: z.coerce.number().min(0.001),
     costs: z.array(runCostSchema).optional(),
 
+    // Waste tracking (optional for backward compatibility)
+    wasteQty: z.coerce.number().min(0).default(0),
+    wasteReasons: z.array(z.string()).default([]),
+
     // Optional destination location (will auto-assign if not provided)
     destinationLocationId: z.coerce.number().optional(),
 });
@@ -254,6 +258,8 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
                 qty: val.outputQty,
                 unitCost: unitCost,
                 batchNumber: batchNum,
+                wasteQty: val.wasteQty,
+                wasteReasons: val.wasteReasons.length > 0 ? JSON.stringify(val.wasteReasons) : null,
             });
 
             // Create Inventory Layer for FG (with QC hold)
@@ -332,6 +338,15 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
                 fields: ['status', 'completedAt']
             }
         });
+
+        // Log waste if recorded
+        if (val.wasteQty > 0) {
+            const wastePercent = ((val.wasteQty / (val.outputQty + val.wasteQty)) * 100).toFixed(1);
+            console.log(`Production Run #${runId}: Waste ${val.wasteQty}kg (${wastePercent}%)`);
+            if (val.wasteReasons.length > 0) {
+                console.log(`  Reasons: ${val.wasteReasons.join(', ')}`);
+            }
+        }
 
         return { success: true, runId, batchNumber: batchNum };
     } catch (error: any) {
