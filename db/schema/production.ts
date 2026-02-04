@@ -13,6 +13,18 @@ const timestampFields = {
 
 // --- Tables ---
 
+// Production Stages: Templates for multi-stage production (e.g., Cleaning, Mixing, Sublimation)
+export const productionStages = sqliteTable('production_stages', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    name: text('name').notNull(), // e.g., 'Cleaning', 'Mixing', 'Sublimation'
+    description: text('description'),
+    sequenceNumber: integer('sequence_number').notNull(), // 1, 2, 3 (order in workflow)
+    expectedYieldPercent: real('expected_yield_percent').default(100).notNull(),
+    allowsIngredientAddition: integer('allows_ingredient_addition', { mode: 'boolean' }).default(false).notNull(),
+    isActive: integer('is_active', { mode: 'boolean' }).default(true).notNull(),
+    ...timestampFields,
+});
+
 // Production Recipes (Templates)
 export const recipes = sqliteTable('recipes', {
     id: integer('id').primaryKey({ autoIncrement: true }),
@@ -37,6 +49,8 @@ export const recipeItems = sqliteTable('recipe_items', {
 export const productionRuns = sqliteTable('production_runs', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     recipeId: integer('recipe_id').references(() => recipes.id), // Optional: links to recipe if recipe-based
+    stageId: integer('stage_id').references(() => productionStages.id), // Links to production stage for multi-stage workflows
+    parentRunId: integer('parent_run_id').references(() => productionRuns.id), // For multi-stage: link to previous stage
     date: integer('date', { mode: 'timestamp' }).notNull(),
     status: text('status', { enum: ['DRAFT', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'] }).default('DRAFT').notNull(),
     type: text('type', { enum: ['MIXING', 'SUBLIMATION'] }).notNull(),
@@ -45,6 +59,9 @@ export const productionRuns = sqliteTable('production_runs', {
     // Destination for output (where WIP goes after production)
     destinationLocationId: integer('destination_location_id')
         .references(() => warehouseLocations.id),
+
+    // For multi-stage: quantity consumed from parent run (reference only)
+    inputQty: real('input_qty'),
 
     ...timestampFields,
 });
@@ -240,9 +257,11 @@ export const productionRunChainMembers = sqliteTable('production_run_chain_membe
 
 // --- Relations ---
 
-
+// Relations are defined in relations.ts to avoid circular dependencies
 
 // --- Zod Schemas ---
+export const insertProductionStageSchema = createInsertSchema(productionStages);
+export const selectProductionStageSchema = createSelectSchema(productionStages);
 export const insertRecipeSchema = createInsertSchema(recipes);
 export const insertRecipeItemSchema = createInsertSchema(recipeItems);
 export const insertProductionRunSchema = createInsertSchema(productionRuns);

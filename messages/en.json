@@ -2329,7 +2329,7 @@
       "step_ingredients": "Ingredients",
       "step_operations": "Operations",
       "step_output_yield": "Output & Yield",
-      "run_type_label": "Run Type:",
+      "run_type_label": "Run Type",
       "production_types": {
         "mixing_liquid": "Mixing (Liquid)",
         "sublimation_freeze_dry": "Sublimation (Freeze Dry)"
@@ -2391,7 +2391,25 @@
       "start_new_run": "Start New Run",
       "production_chain_modal_title": "Production Chain",
       "validation_at_least_one_ingredient": "Please select at least one ingredient with quantity greater than 0",
-      "error_unexpected": "Unexpected error"
+      "error_unexpected": "Unexpected error",
+      "output_summary": "Output",
+      "continue_next_stage": "Continue to Next Stage?",
+      "select_stage": "Select Stage",
+      "choose_stage": "Choose a stage...",
+      "input_from_previous_stage": "Input from Previous Stage",
+      "input_from_previous_stage_readonly": "Read-only, from previous stage output",
+      "additional_ingredients": "Additional Ingredients (Optional)",
+      "stage_progression": {
+        "title": "Stage Progression",
+        "select_next": "Select Next Stage",
+        "base_input": "🔗 Input from Previous Stage",
+        "base_input_readonly": "Read-only, from {previousStageName} output"
+      },
+      "stages": {
+        "cleaning": "Cleaning",
+        "mixing": "Mixing",
+        "sublimation": "Sublimation"
+      }
     },
     "chain_tree": {
       "loading": "Loading production chain...",

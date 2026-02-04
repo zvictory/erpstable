@@ -5,7 +5,7 @@ import {
     productionRuns, productionInputs, productionOutputs, productionCosts,
     productionRunDependencies, productionRunChains, productionRunChainMembers,
     productionRunSteps, inventoryLayers, journalEntries, journalEntryLines,
-    items, recipes, warehouseLocations
+    items, recipes, warehouseLocations, productionStages
 } from '../../../db/schema';
 import { eq, sql, sum, and, inArray } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
@@ -126,7 +126,10 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
         // Variables to capture for post-transaction processing
         let batchNum = '';
         let runId = 0;
+        let stageId: number | null = null;
         let finalOutputItemId = val.outputItemId;
+        let outputQty = 0;
+        let outputItemName = '';
 
         await db.transaction(async (tx: any) => {
             // 0. Handle Item Auto-Creation
@@ -262,6 +265,10 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
                 wasteReasons: val.wasteReasons.length > 0 ? JSON.stringify(val.wasteReasons) : null,
             });
 
+            // Capture output info for response
+            outputQty = val.outputQty;
+            stageId = null; // Will be fetched after transaction if needed
+
             // Create Inventory Layer for FG (with QC hold)
             await tx.insert(inventoryLayers).values({
                 itemId: finalOutputItemId,
@@ -348,7 +355,22 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
             }
         }
 
-        return { success: true, runId, batchNumber: batchNum };
+        // Fetch output item name
+        const outputItem = await db.query.items.findFirst({
+            where: eq(items.id, finalOutputItemId),
+            columns: { name: true },
+        });
+
+        return {
+            success: true,
+            runId,
+            batchNumber: batchNum,
+            outputs: [{
+                qty: outputQty,
+                itemName: outputItem?.name || 'Output',
+            }],
+            stageId: null,
+        };
     } catch (error: any) {
         console.error('Commit Production Error:', error);
         return { success: false, error: error.message || 'Failed to commit production run' };
@@ -1406,5 +1428,215 @@ export async function getProductionRunWithSteps(runId: number) {
     } catch (error: any) {
         console.error('Get Production Run With Steps Error:', error);
         return null;
+    }
+}
+
+// --- Multi-Stage Production Actions ---
+
+/**
+ * Get available next stages for stage progression
+ * Returns stages that can follow the current stage based on sequence
+ */
+export async function getNextStageOptions(currentStageId: number) {
+    try {
+        const currentStage = await db.query.productionStages.findFirst({
+            where: eq(productionStages.id, currentStageId),
+        });
+
+        if (!currentStage) {
+            throw new Error('Current stage not found');
+        }
+
+        // Get all stages with higher sequence number
+        const nextStages = await db.query.productionStages.findMany({
+            where: and(
+                sql`sequence_number > ${currentStage.sequenceNumber}`,
+                eq(productionStages.isActive, true)
+            ),
+            orderBy: productionStages.sequenceNumber,
+        });
+
+        return nextStages;
+    } catch (error: any) {
+        console.error('Get Next Stage Options Error:', error);
+        throw error;
+    }
+}
+
+/**
+ * Create a new production run for the next stage
+ * Automatically links to parent run and pre-fills input from parent output
+ */
+export async function createNextStageRun(input: unknown) {
+    const schema = z.object({
+        previousRunId: z.coerce.number(),
+        nextStageId: z.coerce.number(),
+        nextType: z.enum(['MIXING', 'SUBLIMATION']),
+    });
+
+    const val = schema.parse(input);
+
+    try {
+        const session = await auth();
+        if (!session?.user) {
+            throw new Error('Unauthorized');
+        }
+
+        // Fetch previous run with output data
+        const previousRun = await db.query.productionRuns.findFirst({
+            where: eq(productionRuns.id, val.previousRunId),
+            with: {
+                outputs: true,
+                stage: true,
+            },
+        });
+
+        if (!previousRun) {
+            throw new Error('Previous production run not found');
+        }
+
+        if (previousRun.outputs.length === 0) {
+            throw new Error('Previous run has no outputs');
+        }
+
+        const previousOutput = previousRun.outputs[0];
+        const nextStage = await db.query.productionStages.findFirst({
+            where: eq(productionStages.id, val.nextStageId),
+        });
+
+        if (!nextStage) {
+            throw new Error('Next stage not found');
+        }
+
+        let newRunId = 0;
+        let baseInputQty = previousOutput.qty;
+        let baseInputItemId = previousOutput.itemId;
+
+        await db.transaction(async (tx: any) => {
+            // Create new production run for next stage
+            const [newRun] = await tx.insert(productionRuns).values({
+                stageId: val.nextStageId,
+                parentRunId: val.previousRunId,
+                date: new Date(),
+                type: val.nextType,
+                status: 'DRAFT',
+                inputQty: baseInputQty,
+                destinationLocationId: previousRun.destinationLocationId || undefined,
+            }).returning();
+
+            newRunId = newRun.id;
+
+            // Add production input from parent output (base input, read-only)
+            await tx.insert(productionInputs).values({
+                runId: newRun.id,
+                itemId: baseInputItemId,
+                qty: baseInputQty,
+                costBasis: previousOutput.unitCost,
+                totalCost: Math.round(baseInputQty * previousOutput.unitCost),
+            });
+        });
+
+        return {
+            success: true,
+            newRunId,
+            baseInputQty,
+            baseInputItem: {
+                id: baseInputItemId,
+                name: (await db.query.items.findFirst({ where: eq(items.id, baseInputItemId) }))?.name || 'Unknown',
+            },
+        };
+    } catch (error: any) {
+        console.error('Create Next Stage Run Error:', error);
+        throw error;
+    }
+}
+
+/**
+ * Get the complete production chain for a run
+ * Traces forward and backward through dependencies
+ */
+export async function getProductionPath(runId: number) {
+    try {
+        const run = await db.query.productionRuns.findFirst({
+            where: eq(productionRuns.id, runId),
+            with: {
+                stage: true,
+                outputs: true,
+                inputs: true,
+            },
+        });
+
+        if (!run) {
+            throw new Error('Production run not found');
+        }
+
+        const path: any[] = [];
+        let currentRun: any = run;
+
+        // Trace backwards to root run
+        while (currentRun) {
+            path.unshift({
+                stageId: currentRun.stageId,
+                stageName: currentRun.stage?.name || 'Stage',
+                runId: currentRun.id,
+                inputQty: currentRun.inputQty,
+                outputQty: currentRun.outputs[0]?.qty || 0,
+                waste: (currentRun.outputs[0]?.wasteQty) || 0,
+                costPerKg: currentRun.outputs[0]?.unitCost || 0,
+            });
+
+            if (currentRun.parentRunId) {
+                currentRun = await db.query.productionRuns.findFirst({
+                    where: eq(productionRuns.id, currentRun.parentRunId),
+                    with: {
+                        stage: true,
+                        outputs: true,
+                        inputs: true,
+                    },
+                });
+            } else {
+                currentRun = null;
+            }
+        }
+
+        // Trace forward to leaf runs
+        const traceForward = async (currentRunId: number, depth = 0): Promise<any[]> => {
+            if (depth > 10) return []; // Safety limit
+
+            const childRuns = await db.query.productionRuns.findMany({
+                where: eq(productionRuns.parentRunId, currentRunId),
+                with: {
+                    stage: true,
+                    outputs: true,
+                    inputs: true,
+                },
+            });
+
+            const results: any[] = [];
+            for (const child of childRuns) {
+                results.push({
+                    stageId: child.stageId,
+                    stageName: child.stage?.name || 'Stage',
+                    runId: child.id,
+                    inputQty: child.inputQty,
+                    outputQty: child.outputs[0]?.qty || 0,
+                    waste: (child.outputs[0]?.wasteQty) || 0,
+                    costPerKg: child.outputs[0]?.unitCost || 0,
+                });
+
+                const descendants = await traceForward(child.id, depth + 1);
+                results.push(...descendants);
+            }
+
+            return results;
+        };
+
+        const leafRuns = await traceForward(run.id);
+        const fullPath = path.concat(leafRuns);
+
+        return fullPath;
+    } catch (error: any) {
+        console.error('Get Production Path Error:', error);
+        throw error;
     }
 }

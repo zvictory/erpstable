@@ -41,7 +41,7 @@ import {
     recipes, recipeItems, productionRuns, productionRunSteps,
     productionInputs, productionOutputs, productionCosts,
     productionRunDependencies, productionLaborLogs,
-    productionRunChains, productionRunChainMembers
+    productionRunChains, productionRunChainMembers, productionStages
 } from './production';
 import { bomHeaders, bomItems } from './manufacturing_bom';
 
@@ -840,6 +840,10 @@ export const recipeItemsRelations = relations(recipeItems, ({ one }) => ({
 }));
 
 export const productionRunsRelations = relations(productionRuns, ({ one, many }) => ({
+    stage: one(productionStages, {
+        fields: [productionRuns.stageId],
+        references: [productionStages.id],
+    }),
     recipe: one(recipes, {
         fields: [productionRuns.recipeId],
         references: [recipes.id],

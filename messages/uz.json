@@ -2567,23 +2567,6 @@
       "complete_step": "Bosqichni yakunlash",
       "next_step": "Keyingi bosqich",
       "setup": {
-        "title": "Ishlab chiqarishni sozlash",
-        "select_recipe": "Retsept tanlash (ixtiyoriy)",
-        "production_type": "Ishlab chiqarish turi",
-        "configure_steps": "Bosqichlarni sozlash"
-      },
-      "weight_warning": {
-        "title": "Og'irlik farqi aniqlandi",
-        "message": "Haqiqiy chiqish kutilganidan farq qiladi. Iltimos, farqni tushuntiring.",
-        "expected": "Kutilgan",
-        "actual": "Haqiqiy",
-        "variance_pct": "Farq",
-        "reason": "Farq sababi",
-        "reason_placeholder": "Nima uchun chiqish kutilganidan farq qilishini tushuntiring (masalan, material yo'qotilishi, o'lchash xatosi va h.k.)",
-        "continue": "Davom etish",
-        "cancel": "Bekor qilish"
-      },
-      "setup": {
         "configure_description": "Ko'p bosqichli ishlab chiqarish jarayonini sozlang",
         "number_of_steps": "Bosqichlar soni",
         "expected_yield_label": "Kutilgan chiqish (%)",
@@ -2599,6 +2582,17 @@
         "success_message": "Ko'p bosqichli ishlab chiqarish jarayoni #{runId} muvaffaqiyatli tamomlandi.",
         "success_view_run": "Ishlab chiqarish jarayonini ko'rish",
         "success_start_new": "Yangi ishlab chiqarishni boshlash"
+      },
+      "weight_warning": {
+        "title": "Og'irlik farqi aniqlandi",
+        "message": "Haqiqiy chiqish kutilganidan farq qiladi. Iltimos, farqni tushuntiring.",
+        "expected": "Kutilgan",
+        "actual": "Haqiqiy",
+        "variance_pct": "Farq",
+        "reason": "Farq sababi",
+        "reason_placeholder": "Nima uchun chiqish kutilganidan farq qilishini tushuntiring (masalan, material yo'qotilishi, o'lchash xatosi va h.k.)",
+        "continue": "Davom etish",
+        "cancel": "Bekor qilish"
       }
     },
     "terminal": {
@@ -2608,7 +2602,7 @@
       "step_ingredients": "Ingrediyentlar",
       "step_operations": "Operatsiyalar",
       "step_output_yield": "Chiqish va hosil",
-      "run_type_label": "Jarayoni turi:",
+      "run_type_label": "Ishni turi",
       "production_types": {
         "mixing_liquid": "Aralashtirishrishtirish (suyuqlik)",
         "sublimation_freeze_dry": "Sublimatsiya (muzlab quritish)"
@@ -2670,7 +2664,25 @@
       "start_new_run": "Yangi jarayonni boshlash",
       "production_chain_modal_title": "Ishlab chiqarish zanjiri",
       "validation_at_least_one_ingredient": "Iltimos, miqdori 0 dan ortiq hech bo'lmaganda bir ingrediyentni tanlang",
-      "error_unexpected": "Kutilmagan xatolik"
+      "error_unexpected": "Kutilmagan xatolik",
+      "output_summary": "Chiqim",
+      "continue_next_stage": "Keyingi bosqichga davom etish?",
+      "select_stage": "Bosqichni tanlang",
+      "choose_stage": "Bosqichni tanlashtiring...",
+      "input_from_previous_stage": "Oldingi bosqichdan kirish",
+      "input_from_previous_stage_readonly": "Faqat o'qish, oldingi bosqich chiqimidan",
+      "additional_ingredients": "Qo'shimcha Ingredientlar (Ixtiyoriy)",
+      "stage_progression": {
+        "title": "Bosqich Rivojlanishi",
+        "select_next": "Keyingi bosqichni tanlang",
+        "base_input": "🔗 Oldingi bosqichdan kirish",
+        "base_input_readonly": "Faqat o'qish, {previousStageName} chiqimidan"
+      },
+      "stages": {
+        "cleaning": "Tozalash",
+        "mixing": "Aralash",
+        "sublimation": "Sublimatsiya"
+      }
     },
     "chain_tree": {
       "loading": "Ishlab chiqarish zanjiri yuklanmoqda...",

@@ -10,6 +10,7 @@ import { Loader2, ArrowRight, CheckCircle, Scale, Beaker, Zap, Save, X } from 'l
 import dynamic from 'next/dynamic';
 import { ProductionChainTree } from './ProductionChainTree';
 import WasteScaleWidget, { WasteScaleState } from '@/components/manufacturing/stage-execution/WasteScaleWidget';
+import { getNextStageOptions, createNextStageRun } from '@/app/actions/production';
 
 // --- Form Schema ---
 // Matches server action but adds UI specific fields if needed
@@ -64,6 +65,12 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
         required: number;
         shortage: number;
     }>>({});
+    const [nextStageOptions, setNextStageOptions] = useState<{ id: number; name: string; sequenceNumber: number }[]>([]);
+    const [selectedNextStageId, setSelectedNextStageId] = useState<number | null>(null);
+    const [selectedNextType, setSelectedNextType] = useState<'MIXING' | 'SUBLIMATION'>('MIXING');
+    const [isStartingNextStage, setIsStartingNextStage] = useState(false);
+    const [lastOutputQty, setLastOutputQty] = useState<number | null>(null);
+    const [lastOutputItemName, setLastOutputItemName] = useState<string | null>(null);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -104,6 +111,36 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
         form.setValue('outputQty', state.outputQty, { shouldValidate: true });
         form.setValue('wasteQty', state.wasteQty, { shouldValidate: true });
         form.setValue('wasteReasons', state.wasteReasons, { shouldValidate: true });
+    }
+
+    // Handler for starting next stage
+    async function handleStartNextStage() {
+        if (!selectedNextStageId || !lastRunId) {
+            setError('Please select a stage and ensure the run completed successfully');
+            return;
+        }
+
+        setIsStartingNextStage(true);
+        setError(null);
+
+        try {
+            const result = await createNextStageRun({
+                previousRunId: lastRunId,
+                nextStageId: selectedNextStageId,
+                nextType: selectedNextType,
+            });
+
+            if (result.success) {
+                // Reset form and load new run
+                window.location.href = `/production/terminal?runId=${result.newRunId}`;
+            } else {
+                setError('Failed to start next stage');
+            }
+        } catch (err: any) {
+            setError(err.message || 'Failed to start next stage');
+        } finally {
+            setIsStartingNextStage(false);
+        }
     }
 
     // Check inventory availability for a specific input
@@ -194,6 +231,21 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
                 setSuccess(true);
                 setLastRunId(res.runId || null);
                 setLastBatchNumber((res as any).batchNumber || null);
+
+                // Store output info for next stage display
+                if ((res as any).outputs && (res as any).outputs.length > 0) {
+                    setLastOutputQty((res as any).outputs[0].qty);
+                    setLastOutputItemName((res as any).outputs[0].itemName || 'Output');
+                }
+
+                // Load next stage options - for now, just load all stages as options
+                // In a real scenario, we'd determine which stages can follow based on workflow
+                try {
+                    const allStages = await getNextStageOptions(1); // Start with stage 1 as a placeholder
+                    setNextStageOptions(allStages);
+                } catch (err) {
+                    console.error('Failed to load next stages:', err);
+                }
                 // router.push('/production'); // or reset
             } else {
                 setError(res.error || 'Failed to commit run');
@@ -208,18 +260,74 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
     if (success) {
         return (
             <>
-                <div className="flex flex-col items-center justify-center p-12 text-center h-[50vh]">
+                <div className="flex flex-col items-center justify-center p-12 text-center min-h-screen">
                     <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4">
                         <CheckCircle size={32} />
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900">Run Completed!</h2>
                     <p className="text-slate-500 mt-2">Inventory updated and costs allocated.</p>
-                    {lastBatchNumber && (
-                        <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-lg">
-                            <span className="text-xs font-semibold text-blue-600 block uppercase tracking-wider">Generated Lot Number</span>
-                            <span className="text-lg font-mono font-bold text-blue-900">{lastBatchNumber}</span>
+
+                    {/* Output Summary */}
+                    {lastOutputQty && lastOutputItemName && (
+                        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div className="text-sm text-blue-600 font-semibold uppercase">Output</div>
+                            <div className="text-xl font-bold text-blue-900">{lastOutputQty}kg {lastOutputItemName}</div>
                         </div>
                     )}
+
+                    {lastBatchNumber && (
+                        <div className="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                            <span className="text-xs font-semibold text-slate-600 block uppercase tracking-wider">Generated Lot Number</span>
+                            <span className="text-lg font-mono font-bold text-slate-900">{lastBatchNumber}</span>
+                        </div>
+                    )}
+
+                    {/* Start Next Stage Section */}
+                    {nextStageOptions.length > 0 && (
+                        <div className="mt-8 w-full max-w-md">
+                            <div className="p-6 bg-amber-50 border border-amber-200 rounded-lg">
+                                <h3 className="text-lg font-semibold text-amber-900 mb-4">Continue to Next Stage?</h3>
+
+                                <div className="space-y-3">
+                                    <div>
+                                        <label className="text-sm font-semibold text-slate-700 block mb-2">Select Stage</label>
+                                        <select
+                                            value={selectedNextStageId || ''}
+                                            onChange={(e) => setSelectedNextStageId(Number(e.target.value))}
+                                            className="w-full p-2 border border-slate-300 rounded-lg text-sm bg-white"
+                                        >
+                                            <option value="">Choose a stage...</option>
+                                            {nextStageOptions.map(stage => (
+                                                <option key={stage.id} value={stage.id}>{stage.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-sm font-semibold text-slate-700 block mb-2">Run Type</label>
+                                        <select
+                                            value={selectedNextType}
+                                            onChange={(e) => setSelectedNextType(e.target.value as 'MIXING' | 'SUBLIMATION')}
+                                            className="w-full p-2 border border-slate-300 rounded-lg text-sm bg-white"
+                                        >
+                                            <option value="MIXING">Mixing (Liquid)</option>
+                                            <option value="SUBLIMATION">Sublimation (Freeze Dry)</option>
+                                        </select>
+                                    </div>
+
+                                    <button
+                                        onClick={handleStartNextStage}
+                                        disabled={!selectedNextStageId || isStartingNextStage}
+                                        className="w-full mt-4 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:bg-slate-300 font-semibold transition flex items-center justify-center gap-2"
+                                    >
+                                        {isStartingNextStage && <Loader2 className="animate-spin" size={18} />}
+                                        Start Stage 2
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="flex gap-3 mt-8">
                         {lastRunId && (
                             <button

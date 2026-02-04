@@ -2645,23 +2645,6 @@
       "complete_step": "Aşamayı Tamamla",
       "next_step": "Sonraki Aşama",
       "setup": {
-        "title": "Üretim Kurulumu",
-        "select_recipe": "Tarif Seç (İsteğe bağlı)",
-        "production_type": "Üretim Türü",
-        "configure_steps": "Aşamaları Yapılandır"
-      },
-      "weight_warning": {
-        "title": "Ağırlık Sapması Tespit Edildi",
-        "message": "Gerçek çıktı beklenenden farklı. Lütfen sapmayı açıklayın.",
-        "expected": "Beklenen",
-        "actual": "Gerçek",
-        "variance_pct": "Sapma",
-        "reason": "Sapma Nedeni",
-        "reason_placeholder": "Çıktının neden beklenenden farklı olduğunu açıklayın (örneğin, malzeme kaybı, ölçüm hatası, vb.)",
-        "continue": "Devam Et",
-        "cancel": "İptal"
-      },
-      "setup": {
         "configure_description": "Çok aşamalı üretim çalışmanızı yapılandırın",
         "number_of_steps": "Adım Sayısı",
         "expected_yield_label": "Beklenen Verim (%)",
@@ -2677,6 +2660,17 @@
         "success_message": "Çok aşamalı üretim çalışması #{runId} başarıyla tamamlandı.",
         "success_view_run": "Üretim Çalışmasını Görüntüle",
         "success_start_new": "Yeni Üretimi Başlat"
+      },
+      "weight_warning": {
+        "title": "Ağırlık Sapması Tespit Edildi",
+        "message": "Gerçek çıktı beklenenden farklı. Lütfen sapmayı açıklayın.",
+        "expected": "Beklenen",
+        "actual": "Gerçek",
+        "variance_pct": "Sapma",
+        "reason": "Sapma Nedeni",
+        "reason_placeholder": "Çıktının neden beklenenden farklı olduğunu açıklayın (örneğin, malzeme kaybı, ölçüm hatası, vb.)",
+        "continue": "Devam Et",
+        "cancel": "İptal"
       }
     },
     "terminal": {
@@ -2686,7 +2680,7 @@
       "step_ingredients": "Malzemeler",
       "step_operations": "Operasyonlar",
       "step_output_yield": "Çıktı ve Verim",
-      "run_type_label": "Çalışma Türü:",
+      "run_type_label": "Çalışma Türü",
       "production_types": {
         "mixing_liquid": "Karıştırma (Sıvı)",
         "sublimation_freeze_dry": "Süblimasyonİmitlastırma (Dondurarak Kurutma)"
@@ -2748,7 +2742,25 @@
       "start_new_run": "Yeni Çalışma Başlat",
       "production_chain_modal_title": "Üretim Zinciri",
       "validation_at_least_one_ingredient": "Lütfen miktarı 0'dan büyük en az bir malzeme seçin",
-      "error_unexpected": "Beklenmeyen Hata"
+      "error_unexpected": "Beklenmeyen Hata",
+      "output_summary": "Çıktı",
+      "continue_next_stage": "Sonraki Aşamaya Devam Etmek?",
+      "select_stage": "Aşama Seçin",
+      "choose_stage": "Bir aşama seçin...",
+      "input_from_previous_stage": "Önceki Aşamadan Giriş",
+      "input_from_previous_stage_readonly": "Salt okunur, önceki aşamanın çıktısından",
+      "additional_ingredients": "Ek Malzemeler (İsteğe Bağlı)",
+      "stage_progression": {
+        "title": "Aşama İlerleme",
+        "select_next": "Sonraki Aşamayı Seçin",
+        "base_input": "🔗 Önceki Aşamadan Giriş",
+        "base_input_readonly": "Salt okunur, {previousStageName} çıktısından"
+      },
+      "stages": {
+        "cleaning": "Temizleme",
+        "mixing": "Karıştırma",
+        "sublimation": "Sublimasyonu"
+      }
     },
     "chain_tree": {
       "loading": "Üretim zinciri yükleniyor...",
