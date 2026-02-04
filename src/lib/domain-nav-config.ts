@@ -129,6 +129,11 @@ export const DOMAIN_NAV_CONFIG = {
 
   production: [
     {
+      href: '/',
+      labelKey: 'home',
+      allowedRoles: PRODUCTION_ROLES,
+    },
+    {
       href: '/production',
       labelKey: 'overview',
       allowedRoles: PRODUCTION_ROLES,
