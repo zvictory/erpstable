@@ -80,11 +80,13 @@ const completeStepSchema = z.object({
 // --- Actions ---
 
 export async function commitProductionRun(data: z.infer<typeof productionRunSchema>) {
+    let destinationLocationId: number | undefined;
+
     try {
         const val = productionRunSchema.parse(data);
 
         // Auto-assign destination location if not provided
-        let destinationLocationId = val.destinationLocationId;
+        destinationLocationId = val.destinationLocationId;
 
         if (!destinationLocationId) {
             // Try to find a production location first
