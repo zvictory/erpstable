@@ -208,7 +208,7 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
                     // Track production dependency if this layer came from another production run
                     if (layer.sourceType === 'production_run' && layer.sourceId) {
                         await tx.insert(productionRunDependencies).values({
-                            parentRunId: run.id, // The run that created this WIP
+                            parentRunId: layer.sourceId, // The run that created this WIP
                             childRunId: run.id, // Current run consuming it
                             itemId: input.itemId,
                             qtyConsumed: Math.round(toTake * 100), // Convert to basis points (100 = 1.00)
