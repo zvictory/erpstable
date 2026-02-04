@@ -189,6 +189,22 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
                 throw new Error('No destination location available. Cannot create production run without a warehouse location.');
             }
 
+            // Verify location exists in this transaction context
+            const locationExists = await tx.query.warehouseLocations.findFirst({
+                where: eq(warehouseLocations.id, destinationLocationId),
+                columns: { id: true }
+            });
+
+            if (!locationExists) {
+                throw new Error(
+                    `❌ WAREHOUSE LOCATION NOT FOUND: Location #${destinationLocationId} does not exist.\n\n` +
+                    `This can happen if:\n` +
+                    `1. The location was deleted\n` +
+                    `2. Database is out of sync\n\n` +
+                    `Solution: Refresh the page and try again. If problem persists, create a new warehouse location.`
+                );
+            }
+
             const [run] = await tx.insert(productionRuns).values({
                 date: val.date,
                 type: val.type,
@@ -408,9 +424,31 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
     } catch (error: any) {
         console.error('Commit Production Error:', error);
         const errorMsg = error.message || 'Failed to commit production run';
-        const fullError = `${errorMsg}\n\nDetails: ${error.toString()}\n\nContext: inputs=${JSON.stringify(data.inputs)}, outputQty=${data.outputQty}, destinationLocationId=${destinationLocationId}`;
-        console.error('Full error context:', fullError);
-        return { success: false, error: fullError };
+
+        let userMessage = errorMsg;
+
+        // If it's still an FK error at this point, provide diagnostic info
+        if (error.message?.includes('FOREIGN KEY') || error.message?.includes('CONSTRAINT')) {
+            userMessage = `❌ DATABASE CONSTRAINT ERROR\n\n${errorMsg}\n\n` +
+                `This usually means:\n` +
+                `1. A referenced record doesn't exist\n` +
+                `2. Database tables are corrupted\n\n` +
+                `Diagnostic Info:\n` +
+                `- Inputs: ${JSON.stringify(data.inputs)}\n` +
+                `- Output Qty: ${data.outputQty}\n` +
+                `- Location ID: ${destinationLocationId}\n\n` +
+                `Solution: Refresh the page and try again, or contact support with this info.`;
+        }
+
+        console.error('Full error context:', {
+            error: error.toString(),
+            message: errorMsg,
+            inputs: data.inputs,
+            outputQty: data.outputQty,
+            destinationLocationId
+        });
+
+        return { success: false, error: userMessage };
     }
 }
 
