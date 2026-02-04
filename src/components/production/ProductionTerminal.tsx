@@ -15,13 +15,19 @@ interface ProductionTerminalProps {
     finishedGoods: { id: number; name: string; sku: string | null }[];
 }
 
-// Fruit-specific yield guidance (reference values)
-const FRUIT_YIELDS = {
+// Fruit-specific yield guidance (reference values by lowercase name)
+const FRUIT_YIELDS: Record<string, { cleaning: number; sublimation: number }> = {
     apple: { cleaning: 0.95, sublimation: 0.15 },
     banana: { cleaning: 0.92, sublimation: 0.20 },
     mango: { cleaning: 0.88, sublimation: 0.18 },
     strawberry: { cleaning: 0.90, sublimation: 0.12 },
     orange: { cleaning: 0.87, sublimation: 0.16 },
+};
+
+// Helper function to get yields by item name
+const getYieldGuidance = (itemName: string) => {
+    const lowerName = itemName.toLowerCase();
+    return FRUIT_YIELDS[lowerName] || null;
 };
 
 // Stage configuration
@@ -58,7 +64,8 @@ const STAGES = {
 // Stage-specific form schemas
 const cleaningSchema = z.object({
     date: z.coerce.date(),
-    fruitType: z.string().min(1, 'Select fruit type'),
+    fruitItemId: z.coerce.number().min(1, 'Select fruit type'),
+    fruitItemName: z.string().min(1, 'Select fruit type'),
     inputQty: z.coerce.number().min(0.001, 'Enter quantity'),
     outputQty: z.coerce.number().min(0.001, 'Enter output quantity'),
     wasteQty: z.coerce.number().min(0).default(0),
@@ -107,7 +114,8 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
         resolver: zodResolver(cleaningSchema),
         defaultValues: {
             date: new Date(),
-            fruitType: 'apple',
+            fruitItemId: rawMaterials[0]?.id || 0,
+            fruitItemName: rawMaterials[0]?.name || '',
             inputQty: 100,
             outputQty: 95,
             wasteQty: 5,
@@ -153,10 +161,10 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
             const result = await commitProductionRun({
                 date: data.date,
                 type: 'MIXING',
-                inputs: [{ itemId: 1, qty: data.inputQty }], // Placeholder raw material
+                inputs: [{ itemId: data.fruitItemId, qty: data.inputQty }],
                 costs: data.operatingCost > 0 ? [{ costType: 'Labor', amount: data.operatingCost }] : [],
                 outputItemId: -1,
-                outputItemName: `Cleaned ${data.fruitType}`,
+                outputItemName: `Cleaned ${data.fruitItemName}`,
                 outputQty: data.outputQty,
                 wasteQty: data.wasteQty,
                 wasteReasons: data.wasteReasons,
@@ -165,10 +173,10 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
 
             if (result.success) {
                 setLastRunId(result.runId);
-                setPreviousStagData({ outputQty: data.outputQty, itemName: `Cleaned ${data.fruitType}` });
+                setPreviousStagData({ outputQty: data.outputQty, itemName: `Cleaned ${data.fruitItemName}` });
                 setStage(2);
                 mixingForm.setValue('inputQty', data.outputQty);
-                mixingForm.setValue('inputFruitType', `Cleaned ${data.fruitType}`);
+                mixingForm.setValue('inputFruitType', `Cleaned ${data.fruitItemName}`);
                 mixingForm.setValue('outputQty', data.outputQty); // Start with same qty
             } else {
                 setError('Failed to complete cleaning stage');
@@ -352,14 +360,22 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-2">{t('fruit_type')}</label>
                             <select
-                                {...cleaningForm.register('fruitType')}
+                                {...cleaningForm.register('fruitItemId', {
+                                    onChange: (e) => {
+                                        const selectedItem = rawMaterials.find(item => item.id === parseInt(e.target.value));
+                                        if (selectedItem) {
+                                            cleaningForm.setValue('fruitItemName', selectedItem.name);
+                                        }
+                                    }
+                                })}
                                 className="w-full p-3 border rounded-lg bg-white"
                             >
-                                <option value="apple">Apple</option>
-                                <option value="banana">Banana</option>
-                                <option value="mango">Mango</option>
-                                <option value="strawberry">Strawberry</option>
-                                <option value="orange">Orange</option>
+                                <option value="">Select fruit type...</option>
+                                {rawMaterials.map((item) => (
+                                    <option key={item.id} value={item.id}>
+                                        {item.name}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div>
@@ -377,9 +393,13 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                         <div className="text-sm text-blue-700 font-semibold mb-2">{t('expected_yield_guidance')}</div>
                         <div className="text-blue-600">
-                            {cleaningForm.getValues('fruitType') && FRUIT_YIELDS[cleaningForm.getValues('fruitType') as keyof typeof FRUIT_YIELDS]
-                                ? `${cleaningForm.getValues('fruitType')}: ~${(FRUIT_YIELDS[cleaningForm.getValues('fruitType') as keyof typeof FRUIT_YIELDS].cleaning * 100).toFixed(0)}%`
-                                : 'Select fruit type for guidance'}
+                            {(() => {
+                                const fruitName = cleaningForm.getValues('fruitItemName');
+                                const yields = getYieldGuidance(fruitName);
+                                return yields
+                                    ? `${fruitName}: ~${(yields.cleaning * 100).toFixed(0)}%`
+                                    : 'Select fruit type for guidance';
+                            })()}
                         </div>
                     </div>
 
@@ -586,9 +606,13 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
                     <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                         <div className="text-sm text-amber-700 font-semibold mb-2">{t('expected_yield_guidance')}</div>
                         <div className="text-amber-600">
-                            {sublimationForm.getValues('inputFruitType') && sublimationForm.getValues('inputFruitType').includes('Apple')
-                                ? `Apple: ~15% ${t('yield_guidance')}`
-                                : 'Varies by fruit type'}
+                            {(() => {
+                                const fruitName = sublimationForm.getValues('inputFruitType');
+                                const yields = getYieldGuidance(fruitName);
+                                return yields
+                                    ? `${fruitName}: ~${(yields.sublimation * 100).toFixed(0)}% ${t('yield_guidance')}`
+                                    : 'Varies by fruit type';
+                            })()}
                         </div>
                     </div>
 
