@@ -2769,6 +2769,38 @@
       "no_chain_description": "Bu çalışma, önceki çalışmalardan WIP ürünlerini tüketmiş olmayabilir.",
       "production_chain_title": "Üretim Zinciri",
       "chain_description": "Bu çalışmaya beslenen tüm üretim çalışmalarını gösterir (çok aşamalı üretim)"
+    },
+    "workflow": {
+      "stage_1_cleaning": "Aşama 1: Meyve Temizleme",
+      "stage_1_description": "Meyvenin kabuğunun soyulması ve düzeltilmesi",
+      "stage_2_mixing": "Aşama 2: Karıştırma",
+      "stage_2_description": "Temizlenmiş meyveler ile diğer malzemelerin karıştırılması",
+      "stage_3_sublimation": "Aşama 3: Sublimation",
+      "stage_3_description": "Karıştırılmış ürünün freeze kurutma ile kurutulması",
+      "fruit_type": "Meyve Türü",
+      "input_qty_kg": "Giriş Miktarı (kg)",
+      "output_qty_kg": "Çıkış Miktarı (kg)",
+      "waste_qty_kg": "Atık Miktarı (kg)",
+      "waste_reasons": "Atık Nedenleri",
+      "expected_yield_guidance": "Beklenen Verim (kılavuz)",
+      "expected_yield_mixing": "Beklenen Verim (karıştırma)",
+      "no_waste_expected": "atık beklenmez",
+      "estimated": "Tahmini",
+      "operating_cost_uzs": "İşletme Maliyeti (UZS)",
+      "add_ingredients": "Malzemeleri Ekle",
+      "add_ingredient": "Malzeme Ekle",
+      "complete_stage": "Aşamayı Tamamla",
+      "finish_workflow": "İş Akışını Tamamla",
+      "workflow_complete": "İş Akışı Tamamlandı!",
+      "all_stages_finished": "Tüm aşamalar başarıyla tamamlandı",
+      "view_chain": "Zinciri Görüntüle",
+      "start_new_workflow": "Yeni İş Akışını Başlat",
+      "production_chain": "Üretim Zinciri",
+      "input_from_previous": "🔗 Önceki Aşamadan Giriş",
+      "freeze_drying_params": "❄️ Freeze Kurutma Parametreleri",
+      "duration_hours": "Süre (saat)",
+      "yield_guidance": "verim",
+      "workflow_progress": "İş Akışı Ilerlemesi"
     }
   }
 }

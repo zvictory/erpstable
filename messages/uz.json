@@ -2691,6 +2691,38 @@
       "no_chain_description": "Bu jarayoni oldingi jarayonlardan WIP mahsulotlarini iste'mol qilmagan bo'lishi mumkin.",
       "production_chain_title": "Ishlab chiqarish zanjiri",
       "chain_description": "Bu jarayonga oqim bo'lgan barcha ishlab chiqarish jarayonlarini ko'rsatadi (ko'p bosqichli ishlab chiqarish)"
+    },
+    "workflow": {
+      "stage_1_cleaning": "1-bosqich: Mevalarni Tozalash",
+      "stage_1_description": "Mevalarnı postlogidan ozalsh va obiy tashlash",
+      "stage_2_mixing": "2-bosqich: Aralashtirilsh",
+      "stage_2_description": "Tozalangan mevalarnı boshqa ingredientlar bilan aralashtirlsh",
+      "stage_3_sublimation": "3-bosqich: Sublimatsiya",
+      "stage_3_description": "Aralashtirilgan mahsulotni suvga otkazish orqali quritish",
+      "fruit_type": "Meva Turi",
+      "input_qty_kg": "Kirish Miqdori (kg)",
+      "output_qty_kg": "Chiqish Miqdori (kg)",
+      "waste_qty_kg": "Chiqindi Miqdori (kg)",
+      "waste_reasons": "Chiqindi Sabablari",
+      "expected_yield_guidance": "Kutilgan Chiqish (yoriqnoma)",
+      "expected_yield_mixing": "Kutilgan Chiqish (aralashtirlsh)",
+      "no_waste_expected": "chiqindi kutilmaydi",
+      "estimated": "Taxminiy",
+      "operating_cost_uzs": "Ishchil Xarajati (UZS)",
+      "add_ingredients": "Ingredientlar Qoshing",
+      "add_ingredient": "Ingredient Qoshing",
+      "complete_stage": "Bosqichni Tugatish",
+      "finish_workflow": "Iş Oqimini Tugatish",
+      "workflow_complete": "Iş Oqimi Tugatildi!",
+      "all_stages_finished": "Barcha bosqichlar muvaffaqiyatli tugatildi",
+      "view_chain": "Zanjirni Koring",
+      "start_new_workflow": "Yangi Iş Oqimini Boshlash",
+      "production_chain": "Ishlab Chiqarish Zanjiri",
+      "input_from_previous": "🔗 Oldingi Bosqichdan Kirish",
+      "freeze_drying_params": "❄️ Suvga Otkazish Parametrlari",
+      "duration_hours": "Davomiyligi (soatlar)",
+      "yield_guidance": "chiqish",
+      "workflow_progress": "Iş Oqimi Taraqqiyoti"
     }
   }
 }
