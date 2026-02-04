@@ -153,6 +153,8 @@
       "bills": "Tedarikçi Faturaları"
     },
     "documents": {
+      "new_bill": "Yeni Fatura",
+      "edit_bill": "Faturayı Düzenle",
       "fields": {
         "date": "Tarih",
         "type": "Tür",
@@ -162,8 +164,84 @@
         "action": "İşlem",
         "edit": "Düzenle",
         "delete": "Sil",
-        "view": "Görüntüle"
+        "view": "Görüntüle",
+        "vendor": "Tedarikçi",
+        "bill_number": "Fatura Numarası",
+        "invoice_placeholder": "Fatura #",
+        "ref_number": "Referans Numarası",
+        "payment_terms": "Ödeme Koşulları",
+        "memo": "Not",
+        "memo_placeholder": "Bu fatura hakkında not ekleyin...",
+        "draft": "Taslak",
+        "total": "Toplam",
+        "unknown_vendor": "Bilinmeyen Tedarikçi",
+        "warehouse_receiving": "Depo / Alım",
+        "loading_items": "Ürünler yükleniyor...",
+        "select_warehouse": "Depo seçin",
+        "bay_optional": "Bölme (İsteğe Bağlı)",
+        "auto_select": "Otomatik Seç"
+      },
+      "bills": {
+        "form": {
+          "error_items_required": "Miktarı olan en az bir ürün gereklidir",
+          "error_failed": "Fatura kaydedilemedi",
+          "error_unexpected": "Beklenmeyen bir hata oluştu"
+        }
+      },
+      "payment_terms_options": {
+        "due_on_receipt": "Alındığında Ödenmesi Gerekir"
       }
+    },
+    "modals": {
+      "delete_bill": {
+        "title": "Faturayı Sil",
+        "warnings": {
+          "paid": "Fatura Ödendi",
+          "paid_unusual": "Fatura ödendi olarak işaretlenmiştir. Silinmesi ödeme işleminin tersine çevrilmesini gerektirecektir.",
+          "paid_reasons": {
+            "incorrect": "Yanlış giriş",
+            "error": "Veri girişi hatası",
+            "credit": "Alacak notu veya iade"
+          },
+          "paid_advice": "Yalnızca ödeme hata olarak kaydedildiyse devam edin.",
+          "partial": "Fatura Kısmen Ödendi",
+          "partial_info": "Yalnızca ödenmemiş kısım kaldırılacaktır. Ödenen kısım, ödeme tersine çevrilene kadar ödenecek hesaplarda kalır."
+        },
+        "details": {
+          "bill_number": "Fatura #",
+          "amount": "Tutar",
+          "status": "Durum"
+        },
+        "consequences": {
+          "title": "Bu işlem:",
+          "delete_bill": "Faturayı ve tüm satır öğelerini silecektir",
+          "reverse_gl": "Tüm muhasebe defteri girişlerini tersine çevirecektir",
+          "update_balance": "Tedarikçi ve hesap bakiyelerini güncelleyecektir"
+        },
+        "checkbox_label": "Sonuçlarını anlıyorum ve bu faturayı silmek istiyorum",
+        "button_confirm": "Faturayı Sil"
+      }
+    },
+    "payment_modal": {
+      "title": "Ödemeyi Kaydet",
+      "paying_bill": "Fatura Ödeniyor",
+      "amount": "Ödenecek Tutar",
+      "to": "Kime",
+      "payment_date": "Ödeme Tarihi",
+      "bank_account": "Banka Hesabından",
+      "reference": "Ödeme Referansı",
+      "confirm_payment": "Ödemeyi Kaydet"
+    },
+    "bill_approval": {
+      "amount_label": "Tutar",
+      "pending_approval": "Onay Bekleniyor",
+      "waiting_approval": "Onay bekleniyor",
+      "processing": "İşleniyor",
+      "approve": "Onayla",
+      "reject": "Reddet",
+      "approved": "Onaylandı",
+      "rejected": "Reddedildi",
+      "rejected_message": "Bu fatura reddedildi"
     },
     "vendors": {
       "title": "Kontrol Paneli",

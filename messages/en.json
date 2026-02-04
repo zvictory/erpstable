@@ -211,6 +211,8 @@
       "bills": "Bills"
     },
     "documents": {
+      "new_bill": "New Bill",
+      "edit_bill": "Edit Bill",
       "fields": {
         "date": "Date",
         "type": "Type",
@@ -220,8 +222,84 @@
         "action": "Action",
         "edit": "Edit",
         "delete": "Delete",
-        "view": "View"
+        "view": "View",
+        "vendor": "Vendor",
+        "bill_number": "Bill Number",
+        "invoice_placeholder": "Invoice #",
+        "ref_number": "Reference Number",
+        "payment_terms": "Payment Terms",
+        "memo": "Memo",
+        "memo_placeholder": "Add notes about this bill...",
+        "draft": "Draft",
+        "total": "Total",
+        "unknown_vendor": "Unknown Vendor",
+        "warehouse_receiving": "Warehouse / Receiving",
+        "loading_items": "Loading items...",
+        "select_warehouse": "Select warehouse",
+        "bay_optional": "Bay (Optional)",
+        "auto_select": "Auto-select"
+      },
+      "bills": {
+        "form": {
+          "error_items_required": "At least one item with quantity is required",
+          "error_failed": "Failed to save bill",
+          "error_unexpected": "An unexpected error occurred"
+        }
+      },
+      "payment_terms_options": {
+        "due_on_receipt": "Due on Receipt"
       }
+    },
+    "modals": {
+      "delete_bill": {
+        "title": "Delete Bill",
+        "warnings": {
+          "paid": "Bill is Paid",
+          "paid_unusual": "This bill has been marked as paid. Deleting it will require reversing the payment transaction.",
+          "paid_reasons": {
+            "incorrect": "Incorrect entry",
+            "error": "Data entry error",
+            "credit": "Credit memo or return"
+          },
+          "paid_advice": "Proceed only if the payment was recorded in error.",
+          "partial": "Bill is Partially Paid",
+          "partial_info": "Only the unpaid portion will be removed. The paid portion remains in accounts payable until payment is reversed."
+        },
+        "details": {
+          "bill_number": "Bill #",
+          "amount": "Amount",
+          "status": "Status"
+        },
+        "consequences": {
+          "title": "This action will:",
+          "delete_bill": "Delete the bill and all its line items",
+          "reverse_gl": "Reverse all general ledger entries",
+          "update_balance": "Update vendor and account balances"
+        },
+        "checkbox_label": "I understand the consequences and want to delete this bill",
+        "button_confirm": "Delete Bill"
+      }
+    },
+    "payment_modal": {
+      "title": "Record Payment",
+      "paying_bill": "Paying Bill",
+      "amount": "Amount to Pay",
+      "to": "To",
+      "payment_date": "Payment Date",
+      "bank_account": "From Bank Account",
+      "reference": "Payment Reference",
+      "confirm_payment": "Record Payment"
+    },
+    "bill_approval": {
+      "amount_label": "Amount",
+      "pending_approval": "Pending Approval",
+      "waiting_approval": "Awaiting approval",
+      "processing": "Processing",
+      "approve": "Approve",
+      "reject": "Reject",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "rejected_message": "This bill was rejected"
     },
     "vendors": {
       "title": "Dashboard",

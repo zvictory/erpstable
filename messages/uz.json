@@ -153,6 +153,8 @@
       "bills": "Yetkazib beruvchi hisobnomalari"
     },
     "documents": {
+      "new_bill": "Yangi schyot",
+      "edit_bill": "Schyotni tahrirlash",
       "fields": {
         "date": "Sana",
         "type": "Turi",
@@ -162,8 +164,84 @@
         "action": "Harakat",
         "edit": "Tahrirlash",
         "delete": "O'chirish",
-        "view": "Ko'rish"
+        "view": "Ko'rish",
+        "vendor": "Yetkazib beruvchi",
+        "bill_number": "Schyot raqami",
+        "invoice_placeholder": "Schyot №",
+        "ref_number": "Mos raqam",
+        "payment_terms": "To'lov shartlari",
+        "memo": "Eslatma",
+        "memo_placeholder": "Schyot haqida eslatma qoshing...",
+        "draft": "Qoralama",
+        "total": "Jami",
+        "unknown_vendor": "Noma'lum yetkazib beruvchi",
+        "warehouse_receiving": "Ombor / Qabul qilish",
+        "loading_items": "Mahsulotlar yuklanmoqda...",
+        "select_warehouse": "Omborni tanlang",
+        "bay_optional": "Kanal (Ixtiyoriy)",
+        "auto_select": "Avtomatik tanlash"
+      },
+      "bills": {
+        "form": {
+          "error_items_required": "Miqdori bilan kamida bitta mahsulot talab qilinadi",
+          "error_failed": "Schyotni saqlash muvaffaq bo'lmadi",
+          "error_unexpected": "Kutilmagan xatolik yuz berdi"
+        }
+      },
+      "payment_terms_options": {
+        "due_on_receipt": "Qabul qilinganda"
       }
+    },
+    "modals": {
+      "delete_bill": {
+        "title": "Schyotni o'chirish",
+        "warnings": {
+          "paid": "Schyot to'langan",
+          "paid_unusual": "Schyot to'langan deb belgilangan. Uni o'chirish to'lov tranzaksiyasini bekor qilishni talab qiladi.",
+          "paid_reasons": {
+            "incorrect": "Noto'g'ri yozuv",
+            "error": "Ma'lumot kiritish xatosi",
+            "credit": "Kredit noti yoki qaytarish"
+          },
+          "paid_advice": "Faqat to'lov xatosi bilan qayd etilgan bo'lsa davom eting.",
+          "partial": "Schyot qisman to'langan",
+          "partial_info": "Faqat to'lanmagan qismi o'chiriladi. To'langan qismi to'lov bekor qilingunga qadar hisoblashlar 2000 da qoladi."
+        },
+        "details": {
+          "bill_number": "Schyot №",
+          "amount": "Miqdori",
+          "status": "Holati"
+        },
+        "consequences": {
+          "title": "Bu amal:",
+          "delete_bill": "Schyot va uning barcha satrlarini o'chirish",
+          "reverse_gl": "Barcha umuman daftari yozuvlarini bekor qilish",
+          "update_balance": "Yetkazib beruvchi va hisob qoldiqlari yangilash"
+        },
+        "checkbox_label": "Men oqibatlarini tushunaman va bu schyotni o'chirishni xohlayman",
+        "button_confirm": "Schyotni o'chirish"
+      }
+    },
+    "payment_modal": {
+      "title": "To'lovni qayd qilish",
+      "paying_bill": "Schyot to'lanmoqda",
+      "amount": "To'lov miqdori",
+      "to": "Ga",
+      "payment_date": "To'lov sanasi",
+      "bank_account": "Bank hisobidan",
+      "reference": "To'lov havolasi",
+      "confirm_payment": "To'lovni qayd qilish"
+    },
+    "bill_approval": {
+      "amount_label": "Miqdori",
+      "pending_approval": "Tasdiqlashni kutmoqda",
+      "waiting_approval": "Tasdiqlashni kutmoqda",
+      "processing": "Qayta ishlash",
+      "approve": "Tasdiqlash",
+      "reject": "Rad etish",
+      "approved": "Tasdiqlangan",
+      "rejected": "Rad etilgan",
+      "rejected_message": "Bu schyot rad etildi"
     },
     "vendors": {
       "title": "Boshqaruv paneli",
