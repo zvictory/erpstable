@@ -89,6 +89,8 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
         destinationLocationId = val.destinationLocationId;
 
         if (!destinationLocationId) {
+            console.log('Looking for warehouse location...');
+
             // Try to find a production location first
             let productionLocation = await db.query.warehouseLocations.findFirst({
                 where: and(
@@ -111,9 +113,14 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
 
             if (productionLocation) {
                 destinationLocationId = productionLocation.id;
+                console.log(`✓ Using warehouse location: ${productionLocation.id}`);
             } else {
                 // If no location exists at all, throw an error
-                throw new Error('No warehouse location available. Please create a location first.');
+                throw new Error(
+                    `❌ NO WAREHOUSE LOCATION FOUND\n\n` +
+                    `Your system has no warehouse locations set up.\n\n` +
+                    `Solution: Go to Warehouse Management and create at least one location, then try again.`
+                );
             }
         }
 
@@ -142,7 +149,14 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
                 columns: { id: true, name: true }
             });
             if (!inputItem) {
-                throw new Error(`Input item #${input.itemId} does not exist in database. Please create the item first.`);
+                throw new Error(
+                    `❌ INPUT ITEM NOT FOUND: Item #${input.itemId} does not exist in your database.\n\n` +
+                    `This usually means:\n` +
+                    `1. The item was deleted from inventory\n` +
+                    `2. The item ID is incorrect\n` +
+                    `3. You need to add raw materials first\n\n` +
+                    `Solution: Go to Inventory Management and create a raw material item, then try again.`
+                );
             }
             console.log(`✓ Input item exists: ${inputItem.name} (ID: ${inputItem.id})`);
         }
