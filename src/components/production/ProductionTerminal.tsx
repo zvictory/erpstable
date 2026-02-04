@@ -1,633 +1,675 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { commitProductionRun, checkInventoryAvailability } from '@/app/actions/production';
+import { commitProductionRun, createNextStageRun } from '@/app/actions/production';
 import { useRouter } from 'next/navigation';
-import { Loader2, ArrowRight, CheckCircle, Scale, Beaker, Zap, Save, X } from 'lucide-react';
-import dynamic from 'next/dynamic';
+import { Loader2, CheckCircle, ArrowRight, ChevronRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { ProductionChainTree } from './ProductionChainTree';
-import WasteScaleWidget, { WasteScaleState } from '@/components/manufacturing/stage-execution/WasteScaleWidget';
-import { getNextStageOptions, createNextStageRun } from '@/app/actions/production';
-
-// --- Form Schema ---
-// Matches server action but adds UI specific fields if needed
-const formSchema = z.object({
-    date: z.coerce.date(),
-    type: z.enum(['MIXING', 'SUBLIMATION']),
-    inputs: z.array(z.object({
-        itemId: z.coerce.number().min(1, "Select Item"),
-        qty: z.coerce.number().min(0.001, "Qty required"),
-    })).min(1, "At least one ingredient"),
-    costs: z.array(z.object({
-        costType: z.string().min(1, "Type required"),
-        amount: z.coerce.number().min(0),
-    })),
-    outputItemId: z.coerce.number(),
-    outputItemName: z.string().optional(),
-    outputQty: z.coerce.number().min(0.001, "Output Qty Required"),
-    wasteQty: z.coerce.number().min(0).default(0),
-    wasteReasons: z.array(z.string()).default([]),
-});
-
-type FormValues = z.infer<typeof formSchema>;
 
 interface ProductionTerminalProps {
     rawMaterials: { id: number; name: string; sku: string | null; itemClass?: string }[];
     finishedGoods: { id: number; name: string; sku: string | null }[];
 }
 
-// Helper to get icon for item class
-function getItemClassIcon(itemClass?: string): string {
-    const icons = {
-        RAW_MATERIAL: '📦',
-        WIP: '🏭',
-        FINISHED_GOODS: '✅',
-        SERVICE: '🔧'
-    };
-    return icons[itemClass as keyof typeof icons] || '📦';
-}
+// Fruit-specific yield guidance (reference values)
+const FRUIT_YIELDS = {
+    apple: { cleaning: 0.95, sublimation: 0.15 },
+    banana: { cleaning: 0.92, sublimation: 0.20 },
+    mango: { cleaning: 0.88, sublimation: 0.18 },
+    strawberry: { cleaning: 0.90, sublimation: 0.12 },
+    orange: { cleaning: 0.87, sublimation: 0.16 },
+};
+
+// Stage configuration
+const STAGES = {
+    1: {
+        id: 1,
+        title: 'Cleaning',
+        icon: '🧹',
+        description: 'Peeling and trimming',
+        expectedYield: 'varies', // Fruit-specific
+        allowAdditionalIngredients: false,
+        wasteReasons: ['trimming', 'contamination', 'spoilage'],
+    },
+    2: {
+        id: 2,
+        title: 'Mixing',
+        icon: '🥣',
+        description: 'Blending with ingredients',
+        expectedYield: 1.0, // FIXED: 100% yield, no waste
+        allowAdditionalIngredients: true,
+        wasteReasons: [],
+    },
+    3: {
+        id: 3,
+        title: 'Sublimation',
+        icon: '❄️',
+        description: 'Freeze drying',
+        expectedYield: 'varies', // Fruit-specific
+        allowAdditionalIngredients: false,
+        wasteReasons: ['spillage', 'moisture_loss'],
+    },
+};
+
+// Stage-specific form schemas
+const cleaningSchema = z.object({
+    date: z.coerce.date(),
+    fruitType: z.string().min(1, 'Select fruit type'),
+    inputQty: z.coerce.number().min(0.001, 'Enter quantity'),
+    outputQty: z.coerce.number().min(0.001, 'Enter output quantity'),
+    wasteQty: z.coerce.number().min(0).default(0),
+    wasteReasons: z.array(z.string()).default([]),
+    operatingCost: z.coerce.number().min(0).default(0),
+});
+
+const mixingSchema = z.object({
+    date: z.coerce.date(),
+    inputQty: z.coerce.number().min(0.001),
+    inputFruitType: z.string(),
+    ingredients: z.array(z.object({
+        itemId: z.coerce.number().min(1, 'Select ingredient'),
+        qty: z.coerce.number().min(0.001, 'Enter quantity'),
+    })).min(0), // Optional ingredients
+    outputQty: z.coerce.number().min(0.001, 'Enter output quantity'),
+    wasteQty: z.coerce.number().min(0).default(0),
+    wasteReasons: z.array(z.string()).default([]),
+    operatingCost: z.coerce.number().min(0).default(0),
+});
+
+const sublimationSchema = z.object({
+    date: z.coerce.date(),
+    inputQty: z.coerce.number().min(0.001),
+    inputFruitType: z.string(),
+    durationHours: z.coerce.number().min(1).max(24).default(12),
+    outputQty: z.coerce.number().min(0.001, 'Enter output quantity'),
+    wasteQty: z.coerce.number().min(0).default(0),
+    wasteReasons: z.array(z.string()).default([]),
+    operatingCost: z.coerce.number().min(0).default(0),
+});
 
 export default function ProductionTerminal({ rawMaterials, finishedGoods }: ProductionTerminalProps) {
+    const t = useTranslations('production.workflow');
     const router = useRouter();
-    const [step, setStep] = useState(1);
+    const [stage, setStage] = useState<1 | 2 | 3>(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
-    const [lastRunId, setLastRunId] = useState<number | null>(null);
-    const [lastBatchNumber, setLastBatchNumber] = useState<string | null>(null);
     const [showChain, setShowChain] = useState(false);
-    const [wasteState, setWasteState] = useState<WasteScaleState | null>(null);
-    const [inventoryWarnings, setInventoryWarnings] = useState<Record<number, {
-        available: number;
-        required: number;
-        shortage: number;
-    }>>({});
-    const [nextStageOptions, setNextStageOptions] = useState<{ id: number; name: string; sequenceNumber: number }[]>([]);
-    const [selectedNextStageId, setSelectedNextStageId] = useState<number | null>(null);
-    const [selectedNextType, setSelectedNextType] = useState<'MIXING' | 'SUBLIMATION'>('MIXING');
-    const [isStartingNextStage, setIsStartingNextStage] = useState(false);
-    const [lastOutputQty, setLastOutputQty] = useState<number | null>(null);
-    const [lastOutputItemName, setLastOutputItemName] = useState<string | null>(null);
+    const [lastRunId, setLastRunId] = useState<number | null>(null);
+    const [previousStagData, setPreviousStagData] = useState<{ outputQty: number; itemName: string } | null>(null);
 
-    const form = useForm<FormValues>({
-        resolver: zodResolver(formSchema),
-        mode: 'onChange', // Enable onChange validation for better UX
+    // Stage 1: Cleaning
+    const cleaningForm = useForm({
+        resolver: zodResolver(cleaningSchema),
         defaultValues: {
             date: new Date(),
-            type: 'MIXING',
-            inputs: [{ itemId: 0, qty: 0 }],
-            costs: [{ costType: 'Electricity', amount: 0 }],
-            outputItemId: 0,
-            outputItemName: '',
-            outputQty: 0
-        }
+            fruitType: 'apple',
+            inputQty: 100,
+            outputQty: 95,
+            wasteQty: 5,
+            wasteReasons: ['trimming'],
+            operatingCost: 100,
+        },
     });
 
-    const { fields: inputFields, append: appendInput, remove: removeInput } = useFieldArray({
-        control: form.control,
-        name: "inputs"
+    // Stage 2: Mixing
+    const mixingForm = useForm({
+        resolver: zodResolver(mixingSchema),
+        defaultValues: {
+            date: new Date(),
+            inputQty: 95,
+            inputFruitType: 'Peeled Apple',
+            ingredients: [],
+            outputQty: 95,
+            wasteQty: 0,
+            wasteReasons: [],
+            operatingCost: 50,
+        },
     });
 
-    const { fields: costFields, append: appendCost, remove: removeCost } = useFieldArray({
-        control: form.control,
-        name: "costs"
+    // Stage 3: Sublimation
+    const sublimationForm = useForm({
+        resolver: zodResolver(sublimationSchema),
+        defaultValues: {
+            date: new Date(),
+            inputQty: 95,
+            inputFruitType: 'Mixed Apple',
+            durationHours: 12,
+            outputQty: 15,
+            wasteQty: 80,
+            wasteReasons: ['moisture_loss'],
+            operatingCost: 500,
+        },
     });
 
-    // Watch values for Yield Calculation
-    const watchedInputs = form.watch("inputs");
-    const watchedOutput = form.watch("outputQty");
-
-    // Simple Yield: Total Input Qty vs Output Qty
-    const totalInputQty = watchedInputs.reduce((sum, i) => sum + (Number(i.qty) || 0), 0);
-    const yieldPercent = totalInputQty > 0 ? (watchedOutput / totalInputQty) * 100 : 0;
-
-    // Handler for waste widget changes
-    function handleWasteChange(state: WasteScaleState) {
-        setWasteState(state);
-        // Auto-update output qty in form
-        form.setValue('outputQty', state.outputQty, { shouldValidate: true });
-        form.setValue('wasteQty', state.wasteQty, { shouldValidate: true });
-        form.setValue('wasteReasons', state.wasteReasons, { shouldValidate: true });
-    }
-
-    // Handler for starting next stage
-    async function handleStartNextStage() {
-        if (!selectedNextStageId || !lastRunId) {
-            setError('Please select a stage and ensure the run completed successfully');
-            return;
-        }
-
-        setIsStartingNextStage(true);
-        setError(null);
-
-        try {
-            const result = await createNextStageRun({
-                previousRunId: lastRunId,
-                nextStageId: selectedNextStageId,
-                nextType: selectedNextType,
-            });
-
-            if (result.success) {
-                // Reset form and load new run
-                window.location.href = `/production/terminal?runId=${result.newRunId}`;
-            } else {
-                setError('Failed to start next stage');
-            }
-        } catch (err: any) {
-            setError(err.message || 'Failed to start next stage');
-        } finally {
-            setIsStartingNextStage(false);
-        }
-    }
-
-    // Check inventory availability for a specific input
-    async function checkInputAvailability(index: number) {
-        const input = form.getValues(`inputs.${index}`);
-
-        // Convert to numbers explicitly
-        const itemId = Number(input.itemId);
-        const qty = Number(input.qty);
-
-        if (!itemId || itemId === 0 || !qty || qty <= 0) {
-            // Clear warning if no selection
-            setInventoryWarnings(prev => {
-                const updated = { ...prev };
-                delete updated[index];
-                return updated;
-            });
-            return;
-        }
-
-        try {
-            const result = await checkInventoryAvailability({
-                itemId: itemId,
-                requiredQty: qty,
-            });
-
-            if (!result.isValid) {
-                setInventoryWarnings(prev => ({
-                    ...prev,
-                    [index]: {
-                        available: result.available,
-                        required: qty,
-                        shortage: result.shortage,
-                    }
-                }));
-            } else {
-                // Clear warning if sufficient
-                setInventoryWarnings(prev => {
-                    const updated = { ...prev };
-                    delete updated[index];
-                    return updated;
-                });
-            }
-        } catch (e) {
-            console.error('Failed to check inventory:', e);
-        }
-    }
-
-    // Handle navigation between steps (no full form validation)
-    async function handleNext() {
-        setError(null);
-
-        if (step === 1) {
-            // Validate Step 1: At least one ingredient with valid itemId and qty
-            const inputs = form.getValues('inputs');
-            const hasValidInput = inputs.some(inp => inp.itemId > 0 && inp.qty > 0);
-
-            if (hasValidInput) {
-                setStep(2);
-            } else {
-                setError('Please select at least one ingredient with quantity greater than 0');
-            }
-            return;
-        }
-
-        if (step === 2) {
-            // Validate Step 2: Costs are optional, just proceed
-            setStep(3);
-            return;
-        }
-    }
-
-    // Handle final submission (Step 3 only)
-    async function onSubmit(data: FormValues) {
+    const handleCleaningSubmit = async (data: z.infer<typeof cleaningSchema>) => {
         setIsSubmitting(true);
         setError(null);
         try {
-            const payload = { ...data };
-            if (payload.outputItemId === -1) {
-                payload.outputItemId = 0; // Trigger auto-creation by ID=0 + Name
-            }
-
-            const res = await commitProductionRun({
-                ...payload,
-                status: 'COMPLETED' // Default status
+            const result = await commitProductionRun({
+                date: data.date,
+                type: 'MIXING',
+                inputs: [{ itemId: 1, qty: data.inputQty }], // Placeholder raw material
+                costs: data.operatingCost > 0 ? [{ costType: 'Labor', amount: data.operatingCost }] : [],
+                outputItemId: -1,
+                outputItemName: `Cleaned ${data.fruitType}`,
+                outputQty: data.outputQty,
+                wasteQty: data.wasteQty,
+                wasteReasons: data.wasteReasons,
+                status: 'COMPLETED',
             });
-            if (res.success) {
-                setSuccess(true);
-                setLastRunId(res.runId || null);
-                setLastBatchNumber((res as any).batchNumber || null);
 
-                // Store output info for next stage display
-                if ((res as any).outputs && (res as any).outputs.length > 0) {
-                    setLastOutputQty((res as any).outputs[0].qty);
-                    setLastOutputItemName((res as any).outputs[0].itemName || 'Output');
-                }
-
-                // Load next stage options - for now, just load all stages as options
-                // In a real scenario, we'd determine which stages can follow based on workflow
-                try {
-                    const allStages = await getNextStageOptions(1); // Start with stage 1 as a placeholder
-                    setNextStageOptions(allStages);
-                } catch (err) {
-                    console.error('Failed to load next stages:', err);
-                }
-                // router.push('/production'); // or reset
+            if (result.success) {
+                setLastRunId(result.runId);
+                setPreviousStagData({ outputQty: data.outputQty, itemName: `Cleaned ${data.fruitType}` });
+                setStage(2);
+                mixingForm.setValue('inputQty', data.outputQty);
+                mixingForm.setValue('inputFruitType', `Cleaned ${data.fruitType}`);
+                mixingForm.setValue('outputQty', data.outputQty); // Start with same qty
             } else {
-                setError(res.error || 'Failed to commit run');
+                setError('Failed to complete cleaning stage');
             }
-        } catch (e) {
-            setError('Unexpected error');
+        } catch (err: any) {
+            setError(err.message || 'Error completing cleaning stage');
         } finally {
             setIsSubmitting(false);
         }
-    }
+    };
 
+    const handleMixingSubmit = async (data: z.infer<typeof mixingSchema>) => {
+        setIsSubmitting(true);
+        setError(null);
+        try {
+            // Calculate total input (previous stage output + added ingredients)
+            const totalInputQty = data.inputQty + (data.ingredients.reduce((sum, ing) => sum + ing.qty, 0));
+
+            const result = await commitProductionRun({
+                date: data.date,
+                type: 'MIXING',
+                inputs: [{ itemId: 1, qty: data.inputQty }], // Base input from previous stage
+                costs: data.operatingCost > 0 ? [{ costType: 'Labor', amount: data.operatingCost }] : [],
+                outputItemId: -1,
+                outputItemName: `Mixed ${data.inputFruitType}`,
+                outputQty: data.outputQty,
+                wasteQty: data.wasteQty,
+                wasteReasons: data.wasteReasons,
+                status: 'COMPLETED',
+            });
+
+            if (result.success) {
+                setLastRunId(result.runId);
+                setPreviousStagData({ outputQty: data.outputQty, itemName: `Mixed ${data.inputFruitType}` });
+                setStage(3);
+                sublimationForm.setValue('inputQty', data.outputQty);
+                sublimationForm.setValue('inputFruitType', `Mixed ${data.inputFruitType}`);
+                sublimationForm.setValue('outputQty', Math.round(data.outputQty * 0.15)); // 15% yield estimate
+            } else {
+                setError('Failed to complete mixing stage');
+            }
+        } catch (err: any) {
+            setError(err.message || 'Error completing mixing stage');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleSublimationSubmit = async (data: z.infer<typeof sublimationSchema>) => {
+        setIsSubmitting(true);
+        setError(null);
+        try {
+            const result = await commitProductionRun({
+                date: data.date,
+                type: 'SUBLIMATION',
+                inputs: [{ itemId: 1, qty: data.inputQty }],
+                costs: data.operatingCost > 0 ? [{ costType: 'Energy', amount: data.operatingCost }] : [],
+                outputItemId: -1,
+                outputItemName: `Dried ${data.inputFruitType}`,
+                outputQty: data.outputQty,
+                wasteQty: data.wasteQty,
+                wasteReasons: data.wasteReasons,
+                status: 'COMPLETED',
+            });
+
+            if (result.success) {
+                setLastRunId(result.runId);
+                setSuccess(true);
+            } else {
+                setError('Failed to complete sublimation stage');
+            }
+        } catch (err: any) {
+            setError(err.message || 'Error completing sublimation stage');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    // === SUCCESS SCREEN ===
     if (success) {
         return (
-            <>
-                <div className="flex flex-col items-center justify-center p-12 text-center min-h-screen">
-                    <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4">
-                        <CheckCircle size={32} />
+            <div className="max-w-2xl mx-auto p-8">
+                <div className="text-center space-y-6">
+                    <div className="flex justify-center">
+                        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+                            <CheckCircle size={48} className="text-green-600" />
+                        </div>
                     </div>
-                    <h2 className="text-2xl font-bold text-slate-900">Run Completed!</h2>
-                    <p className="text-slate-500 mt-2">Inventory updated and costs allocated.</p>
+                    <div>
+                        <h2 className="text-3xl font-bold text-slate-900">{t('workflow_complete')}</h2>
+                        <p className="text-slate-500 mt-2">{t('all_stages_finished')}</p>
+                    </div>
 
-                    {/* Output Summary */}
-                    {lastOutputQty && lastOutputItemName && (
-                        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                            <div className="text-sm text-blue-600 font-semibold uppercase">Output</div>
-                            <div className="text-xl font-bold text-blue-900">{lastOutputQty}kg {lastOutputItemName}</div>
-                        </div>
-                    )}
-
-                    {lastBatchNumber && (
-                        <div className="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-lg">
-                            <span className="text-xs font-semibold text-slate-600 block uppercase tracking-wider">Generated Lot Number</span>
-                            <span className="text-lg font-mono font-bold text-slate-900">{lastBatchNumber}</span>
-                        </div>
-                    )}
-
-                    {/* Start Next Stage Section */}
-                    {nextStageOptions.length > 0 && (
-                        <div className="mt-8 w-full max-w-md">
-                            <div className="p-6 bg-amber-50 border border-amber-200 rounded-lg">
-                                <h3 className="text-lg font-semibold text-amber-900 mb-4">Continue to Next Stage?</h3>
-
-                                <div className="space-y-3">
-                                    <div>
-                                        <label className="text-sm font-semibold text-slate-700 block mb-2">Select Stage</label>
-                                        <select
-                                            value={selectedNextStageId || ''}
-                                            onChange={(e) => setSelectedNextStageId(Number(e.target.value))}
-                                            className="w-full p-2 border border-slate-300 rounded-lg text-sm bg-white"
-                                        >
-                                            <option value="">Choose a stage...</option>
-                                            {nextStageOptions.map(stage => (
-                                                <option key={stage.id} value={stage.id}>{stage.name}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label className="text-sm font-semibold text-slate-700 block mb-2">Run Type</label>
-                                        <select
-                                            value={selectedNextType}
-                                            onChange={(e) => setSelectedNextType(e.target.value as 'MIXING' | 'SUBLIMATION')}
-                                            className="w-full p-2 border border-slate-300 rounded-lg text-sm bg-white"
-                                        >
-                                            <option value="MIXING">Mixing (Liquid)</option>
-                                            <option value="SUBLIMATION">Sublimation (Freeze Dry)</option>
-                                        </select>
-                                    </div>
-
-                                    <button
-                                        onClick={handleStartNextStage}
-                                        disabled={!selectedNextStageId || isStartingNextStage}
-                                        className="w-full mt-4 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:bg-slate-300 font-semibold transition flex items-center justify-center gap-2"
-                                    >
-                                        {isStartingNextStage && <Loader2 className="animate-spin" size={18} />}
-                                        Start Stage 2
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="flex gap-3 mt-8">
-                        {lastRunId && (
+                    {lastRunId && (
+                        <div className="flex gap-3 justify-center mt-8">
                             <button
                                 onClick={() => setShowChain(true)}
-                                className="px-6 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700"
+                                className="px-6 py-3 bg-slate-600 text-white rounded-lg hover:bg-slate-700 font-semibold"
                             >
-                                View Production Chain
+                                {t('view_chain')}
                             </button>
-                        )}
-                        <button
-                            onClick={() => window.location.reload()}
-                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                        >
-                            Start New Run
-                        </button>
-                    </div>
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
+                            >
+                                {t('start_new_workflow')}
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Production Chain Modal */}
                 {showChain && lastRunId && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[80vh] overflow-hidden flex flex-col">
-                            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
-                                <h2 className="text-xl font-semibold text-slate-900">Production Chain</h2>
-                                <button
-                                    onClick={() => setShowChain(false)}
-                                    className="text-slate-400 hover:text-slate-600"
-                                >
-                                    <X size={24} />
-                                </button>
-                            </div>
-                            <div className="flex-1 overflow-auto p-6">
-                                <ProductionChainTree runId={lastRunId} />
-                            </div>
+                        <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[80vh] overflow-auto p-6">
+                            <h2 className="text-2xl font-bold text-slate-900 mb-4">{t('production_chain')}</h2>
+                            <ProductionChainTree runId={lastRunId} />
+                            <button
+                                onClick={() => setShowChain(false)}
+                                className="mt-4 px-4 py-2 bg-slate-200 text-slate-900 rounded hover:bg-slate-300"
+                            >
+                                Close
+                            </button>
                         </div>
                     </div>
                 )}
-            </>
-        )
+            </div>
+        );
     }
 
+    // === WORKFLOW PROGRESS ===
     return (
-        <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+        <div className="max-w-4xl mx-auto p-8">
+            {/* Progress Bar */}
+            <div className="mb-12">
+                <div className="flex items-center justify-between mb-4">
+                    {Object.entries(STAGES).map(([stageNum, stageConfig]) => {
+                        const stageId = parseInt(stageNum) as 1 | 2 | 3;
+                        const isActive = stage === stageId;
+                        const isCompleted = stage > stageId;
 
-            {/* Sidebar / Steps */}
-            <div className="w-full md:w-64 bg-slate-50 border-r border-slate-200 p-6 flex flex-col gap-6">
-                <h1 className="font-bold text-xl text-slate-800 flex items-center gap-2">
-                    <Beaker size={24} className="text-blue-600" />
-                    Production
-                </h1>
-
-                <div className="space-y-1">
-                    <StepIndicator step={1} current={step} label="Ingredients" icon={<Scale size={16} />} />
-                    <StepIndicator step={2} current={step} label="Operations" icon={<Zap size={16} />} />
-                    <StepIndicator step={3} current={step} label="Output & Yield" icon={<CheckCircle size={16} />} />
+                        return (
+                            <div key={stageId} className="flex items-center flex-1">
+                                <div
+                                    className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition ${
+                                        isActive
+                                            ? 'bg-blue-600 text-white'
+                                            : isCompleted
+                                            ? 'bg-green-100 text-green-600'
+                                            : 'bg-slate-200 text-slate-600'
+                                    }`}
+                                >
+                                    {isCompleted ? '✓' : stageConfig.icon}
+                                </div>
+                                <div className="ml-4">
+                                    <div className="font-semibold text-slate-900">{stageConfig.title}</div>
+                                    <div className="text-sm text-slate-500">{stageConfig.description}</div>
+                                </div>
+                                {stageId < 3 && <ChevronRight className="ml-auto text-slate-300" />}
+                            </div>
+                        );
+                    })}
                 </div>
-
-                <div className="mt-auto pt-6 border-t border-slate-200 text-xs text-slate-400">
-                    Run Type: <span className="font-semibold text-slate-600">{form.watch('type')}</span>
-                </div>
-
-                <select
-                    {...form.register('type')}
-                    className="w-full px-3 py-2 border rounded text-sm bg-white"
-                >
-                    <option value="MIXING">Mixing (Liquid)</option>
-                    <option value="SUBLIMATION">Sublimation (Freeze Dry)</option>
-                </select>
             </div>
 
-            {/* Main Content */}
-            <div className="flex-1 p-8 flex flex-col">
-                <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 flex flex-col">
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-lg border border-red-100">
-                            {error}
+            {error && (
+                <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-lg border border-red-200">
+                    {error}
+                </div>
+            )}
+
+            {/* Stage 1: Cleaning */}
+            {stage === 1 && (
+                <form onSubmit={cleaningForm.handleSubmit(handleCleaningSubmit)} className="space-y-8 bg-white rounded-xl p-8 border border-slate-200">
+                    <div>
+                        <h2 className="text-2xl font-bold text-slate-900 mb-2">{t('stage_1_cleaning')}</h2>
+                        <p className="text-slate-500">{t('stage_1_description')}</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">{t('fruit_type')}</label>
+                            <select
+                                {...cleaningForm.register('fruitType')}
+                                className="w-full p-3 border rounded-lg bg-white"
+                            >
+                                <option value="apple">Apple</option>
+                                <option value="banana">Banana</option>
+                                <option value="mango">Mango</option>
+                                <option value="strawberry">Strawberry</option>
+                                <option value="orange">Orange</option>
+                            </select>
                         </div>
-                    )}
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">{t('input_qty_kg')}</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                {...cleaningForm.register('inputQty')}
+                                className="w-full p-3 border rounded-lg"
+                                placeholder="100"
+                            />
+                        </div>
+                    </div>
 
-                    {step === 1 && (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                            <h2 className="text-2xl font-bold text-slate-900">Step 1: Ingredients</h2>
-                            <p className="text-slate-500">Select raw materials and actual quantities added.</p>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="text-sm text-blue-700 font-semibold mb-2">{t('expected_yield_guidance')}</div>
+                        <div className="text-blue-600">
+                            {cleaningForm.getValues('fruitType') && FRUIT_YIELDS[cleaningForm.getValues('fruitType') as keyof typeof FRUIT_YIELDS]
+                                ? `${cleaningForm.getValues('fruitType')}: ~${(FRUIT_YIELDS[cleaningForm.getValues('fruitType') as keyof typeof FRUIT_YIELDS].cleaning * 100).toFixed(0)}%`
+                                : 'Select fruit type for guidance'}
+                        </div>
+                    </div>
 
-                            <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
-                                {inputFields.map((field, index) => (
-                                    <div key={field.id} className="space-y-2">
-                                        <div className="flex gap-4 items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                            <div className="flex-[3]">
-                                                <label className="text-xs font-semibold text-slate-500 mb-1 block">Item</label>
-                                                <select
-                                                    {...form.register(`inputs.${index}.itemId`)}
-                                                    className="w-full p-2 border rounded bg-white text-sm"
-                                                    onChange={(e) => {
-                                                        form.setValue(`inputs.${index}.itemId`, Number(e.target.value));
-                                                        checkInputAvailability(index);
-                                                    }}
-                                                >
-                                                    <option value="0">Select Ingredient</option>
-                                                    {rawMaterials.map(i => (
-                                                        <option key={i.id} value={i.id}>{getItemClassIcon(i.itemClass)} {i.name} ({i.sku})</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                            <div className="flex-1">
-                                                <label className="text-xs font-semibold text-slate-500 mb-1 block">Qty (kg)</label>
-                                                <input
-                                                    type="number" step="0.001"
-                                                    {...form.register(`inputs.${index}.qty`)}
-                                                    className="w-full p-2 border rounded text-sm"
-                                                    onBlur={() => checkInputAvailability(index)}
-                                                />
-                                            </div>
-                                            <button type="button" onClick={() => removeInput(index)} className="mt-5 text-slate-400 hover:text-red-500 px-2">
-                                                &times;
-                                            </button>
-                                        </div>
-
-                                        {/* WIP Item Warning */}
-                                        {field.itemId > 0 && rawMaterials.find(i => i.id === field.itemId)?.itemClass === 'WIP' && (
-                                            <div className="mt-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg text-sm">
-                                                <div className="flex items-center gap-2 text-blue-700">
-                                                    <span className="font-semibold">🏭 WIP Item Selected</span>
-                                                </div>
-                                                <div className="mt-1 text-blue-600 text-xs">
-                                                    This item is manufactured. Using inventory from previous production runs.
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {inventoryWarnings[index] && (
-                                            <div className="px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg text-sm">
-                                                <div className="flex items-center gap-2 text-amber-700">
-                                                    <span className="font-semibold">⚠️ Insufficient Inventory</span>
-                                                </div>
-                                                <div className="mt-1 text-amber-600 text-xs">
-                                                    Available: {inventoryWarnings[index].available.toFixed(2)} kg |
-                                                    Required: {inventoryWarnings[index].required.toFixed(2)} kg |
-                                                    Short by: {inventoryWarnings[index].shortage.toFixed(2)} kg
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                                <button
-                                    type="button"
-                                    onClick={() => appendInput({ itemId: 0, qty: 0 })}
-                                    className="text-sm text-blue-600 font-medium hover:underline flex items-center gap-1"
-                                >
-                                    + Add Ingredient
-                                </button>
+                    <div className="grid grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">{t('output_qty_kg')}</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                {...cleaningForm.register('outputQty')}
+                                className="w-full p-3 border rounded-lg"
+                                placeholder="95"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">{t('waste_qty_kg')}</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                {...cleaningForm.register('wasteQty')}
+                                className="w-full p-3 border rounded-lg bg-slate-50"
+                                disabled
+                                placeholder="0"
+                            />
+                            <div className="text-xs text-slate-500 mt-1">
+                                Auto-calculated: {cleaningForm.watch('inputQty') - cleaningForm.watch('outputQty')}kg
                             </div>
                         </div>
-                    )}
+                    </div>
 
-                    {step === 2 && (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                            <h2 className="text-2xl font-bold text-slate-900">Step 2: Operations Cost</h2>
-                            <p className="text-slate-500">Enter operational overheads (Labor, Electricity).</p>
-
-                            <div className="space-y-3">
-                                {costFields.map((field, index) => (
-                                    <div key={field.id} className="flex gap-4 items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                        <div className="flex-[2]">
-                                            <label className="text-xs font-semibold text-slate-500 mb-1 block">Cost Type</label>
-                                            <input
-                                                {...form.register(`costs.${index}.costType`)}
-                                                className="w-full p-2 border rounded text-sm"
-                                                placeholder="e.g. Labor"
-                                            />
-                                        </div>
-                                        <div className="flex-1">
-                                            <label className="text-xs font-semibold text-slate-500 mb-1 block">Amount (UZS)</label>
-                                            <input
-                                                type="number"
-                                                {...form.register(`costs.${index}.amount`)}
-                                                className="w-full p-2 border rounded text-sm"
-                                            />
-                                        </div>
-                                        <button type="button" onClick={() => removeCost(index)} className="mt-5 text-slate-400 hover:text-red-500 px-2">
-                                            &times;
-                                        </button>
-                                    </div>
-                                ))}
-                                <button
-                                    type="button"
-                                    onClick={() => appendCost({ costType: '', amount: 0 })}
-                                    className="text-sm text-blue-600 font-medium hover:underline flex items-center gap-1"
-                                >
-                                    + Add Cost
-                                </button>
-                            </div>
+                    <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-3">{t('waste_reasons')}</label>
+                        <div className="space-y-2">
+                            {['trimming', 'contamination', 'spoilage'].map((reason) => (
+                                <label key={reason} className="flex items-center p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        value={reason}
+                                        {...cleaningForm.register('wasteReasons')}
+                                        className="rounded w-4 h-4"
+                                    />
+                                    <span className="ml-3 text-slate-700">
+                                        {reason === 'trimming' && '✂️ Trimming/Peeling'}
+                                        {reason === 'contamination' && '🌿 Contamination'}
+                                        {reason === 'spoilage' && '🍂 Spoilage'}
+                                    </span>
+                                </label>
+                            ))}
                         </div>
-                    )}
+                    </div>
 
-                    {step === 3 && (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                            <h2 className="text-2xl font-bold text-slate-900">Step 3: Output & Waste Recording</h2>
-                            <p className="text-slate-500">Record waste and calculate final output</p>
+                    <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">{t('operating_cost_uzs')}</label>
+                        <input
+                            type="number"
+                            step="1"
+                            {...cleaningForm.register('operatingCost')}
+                            className="w-full p-3 border rounded-lg"
+                            placeholder="Labor cost (optional)"
+                        />
+                    </div>
 
-                            {/* Output Item Selection */}
-                            <div className="bg-slate-50 p-6 rounded-xl border border-slate-100">
-                                <div className="flex justify-between items-center mb-2">
-                                    <label className="text-sm font-semibold text-slate-700 block">WIP Item</label>
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-400 font-semibold flex items-center justify-center gap-2"
+                    >
+                        {isSubmitting && <Loader2 className="animate-spin" size={18} />}
+                        {t('complete_stage')} <ArrowRight size={18} />
+                    </button>
+                </form>
+            )}
+
+            {/* Stage 2: Mixing */}
+            {stage === 2 && (
+                <form onSubmit={mixingForm.handleSubmit(handleMixingSubmit)} className="space-y-8 bg-white rounded-xl p-8 border border-slate-200">
+                    <div>
+                        <h2 className="text-2xl font-bold text-slate-900 mb-2">{t('stage_2_mixing')}</h2>
+                        <p className="text-slate-500">{t('stage_2_description')}</p>
+                    </div>
+
+                    {/* Input from previous stage (read-only) */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="text-sm text-blue-700 font-semibold mb-2">🔗 {t('input_from_previous')}</div>
+                        <div className="text-lg font-bold text-blue-900">
+                            {mixingForm.watch('inputQty')}kg {mixingForm.watch('inputFruitType')}
+                        </div>
+                    </div>
+
+                    {/* Additional ingredients */}
+                    <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-3">{t('add_ingredients')}</label>
+                        <div className="space-y-3">
+                            {mixingForm.watch('ingredients').map((_, index) => (
+                                <div key={index} className="flex gap-3">
+                                    <select
+                                        {...mixingForm.register(`ingredients.${index}.itemId`)}
+                                        className="flex-1 p-3 border rounded-lg"
+                                    >
+                                        <option value="">Select ingredient</option>
+                                        {finishedGoods.map((item) => (
+                                            <option key={item.id} value={item.id}>
+                                                {item.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="Qty"
+                                        {...mixingForm.register(`ingredients.${index}.qty`)}
+                                        className="w-24 p-3 border rounded-lg"
+                                    />
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            const current = form.getValues('outputItemId');
-                                            if (current === -1) {
-                                                form.setValue('outputItemId', 0);
-                                            } else {
-                                                form.setValue('outputItemId', -1);
-                                            }
+                                            const current = mixingForm.getValues('ingredients');
+                                            mixingForm.setValue('ingredients', current.filter((_, i) => i !== index));
                                         }}
-                                        className="text-xs text-blue-600 font-medium hover:underline"
+                                        className="text-red-600 hover:text-red-700 font-bold"
                                     >
-                                        {form.watch('outputItemId') === -1 ? 'Select Existing' : '+ Create New Item'}
+                                        ×
                                     </button>
                                 </div>
-
-                                {form.watch('outputItemId') === -1 ? (
-                                    <input
-                                        {...form.register('outputItemName')}
-                                        className="w-full p-3 border rounded-lg text-lg bg-white"
-                                        placeholder="Enter New WIP Item Name"
-                                        autoFocus
-                                    />
-                                ) : (
-                                    <select
-                                        {...form.register('outputItemId')}
-                                        className="w-full p-3 border rounded-lg text-lg bg-white"
-                                    >
-                                        <option value="0">Select Output Product</option>
-                                        {finishedGoods.map(i => (
-                                            <option key={i.id} value={i.id}>{i.name} ({i.sku})</option>
-                                        ))}
-                                    </select>
-                                )}
-                            </div>
-
-                            {/* Waste Scale Widget */}
-                            <WasteScaleWidget
-                                inputQty={totalInputQty}
-                                expectedWastePercent={form.watch('type') === 'SUBLIMATION' ? 85 : 5}
-                                onWasteStateChange={handleWasteChange}
-                            />
+                            ))}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const current = mixingForm.getValues('ingredients');
+                                    mixingForm.setValue('ingredients', [...current, { itemId: 0, qty: 0 }]);
+                                }}
+                                className="text-blue-600 hover:text-blue-700 font-semibold text-sm"
+                            >
+                                + {t('add_ingredient')}
+                            </button>
                         </div>
-                    )}
-
-                    {/* Navigation Buttons */}
-                    <div className="mt-auto pt-8 flex justify-between">
-                        {step > 1 ? (
-                            <button
-                                type="button"
-                                onClick={() => setStep(step - 1)}
-                                className="px-6 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-lg transition"
-                            >
-                                Back
-                            </button>
-                        ) : <div></div>}
-
-                        {step < 3 ? (
-                            <button
-                                type="button"
-                                onClick={handleNext}
-                                className="flex items-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold shadow-lg shadow-blue-200 transition transform active:scale-95"
-                            >
-                                Next Step
-                                <ArrowRight size={18} />
-                            </button>
-                        ) : (
-                            <button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="flex items-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold shadow-lg shadow-blue-200 transition transform active:scale-95"
-                            >
-                                {isSubmitting && <Loader2 className="animate-spin" />}
-                                Commit Run
-                            </button>
-                        )}
                     </div>
 
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div className="text-sm text-green-700 font-semibold">{t('expected_yield_mixing')}</div>
+                        <div className="text-green-600 text-sm">100% {t('no_waste_expected')}</div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">{t('output_qty_kg')}</label>
+                        <input
+                            type="number"
+                            step="0.01"
+                            {...mixingForm.register('outputQty')}
+                            className="w-full p-3 border rounded-lg"
+                            placeholder="100"
+                        />
+                        <div className="text-xs text-slate-500 mt-1">
+                            {t('estimated')}: {mixingForm.watch('inputQty') + (mixingForm.watch('ingredients').reduce((sum, ing) => sum + ing.qty, 0))}kg
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">{t('operating_cost_uzs')}</label>
+                        <input
+                            type="number"
+                            step="1"
+                            {...mixingForm.register('operatingCost')}
+                            className="w-full p-3 border rounded-lg"
+                            placeholder="Labor/equipment cost (optional)"
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-400 font-semibold flex items-center justify-center gap-2"
+                    >
+                        {isSubmitting && <Loader2 className="animate-spin" size={18} />}
+                        {t('complete_stage')} <ArrowRight size={18} />
+                    </button>
                 </form>
-            </div>
+            )}
+
+            {/* Stage 3: Sublimation */}
+            {stage === 3 && (
+                <form onSubmit={sublimationForm.handleSubmit(handleSublimationSubmit)} className="space-y-8 bg-white rounded-xl p-8 border border-slate-200">
+                    <div>
+                        <h2 className="text-2xl font-bold text-slate-900 mb-2">{t('stage_3_sublimation')}</h2>
+                        <p className="text-slate-500">{t('stage_3_description')}</p>
+                    </div>
+
+                    {/* Input from previous stage (read-only) */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="text-sm text-blue-700 font-semibold mb-2">🔗 {t('input_from_previous')}</div>
+                        <div className="text-lg font-bold text-blue-900">
+                            {sublimationForm.watch('inputQty')}kg {sublimationForm.watch('inputFruitType')}
+                        </div>
+                    </div>
+
+                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                        <div className="text-sm text-slate-700 font-semibold mb-2">❄️ {t('freeze_drying_params')}</div>
+                        <div className="space-y-2 text-slate-600 text-sm">
+                            <div>🌡️ Temperature: -65°C (standard)</div>
+                            <div>⏱️ Duration: {sublimationForm.watch('durationHours')} hours</div>
+                        </div>
+                    </div>
+
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                        <div className="text-sm text-amber-700 font-semibold mb-2">{t('expected_yield_guidance')}</div>
+                        <div className="text-amber-600">
+                            {sublimationForm.getValues('inputFruitType') && sublimationForm.getValues('inputFruitType').includes('Apple')
+                                ? `Apple: ~15% ${t('yield_guidance')}`
+                                : 'Varies by fruit type'}
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">{t('duration_hours')}</label>
+                            <input
+                                type="number"
+                                min="1"
+                                max="24"
+                                {...sublimationForm.register('durationHours')}
+                                className="w-full p-3 border rounded-lg"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">{t('output_qty_kg')}</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                {...sublimationForm.register('outputQty')}
+                                className="w-full p-3 border rounded-lg"
+                                placeholder="15"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">{t('waste_qty_kg')}</label>
+                        <input
+                            type="number"
+                            step="0.01"
+                            {...sublimationForm.register('wasteQty')}
+                            className="w-full p-3 border rounded-lg bg-slate-50"
+                            disabled
+                        />
+                        <div className="text-xs text-slate-500 mt-1">
+                            Auto-calculated: {sublimationForm.watch('inputQty') - sublimationForm.watch('outputQty')}kg
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-3">{t('waste_reasons')}</label>
+                        <div className="space-y-2">
+                            {['spillage', 'moisture_loss'].map((reason) => (
+                                <label key={reason} className="flex items-center p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        value={reason}
+                                        {...sublimationForm.register('wasteReasons')}
+                                        className="rounded w-4 h-4"
+                                    />
+                                    <span className="ml-3 text-slate-700">
+                                        {reason === 'spillage' && '💧 Spillage/Evaporation'}
+                                        {reason === 'moisture_loss' && '💨 Moisture Loss'}
+                                    </span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">{t('operating_cost_uzs')}</label>
+                        <input
+                            type="number"
+                            step="1"
+                            {...sublimationForm.register('operatingCost')}
+                            className="w-full p-3 border rounded-lg"
+                            placeholder="Energy/maintenance cost (optional)"
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-slate-400 font-semibold flex items-center justify-center gap-2"
+                    >
+                        {isSubmitting && <Loader2 className="animate-spin" size={18} />}
+                        {t('finish_workflow')}
+                    </button>
+                </form>
+            )}
         </div>
     );
-}
-
-function StepIndicator({ step, current, label, icon }: { step: number, current: number, label: string, icon: React.ReactNode }) {
-    const isActive = step === current;
-    const isCompleted = step < current;
-
-    return (
-        <div className={`flex items-center gap-3 p-3 rounded-lg transition ${isActive ? 'bg-white border border-blue-100 shadow-sm' : 'text-slate-400'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition
-                ${isActive ? 'bg-blue-600 text-white' : isCompleted ? 'bg-green-100 text-green-600' : 'bg-slate-200 text-slate-500'}
-            `}>
-                {isCompleted ? <CheckCircle size={14} /> : step}
-            </div>
-            <div className={`text-sm font-medium ${isActive ? 'text-slate-900' : ''}`}>{label}</div>
-        </div>
-    )
 }
