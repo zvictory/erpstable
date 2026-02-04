@@ -132,6 +132,19 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
         let outputQty = 0;
         let outputItemName = '';
 
+        // VALIDATE: All input items exist in database
+        console.log('Validating input items:', val.inputs);
+        for (const input of val.inputs) {
+            const inputItem = await db.query.items.findFirst({
+                where: eq(items.id, input.itemId),
+                columns: { id: true, name: true }
+            });
+            if (!inputItem) {
+                throw new Error(`Input item #${input.itemId} does not exist in database. Please create the item first.`);
+            }
+            console.log(`✓ Input item exists: ${inputItem.name} (ID: ${inputItem.id})`);
+        }
+
         await db.transaction(async (tx: any) => {
             // 0. Handle Item Auto-Creation
             if (finalOutputItemId === 0 && val.outputItemName) {
@@ -156,12 +169,16 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
                 throw new Error("Valid Output Item ID or Name required");
             }
 
+            if (!destinationLocationId) {
+                throw new Error('No destination location available. Cannot create production run without a warehouse location.');
+            }
+
             const [run] = await tx.insert(productionRuns).values({
                 date: val.date,
                 type: val.type,
                 status: 'COMPLETED', // Auto-complete for now given the prompt context of "commit"
                 notes: val.notes,
-                destinationLocationId, // Set the destination location
+                destinationLocationId: destinationLocationId, // Explicitly set, never undefined
             }).returning();
 
             runId = run.id;
@@ -374,7 +391,10 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
         };
     } catch (error: any) {
         console.error('Commit Production Error:', error);
-        return { success: false, error: error.message || 'Failed to commit production run' };
+        const errorMsg = error.message || 'Failed to commit production run';
+        const fullError = `${errorMsg}\n\nDetails: ${error.toString()}\n\nData: fruitItemId=${data.fruitItemId}, outputQty=${data.outputQty}, destinationLocationId=${destinationLocationId}`;
+        console.error('Full error context:', fullError);
+        return { success: false, error: fullError };
     }
 }
 
