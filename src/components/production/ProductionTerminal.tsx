@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -155,6 +155,33 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
             operatingCost: 500,
         },
     });
+
+    // Auto-calculate output quantity in Cleaning stage based on fruit yield
+    useEffect(() => {
+        const subscription = cleaningForm.watch((data) => {
+            const inputQty = data.inputQty;
+            const fruitName = data.fruitItemName;
+
+            if (inputQty && inputQty > 0 && fruitName) {
+                const yieldGuidance = getYieldGuidance(fruitName);
+                if (yieldGuidance) {
+                    // Calculate output based on cleaning yield percentage
+                    const calculatedOutput = Number((inputQty * yieldGuidance.cleaning).toFixed(2));
+                    const calculatedWaste = Number((inputQty - calculatedOutput).toFixed(2));
+
+                    // Only update if user hasn't manually changed the output
+                    // (We check if outputQty equals a previously calculated value)
+                    const currentOutput = cleaningForm.getValues('outputQty');
+                    const currentWaste = cleaningForm.getValues('wasteQty');
+
+                    // Update waste automatically based on input - output
+                    cleaningForm.setValue('wasteQty', calculatedWaste, { shouldValidate: false });
+                }
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, [cleaningForm]);
 
     const handleCleaningSubmit = async (data: z.infer<typeof cleaningSchema>) => {
         setIsSubmitting(true);
@@ -449,7 +476,18 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
 
                     <div className="grid grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">{t('output_qty_kg')}</label>
+                            <div className="flex items-center gap-2 mb-2">
+                                <label className="block text-sm font-semibold text-slate-700">{t('output_qty_kg')}</label>
+                                {(() => {
+                                    const fruitName = cleaningForm.getValues('fruitItemName');
+                                    const inputQty = cleaningForm.getValues('inputQty');
+                                    const yieldGuidance = getYieldGuidance(fruitName);
+                                    if (inputQty && yieldGuidance) {
+                                        return <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">(Auto)</span>;
+                                    }
+                                    return null;
+                                })()}
+                            </div>
                             <input
                                 type="number"
                                 step="0.01"
@@ -457,6 +495,20 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
                                 className="w-full p-3 border rounded-lg"
                                 placeholder="95"
                             />
+                            {(() => {
+                                const fruitName = cleaningForm.getValues('fruitItemName');
+                                const inputQty = cleaningForm.getValues('inputQty');
+                                const yieldGuidance = getYieldGuidance(fruitName);
+                                if (inputQty && yieldGuidance) {
+                                    const calculatedOutput = (inputQty * yieldGuidance.cleaning).toFixed(2);
+                                    return (
+                                        <div className="text-xs text-blue-600 mt-1">
+                                            Calculated: {calculatedOutput}kg ({(yieldGuidance.cleaning * 100).toFixed(0)}% of {inputQty}kg)
+                                        </div>
+                                    );
+                                }
+                                return null;
+                            })()}
                         </div>
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-2">{t('waste_qty_kg')}</label>
@@ -469,7 +521,7 @@ export default function ProductionTerminal({ rawMaterials, finishedGoods }: Prod
                                 placeholder="0"
                             />
                             <div className="text-xs text-slate-500 mt-1">
-                                Auto-calculated: {cleaningForm.watch('inputQty') - cleaningForm.watch('outputQty')}kg
+                                Auto-calculated: {Number((cleaningForm.watch('inputQty') - cleaningForm.watch('outputQty')).toFixed(2))}kg
                             </div>
                         </div>
                     </div>

@@ -161,9 +161,11 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
             console.log(`✓ Input item exists: ${inputItem.name} (ID: ${inputItem.id})`);
         }
 
-        await db.transaction(async (tx: any) => {
+        try {
+            await db.transaction(async (tx: any) => {
             // 0. Handle Item Auto-Creation
-            if (finalOutputItemId === 0 && val.outputItemName) {
+            // Check for both 0 and -1 (component uses -1 to signal auto-creation)
+            if ((finalOutputItemId === 0 || finalOutputItemId === -1) && val.outputItemName) {
                 // Auto-create WIP Item
                 const [newItem] = await tx.insert(items).values({
                     name: val.outputItemName,
@@ -181,7 +183,8 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
                 console.log(`✨ Auto-created Finished Good: ${val.outputItemName} (ID: ${finalOutputItemId})`);
             }
 
-            if (!finalOutputItemId || finalOutputItemId === 0) {
+            // Ensure we have a valid output item ID after auto-creation
+            if (!finalOutputItemId || finalOutputItemId === 0 || finalOutputItemId === -1) {
                 throw new Error("Valid Output Item ID or Name required");
             }
 
@@ -376,7 +379,26 @@ export async function commitProductionRun(data: z.infer<typeof productionRunSche
                     description: `Overhead Applied Run #${run.id}`
                 });
             }
-        });
+            });
+        } catch (txError: any) {
+            console.error('❌ TRANSACTION ERROR:', txError);
+
+            // Check for foreign key constraint errors
+            if (txError.message && txError.message.includes('FOREIGN KEY')) {
+                throw new Error(
+                    `❌ DATABASE REFERENCE ERROR: A record referenced in the production run does not exist.\n\n` +
+                    `This usually means:\n` +
+                    `1. An input item was deleted\n` +
+                    `2. A warehouse location was deleted\n` +
+                    `3. Database tables are out of sync\n\n` +
+                    `Details: ${txError.message}\n\n` +
+                    `Solution: Refresh the page, verify all items and locations exist, then try again.`
+                );
+            }
+
+            // Re-throw other errors
+            throw txError;
+        }
 
         // QC workflow disabled - inspection generation skipped
         // Production output is auto-available (qcStatus: NOT_REQUIRED)
